@@ -42,7 +42,9 @@
     box-shadow: var(--shadow);
     display: flex; align-items: center; gap: 13px; padding: 12px 16px;
   }
-  .plaque img { width: 92px; height: 92px; flex: none; margin: -12px 0 -12px -6px; }
+  /* 스티커 물성(판과 동일 처방): 카드 리듬 안에 앉히고(음수마진 제거) 그림자로 종이에 붙인다 */
+  .plaque img { width: 80px; height: 80px; flex: none; object-fit: contain;
+    margin: -6px 0; filter: drop-shadow(0 1.5px 3px rgba(30, 28, 20, .28)); }
   .plaque h1 { font-size: 24px; font-weight: 900; letter-spacing: -0.6px; line-height: 1.2; color: var(--navy); }
   /* 포춘쿠키 — 누르면 🥠이 반으로 쪼개지며 쪽지가 나온다 (이모지 반쪽 clip-path 트릭, 의존성 0) */
   .cookie {
@@ -112,9 +114,10 @@
   }
   /* 기은센의 말풍선 — 오늘의 한마디 */
   .bubble {
-    position: relative; display: inline-block; margin-top: 7px;
+    position: relative; display: inline-block; margin-top: 6px;
     background: #FFFFFF; border: 1.5px solid var(--navy); border-radius: 11px;
     padding: 7px 12px; font-size: 13px; font-weight: 700; color: var(--ink); line-height: 1.45;
+    box-shadow: 0 1px 2px rgba(30, 28, 20, .08);
   }
   .bubble::before {
     content: ""; position: absolute; left: -4.5px; top: 14px; width: 7px; height: 7px;
