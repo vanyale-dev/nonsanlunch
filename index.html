@@ -665,14 +665,17 @@ function renderLunchWx(w) {
   if (idx.length < 3) return;
   const temps = idx.map(i => H.temperature_2m[i]);
   const pops = idx.map(i => H.precipitation_probability[i] || 0);
-  const maxT = Math.max(...temps), minT = Math.min(...temps), maxP = Math.max(...pops);
+  // 판단은 체감온도(습도·바람·일사 반영) 기준 — 없으면 기온으로 폴백
+  const feels = (H.apparent_temperature || H.temperature_2m);
+  const apps = idx.map(i => feels[i]);
+  const maxT = Math.max(...apps), minT = Math.min(...apps), maxP = Math.max(...pops);
   const firstRain = idx.find(i => (H.precipitation_probability[i] || 0) >= 50);
   const rainH = firstRain !== undefined ? parseInt(H.time[firstRain].split("T")[1], 10) : null;
   // 판단문 — 우선순위: 비 > 폭염 > 한파 > 쌀쌀 > 쾌적 (메뉴·동선·준비물 결정 축)
   let advice;
   if (maxP >= 60) advice = "☔ 우산 꼭 챙기세요 — " + (rainH !== null ? rainH + "시부터 " : "") + "비 예보예요. 뜨끈한 국물 어때요?";
   else if (maxP >= 30) advice = "🌂 비 확률 " + maxP + "% — 우산 하나 챙겨두면 안심이에요";
-  else if (maxT >= 32) advice = "🥵 한낮 " + Math.round(maxT) + "° — 가까운 데서 시원한 걸로 드세요";
+  else if (maxT >= 32) advice = "🥵 체감 " + Math.round(maxT) + "° — 가까운 데서 시원한 걸로 드세요";
   else if (minT <= -5) advice = "🥶 꽁꽁 어는 날 — 차 타고, 뜨끈한 국물로";
   else if (minT <= 3) advice = "🧤 쌀쌀해요 — 따뜻하게 입고 나가세요";
   else advice = "😌 걷기 좋은 날씨예요 — 슬슬 걸어가도 좋겠어요";
@@ -689,7 +692,7 @@ function renderLunchWx(w) {
   document.getElementById("lunchWx").hidden = false;
 }
 if (NET_ON) {
-  fetch("https://api.open-meteo.com/v1/forecast?latitude=36.199&longitude=127.089&current=temperature_2m,precipitation,weather_code&hourly=temperature_2m,precipitation_probability,weather_code&timezone=Asia%2FSeoul&forecast_days=2")
+  fetch("https://api.open-meteo.com/v1/forecast?latitude=36.199&longitude=127.089&current=temperature_2m,precipitation,weather_code&hourly=temperature_2m,apparent_temperature,precipitation_probability,weather_code&timezone=Asia%2FSeoul&forecast_days=2")
     .then(r => r.json())
     .then(w => {
       window.WEATHER = w;
