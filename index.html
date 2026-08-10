@@ -672,11 +672,12 @@ function renderLunchWx(w) {
   let advice;
   if (maxP >= 60) advice = "☔ 우산 꼭 챙기세요 — " + (rainH !== null ? rainH + "시부터 " : "") + "비 예보예요. 뜨끈한 국물 어때요?";
   else if (maxP >= 30) advice = "🌂 비 확률 " + maxP + "% — 우산 하나 챙겨두면 안심이에요";
-  else if (maxT >= 32) advice = "🥵 한낮 " + Math.round(maxT) + "° — 가까운 창구나 시원한 메뉴 추천";
+  else if (maxT >= 32) advice = "🥵 한낮 " + Math.round(maxT) + "° — 가까운 데서 시원한 걸로 드세요";
   else if (minT <= -5) advice = "🥶 꽁꽁 어는 날 — 차 타고, 뜨끈한 국물로";
   else if (minT <= 3) advice = "🧤 쌀쌀해요 — 따뜻하게 입고 나가세요";
-  else advice = "😌 걷기 좋은 날씨예요 — 도보 창구도 좋아요";
-  document.getElementById("wxDay").textContent = (useTomorrow ? "내일" : "오늘") + " 점심 10~14시";
+  else advice = "😌 걷기 좋은 날씨예요 — 슬슬 걸어가도 좋겠어요";
+  document.getElementById("wxDay").textContent =
+    (useTomorrow ? "내일" : "오늘") + "(" + (base.getMonth() + 1) + "/" + base.getDate() + ") 점심 10~14시";
   document.getElementById("wxAdvice").textContent = advice;
   document.getElementById("wxStrip").innerHTML = idx.map(i => {
     const hh = parseInt(H.time[i].split("T")[1], 10);
