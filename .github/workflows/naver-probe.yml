@@ -1,0 +1,41 @@
+name: naver-probe
+# 임시 프로브 — GitHub Actions 러너(Azure IP)에서 네이버 플레이스(pcmap/m.place) 접근 가능 여부 실측.
+# 결과 확인 후 삭제 예정. 수동 트리거 전용.
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: probe naver place
+        run: |
+          pip install -q "curl_cffi>=0.15.0"
+          python - <<'PY'
+          from curl_cffi import requests as r
+          import re, json
+          results = {}
+          # 1) 모바일 플레이스 홈 (유지보수 봇 경로)
+          try:
+              h = r.get("https://m.place.naver.com/restaurant/1011885460/home",
+                        impersonate="safari", timeout=20)
+              apollo = "window.__APOLLO_STATE__" in h.text
+              results["m.place home"] = f"{h.status_code} apollo={apollo} len={len(h.text)}"
+          except Exception as e:
+              results["m.place home"] = f"FAIL {type(e).__name__}: {str(e)[:80]}"
+          # 2) pcmap 검색 (새로오픈 봇 경로)
+          try:
+              h = r.get("https://pcmap.place.naver.com/restaurant/list?query=%EB%85%BC%EC%82%B0%20%EC%8B%9D%EB%8B%B9",
+                        impersonate="safari", timeout=20)
+              has_open = "newOpening" in h.text
+              results["pcmap list"] = f"{h.status_code} newOpening={has_open} len={len(h.text)}"
+          except Exception as e:
+              results["pcmap list"] = f"FAIL {type(e).__name__}: {str(e)[:80]}"
+          print("=== PROBE RESULT ===")
+          for k, v in results.items():
+              print(f"  {k}: {v}")
+          PY
