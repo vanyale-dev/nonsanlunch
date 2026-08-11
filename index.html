@@ -9,14 +9,14 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<meta name="theme-color" content="#1B3A5C">
+<meta name="theme-color" content="#26395B">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="논산런치">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
   :root {
     /* 잉크 */
-    --ink: #22262B; --navy: #1B3A5C; --navy-deep: #12293F; --red: #C23B2E;
+    --ink: #29261F; --navy: #26395B; --navy-deep: #1A2A44; --red: #C23B2E;
     /* 종이 — 다크모드에서도 불변 (물성) */
     --paper: #FAF7F0; --paper-dim: #F1ECE0; --paper-line: #D9D2C4; --paper-ink-sub: #6B6558;
     /* LED 전광판 */
@@ -109,7 +109,7 @@
     transform: translateY(-50%) scale(.25) rotate(-4deg); opacity: 0;
     background: #FFFDF6; border: 1px solid #D9D2C4; border-radius: 3px;
     padding: 9px 12px; font-size: 14px; font-weight: 800; line-height: 1.4;
-    letter-spacing: -0.3px; word-break: keep-all; text-align: center; color: #22262B;
+    letter-spacing: -0.3px; word-break: keep-all; text-align: center; color: #29261F;
     box-shadow: 0 2px 8px rgba(30,28,20,.16);
     transition: transform .45s cubic-bezier(.34,1.56,.64,1) .16s, opacity .3s .16s;
   }
@@ -228,12 +228,12 @@
   .tkt .t-place .mt { font-size: 12.5px; color: var(--paper-ink-sub); margin-top: 4px; }
   .tkt .t-ncrow { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 6px; }
   .tkt .t-ncrow .straw { width: 16px; height: 16px; }
-  .t-blue { font-size: 10.5px; font-weight: 800; color: #123E8C;
-    border: 1.2px solid #2E5AAC; background: #EAF0FB; border-radius: 4px; padding: 1px 6px 1px 5px;
+  .t-blue { font-size: 10.5px; font-weight: 800; color: #2C4A85;
+    border: 1.2px solid #4A66A0; background: #EDF1F8; border-radius: 4px; padding: 1px 6px 1px 5px;
     display: inline-flex; align-items: center; gap: 3px; }
-  .t-blue.local { color: #1C6B3C; border-color: #3E9C63; background: #E9F5EE; }
-  .t-blue.chain { color: #A34418; border-color: #D97742; background: #FBEDE3; }
-  .t-blue.heritage { color: #6E4A1E; border-color: #B08240; background: #F5ECDC; }
+  .t-blue.local { color: #2F6B3C; border-color: #55925F; background: #EBF3EB; }
+  .t-blue.chain { color: #9C4A21; border-color: #C0764A; background: #F8EFE7; }
+  .t-blue.heritage { color: #70522A; border-color: #A9854A; background: #F4EDDE; }
   .t-seal {
     position: absolute; right: -6px; top: -14px; width: 82px; height: 82px;
     transform: rotate(-9deg); opacity: .88; mix-blend-mode: multiply; pointer-events: none;
@@ -325,8 +325,8 @@
     font-size: 13px; font-weight: 800; padding: 3px 9px 3px 7px; border-radius: 7px;
     font-variant-numeric: tabular-nums; }
   .distchip svg { width: 15px; height: 15px; flex: none; }
-  .distchip.walk { color: #1C6B3C; background: #E6F3EB; }
-  .distchip.car { color: #1B3A5C; background: #E7EDF5; }
+  .distchip.walk { color: #2F6B3C; background: #E6F3EB; }
+  .distchip.car { color: #26395B; background: #E7EDF5; }
   @media (prefers-color-scheme: dark) {
     .distchip.walk { color: #DFF3E8; background: #234A34; }
     .distchip.car { color: #DDE9F7; background: #26364E; }
@@ -364,7 +364,7 @@
   .wx-cell .h { font-size: 9.5px; font-weight: 700; color: var(--paper-ink-sub); font-variant-numeric: tabular-nums; }
   .wx-cell .i { font-size: 16px; line-height: 1.15; }
   .wx-cell .t { font-size: 11px; font-weight: 800; font-variant-numeric: tabular-nums; }
-  .wx-cell .p { font-size: 9px; font-weight: 800; color: #2E5AAC; font-variant-numeric: tabular-nums; }
+  .wx-cell .p { font-size: 9px; font-weight: 800; color: #4A66A0; font-variant-numeric: tabular-nums; }
 
   /* 홈 화면 설치 버튼 + 아이폰 안내 시트 */
   .a2hs {
@@ -438,22 +438,22 @@
   .np-only {
     flex: none; display: inline-flex; align-items: center; gap: 4px;
     font-family: inherit; font-size: 12px; font-weight: 800; line-height: 1;
-    padding: 9px 10px; border-radius: 8px; border: 1.5px solid #C9A24B;
-    background: transparent; color: #8A6100; cursor: pointer;
+    padding: 9px 10px; border-radius: 8px; border: 1.5px solid #B08F3C;
+    background: transparent; color: #8A6A1F; cursor: pointer;
   }
-  .np-only[aria-pressed="true"] { background: #C9A24B; color: #FFFDF6; }
-  .np-only.chain { border-color: #D97742; color: #A34418; }
-  .np-only.chain[aria-pressed="true"] { background: #D97742; color: #FBEDE3; }
-  .np-only.blue { border-color: #2E5AAC; color: #123E8C; }
-  .np-only.blue[aria-pressed="true"] { background: #2E5AAC; color: #EAF0FB; }
-  .np-only.heritage { border-color: #B08240; color: #6E4A1E; }
-  .np-only.heritage[aria-pressed="true"] { background: #B08240; color: #F5ECDC; }
-  .np-only.kid { border-color: #D2547E; color: #B03A63; }
-  .np-only.kid[aria-pressed="true"] { background: #D2547E; color: #FDF0F5; }
+  .np-only[aria-pressed="true"] { background: #B08F3C; color: #FFFDF6; }
+  .np-only.chain { border-color: #C0764A; color: #9C4A21; }
+  .np-only.chain[aria-pressed="true"] { background: #C0764A; color: #F8EFE7; }
+  .np-only.blue { border-color: #4A66A0; color: #2C4A85; }
+  .np-only.blue[aria-pressed="true"] { background: #4A66A0; color: #EDF1F8; }
+  .np-only.heritage { border-color: #A9854A; color: #70522A; }
+  .np-only.heritage[aria-pressed="true"] { background: #A9854A; color: #F4EDDE; }
+  .np-only.kid { border-color: #B4527A; color: #9C446B; }
+  .np-only.kid[aria-pressed="true"] { background: #B4527A; color: #F9EEF4; }
   .np-only.staff { border-color: #C23B2E; color: #A32E23; }
   .np-only.staff[aria-pressed="true"] { background: #C23B2E; color: #FDF0EE; }
-  .np-only.fresh { border-color: #2E7D4F; color: #21603C; }
-  .np-only.fresh[aria-pressed="true"] { background: #2E7D4F; color: #EAF6EE; }
+  .np-only.fresh { border-color: #1F6B5C; color: #175A4E; }
+  .np-only.fresh[aria-pressed="true"] { background: #1F6B5C; color: #E9F3F0; }
   /* 특별 선정 필터 — 4열 그리드(7종 → 4+3) */
   .pick-filters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 5px; }
   .pick-filters .np-only { justify-content: center; text-align: center; white-space: nowrap;
@@ -532,18 +532,18 @@
   .ncs-tier.peak { border: 2px solid #D4A72C; background: linear-gradient(#FFFDF3, #FFF4D8);
     box-shadow: 0 4px 12px rgba(201, 162, 75, .24); padding: 15px 15px; }
   .ncs-tier.peak .t-straw .straw { width: 21px; height: 21px; }
-  .ncs-tier.peak .t-n { color: #8A6100; }
+  .ncs-tier.peak .t-n { color: #8A6A1F; }
   .ncs-tier.peak .t-desc b { color: #7A5600; }
   .tag.line { color: var(--paper-ink-sub); border: 1.2px solid #B9AF9D; background: transparent; }
-  .tag.blue { color: #123E8C; border: 1.2px solid #2E5AAC; background: #EAF0FB;
+  .tag.blue { color: #2C4A85; border: 1.2px solid #4A66A0; background: #EDF1F8;
     display: inline-flex; align-items: center; gap: 3px; }
-  .tag.chain { color: #A34418; border: 1.2px solid #D97742; background: #FBEDE3; }
-  .tag.heritage { color: #6E4A1E; border: 1.2px solid #B08240; background: #F5ECDC; }
-  .tag.fresh { color: #21603C; border: 1.2px solid #2E7D4F; background: #EAF6EE; }
-  .t-blue.fresh { color: #21603C; border-color: #2E7D4F; background: #EAF6EE; }
+  .tag.chain { color: #9C4A21; border: 1.2px solid #C0764A; background: #F8EFE7; }
+  .tag.heritage { color: #70522A; border: 1.2px solid #A9854A; background: #F4EDDE; }
+  .tag.fresh { color: #175A4E; border: 1.2px solid #1F6B5C; background: #E9F3F0; }
+  .t-blue.fresh { color: #175A4E; border-color: #1F6B5C; background: #E9F3F0; }
   .cat { font-size: 10.5px; font-weight: 800; padding: 1.5px 7px; border-radius: 4px; }
   .card .row-dist { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
-  .stars { color: #8A6100; font-size: 12.5px; font-weight: 800; }
+  .stars { color: #8A6A1F; font-size: 12.5px; font-weight: 800; }
   .stars .num { color: var(--paper-ink-sub); font-weight: 600; font-variant-numeric: tabular-nums; }
   .info { font-size: 12.5px; color: var(--paper-ink-sub); }
   .liner { font-size: 13px; }
@@ -1691,7 +1691,7 @@ function confettiBurst() {
   cv.width = innerWidth * dpr; cv.height = innerHeight * dpr;
   cv.style.width = innerWidth + "px"; cv.style.height = innerHeight + "px";
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const colors = ["#1B3A5C", "#C23B2E", "#FFB300", "#FAF7F0", "#8FA3B8"];
+  const colors = ["#26395B", "#C23B2E", "#FFB300", "#FAF7F0", "#8FA3B8"];
   const N = REDUCED ? 55 : 110;
   const parts = Array.from({ length: N }, (_, i) => {
     const cannon = i % 3 === 2, side = i % 2 ? 1 : -1;
