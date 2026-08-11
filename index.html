@@ -32,6 +32,8 @@
     }
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* hidden 속성은 어떤 display 선언보다 이긴다 — a2hs 시트가 안 닫히던 버그의 근치 */
+  [hidden] { display: none !important; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕", sans-serif;
     background: var(--wall); color: var(--wall-ink); line-height: 1.55;
