@@ -1,0 +1,32 @@
+name: 새로오픈 정찰 봇
+# 매주 월요일 아침 네이버 신규개업 표시를 훑어 후보 보고를 커밋한다.
+# 편입은 자동으로 하지 않는다 — 보고 검토 후 로컬 파이프라인(add_new_open)에서 사장 승인으로.
+on:
+  schedule:
+    - cron: "10 22 * * 0"   # 매주 월요일 07:10 KST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 신규개업 스캔 → data/new_open_report.json
+        run: |
+          pip install -q "curl_cffi>=0.15.0"
+          python bots/scan_new_open.py
+      - name: 보고 커밋
+        run: |
+          git config user.name "lunch-bot"
+          git config user.email "lunch-bot@users.noreply.github.com"
+          git add data/new_open_report.json
+          N=$(python -c "import json;print(len(json.load(open('data/new_open_report.json'))['candidates']))")
+          git diff --cached --quiet || git commit -m "새로오픈 정찰 $(date -u -d '+9 hours' +%F) — 후보 ${N}곳"
+          git push

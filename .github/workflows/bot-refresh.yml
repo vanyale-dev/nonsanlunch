@@ -1,0 +1,32 @@
+name: 유지보수 봇
+# 매월 초 수록 전체를 재실측해 폐업·개명·별점변동·표시변화 보고를 커밋한다.
+# 보고 전용 — 데이터 반영은 로컬 파이프라인에서 사장 확인 후.
+on:
+  schedule:
+    - cron: "10 21 1 * *"   # 매월 2일 06:10 KST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 전수 재실측 → data/refresh_report.json
+        run: |
+          pip install -q "curl_cffi>=0.15.0"
+          python bots/refresh_dataset.py
+      - name: 보고 커밋
+        run: |
+          git config user.name "lunch-bot"
+          git config user.email "lunch-bot@users.noreply.github.com"
+          git add data/refresh_report.json data/star_visibility_baseline.json
+          S=$(python -c "import json; r=json.load(open('data/refresh_report.json')); print('폐업의심%d 개명%d 변동%d 표시변화%d' % (len(r['dead_suspect']), len(r['renamed']), len(r['score_drift']), len(r['visibility_changed'])))")
+          git diff --cached --quiet || git commit -m "유지보수 점검 $(date -u -d '+9 hours' +%F) — ${S}"
+          git push
