@@ -63,18 +63,26 @@
     background-image: linear-gradient(90deg, var(--paper-line) 0 5px, transparent 5px 10px);
     background-size: 10px 2px; background-repeat: repeat-x; background-position: 0 0;
   }
+  /* 쟁반 3지선다 — 고른 것만 깨지고 나머지는 미개봉 퇴장(내용 영구 미지 = 선택의 성립 조건) */
+  .ck-tray { position: relative; display: flex; }
+  .ck-slot { position: relative; flex: 1; background: none; border: 0; padding: 0;
+    cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent;
+    transform: rotate(var(--tilt, 0deg)) scale(var(--sz, 1));
+    transition: opacity .35s ease, transform .35s ease; }
+  .ck-slot.gone { opacity: 0; transform: rotate(var(--tilt, 0deg)) translateY(10px) scale(.9);
+    pointer-events: none; }
   .ck-stage { position: relative; display: block; height: 78px; }
   .ck-half {
-    position: absolute; left: 50%; top: 6px; font-size: 56px; line-height: 1;
-    transform: translateX(-50%); will-change: transform;
+    position: absolute; left: 50%; top: 6px; font-size: 52px; line-height: 1;
+    transform: translateX(-50%);
   }
   .ck-l { clip-path: inset(-12% 49.5% -12% -12%); }
   .ck-r { clip-path: inset(-12% -12% -12% 49.5%); }
   /* 톡(살짝 눌림) → 뽀각(급가속 분리+오버슛) → 안착. 키프레임 초반 기울기가 스냅감의 핵심 */
-  .cookie.snap .ck-stage { animation: ckJolt .11s ease-in; }
+  .ck-slot.snap .ck-stage { animation: ckJolt .11s ease-in; }
   @keyframes ckJolt { 0% { transform: scale(1); } 60% { transform: scale(.93,.87) rotate(-1.5deg); } 100% { transform: scale(1); } }
-  /* 두 번째 쿠키 — 조립된 채 달그락 흔들리다가 뽀각 */
-  .cookie.wobble .ck-stage { animation: ckWobble .5s ease-in-out; }
+  /* 새 쿠키들 착지 — 달그락 */
+  .ck-slot.settle .ck-stage { animation: ckWobble .5s ease-in-out; }
   @keyframes ckWobble {
     0%, 100% { transform: rotate(0); }
     15% { transform: rotate(-5deg) translateX(-2px); }
@@ -82,8 +90,8 @@
     55% { transform: rotate(-3deg) translateX(-1px); }
     75% { transform: rotate(2deg) translateX(1px); }
   }
-  .cookie.cracked .ck-l { animation: ckCrackL .6s cubic-bezier(.2,.85,.3,1.15) forwards; }
-  .cookie.cracked .ck-r { animation: ckCrackR .6s cubic-bezier(.2,.85,.3,1.15) forwards; }
+  .ck-slot.cracked .ck-l { animation: ckCrackL .6s cubic-bezier(.2,.85,.3,1.15) forwards; }
+  .ck-slot.cracked .ck-r { animation: ckCrackR .6s cubic-bezier(.2,.85,.3,1.15) forwards; }
   @keyframes ckCrackL {
     0%   { transform: translateX(-50%); }
     14%  { transform: translateX(-50%) translate(-6px,1px) rotate(-6deg); }
@@ -99,27 +107,29 @@
   /* 부스러기 — 쪼개지는 순간 튀는 과자 파편 */
   .ck-crumb { position: absolute; left: 50%; top: 34px; width: 5px; height: 5px; margin-left: -2px;
     border-radius: 1.5px; background: #D89B3F; opacity: 0; pointer-events: none; }
-  .cookie.cracked .ck-crumb { animation: ckCrumb .6s ease-out forwards; }
+  .ck-slot.cracked .ck-crumb { animation: ckCrumb .6s ease-out forwards; }
   @keyframes ckCrumb {
     0%   { opacity: 1; transform: translate(0,0) rotate(0); }
     100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(230deg); }
   }
   .ck-paper {
-    position: absolute; left: 6%; right: 6%; top: 50%;
+    position: absolute; left: 6%; right: 6%; top: 50%; z-index: 2; pointer-events: none;
     transform: translateY(-50%) scale(.25) rotate(-4deg); opacity: 0;
     background: #FFFDF6; border: 1px solid #D9D2C4; border-radius: 3px;
-    padding: 9px 12px; font-size: 14px; font-weight: 800; line-height: 1.4;
+    padding: 13px 12px 9px; font-size: 14px; font-weight: 800; line-height: 1.4;
     letter-spacing: -0.3px; word-break: keep-all; text-align: center; color: #29261F;
     box-shadow: 0 2px 8px rgba(30,28,20,.16);
     transition: transform .45s cubic-bezier(.34,1.56,.64,1) .16s, opacity .3s .16s;
   }
-  .cookie.cracked .ck-paper { transform: translateY(-50%) scale(1) rotate(0deg); opacity: 1; }
+  .ck-paper.show { transform: translateY(-50%) scale(1) rotate(0deg); opacity: 1; }
+  .ck-paper .ck-no { position: absolute; top: 3px; right: 7px; font-size: 8.5px; font-weight: 800;
+    letter-spacing: .06em; color: #8A6A1F; }
   .ck-hint { display: block; margin-top: 4px; font-size: 10.5px; font-weight: 800;
     letter-spacing: .08em; color: var(--paper-ink-sub); text-align: center; }
-  .cookie:active .ck-stage { transform: scale(.97); }
+  .ck-slot:active .ck-stage { transform: scale(.97); }
   @media (prefers-reduced-motion: reduce) {
-    .ck-half, .ck-crumb, .cookie.snap .ck-stage, .cookie.wobble .ck-stage { animation-duration: .01s; animation-delay: 0s; }
-    .ck-paper { transition-duration: .01s; transition-delay: 0s; }
+    .ck-half, .ck-crumb, .ck-slot.snap .ck-stage, .ck-slot.settle .ck-stage { animation-duration: .01s; animation-delay: 0s; }
+    .ck-paper, .ck-slot { transition-duration: .01s; transition-delay: 0s; }
   }
   /* 기은센의 말풍선 — 오늘의 한마디 */
   .bubble {
@@ -579,20 +589,13 @@
     </div>
   </div>
 
-  <button class="cookie" id="cookieBtn" type="button" aria-label="포춘쿠키 깨기">
-    <span class="ck-stage">
-      <span class="ck-half ck-l" aria-hidden="true">🥠</span>
-      <span class="ck-half ck-r" aria-hidden="true">🥠</span>
-      <span class="ck-crumb" style="--dx:-30px;--dy:26px"></span>
-      <span class="ck-crumb" style="--dx:-14px;--dy:38px;animation-delay:.04s"></span>
-      <span class="ck-crumb" style="--dx:4px;--dy:42px;animation-delay:.02s"></span>
-      <span class="ck-crumb" style="--dx:18px;--dy:36px;animation-delay:.06s"></span>
-      <span class="ck-crumb" style="--dx:32px;--dy:24px"></span>
-      <span class="ck-crumb" style="--dx:-2px;--dy:-18px;animation-delay:.03s"></span>
-      <span class="ck-paper" id="ckPaper"></span>
-    </span>
-    <span class="ck-hint" id="ckHint">오늘의 포춘쿠키 · 톡! 눌러서 깨보세요</span>
-  </button>
+  <div class="cookie" id="cookieTray">
+    <div class="ck-tray" id="ckTrayRow">
+      <button class="ck-slot" type="button" aria-label="포춘쿠키 고르기"><span class="ck-stage"><span class="ck-half ck-l" aria-hidden="true">🥠</span><span class="ck-half ck-r" aria-hidden="true">🥠</span><span class="ck-crumb" style="--dx:-30px;--dy:26px"></span><span class="ck-crumb" style="--dx:-14px;--dy:38px;animation-delay:.04s"></span><span class="ck-crumb" style="--dx:4px;--dy:42px;animation-delay:.02s"></span><span class="ck-crumb" style="--dx:18px;--dy:36px;animation-delay:.06s"></span><span class="ck-crumb" style="--dx:32px;--dy:24px"></span><span class="ck-crumb" style="--dx:-2px;--dy:-18px;animation-delay:.03s"></span></span></button><button class="ck-slot" type="button" aria-label="포춘쿠키 고르기"><span class="ck-stage"><span class="ck-half ck-l" aria-hidden="true">🥠</span><span class="ck-half ck-r" aria-hidden="true">🥠</span><span class="ck-crumb" style="--dx:-30px;--dy:26px"></span><span class="ck-crumb" style="--dx:-14px;--dy:38px;animation-delay:.04s"></span><span class="ck-crumb" style="--dx:4px;--dy:42px;animation-delay:.02s"></span><span class="ck-crumb" style="--dx:18px;--dy:36px;animation-delay:.06s"></span><span class="ck-crumb" style="--dx:32px;--dy:24px"></span><span class="ck-crumb" style="--dx:-2px;--dy:-18px;animation-delay:.03s"></span></span></button><button class="ck-slot" type="button" aria-label="포춘쿠키 고르기"><span class="ck-stage"><span class="ck-half ck-l" aria-hidden="true">🥠</span><span class="ck-half ck-r" aria-hidden="true">🥠</span><span class="ck-crumb" style="--dx:-30px;--dy:26px"></span><span class="ck-crumb" style="--dx:-14px;--dy:38px;animation-delay:.04s"></span><span class="ck-crumb" style="--dx:4px;--dy:42px;animation-delay:.02s"></span><span class="ck-crumb" style="--dx:18px;--dy:36px;animation-delay:.06s"></span><span class="ck-crumb" style="--dx:32px;--dy:24px"></span><span class="ck-crumb" style="--dx:-2px;--dy:-18px;animation-delay:.03s"></span></span></button>
+      <span class="ck-paper" id="ckPaper"><span class="ck-no" id="ckNo"></span><span id="ckLine"></span></span>
+    </div>
+    <span class="ck-hint" id="ckHint">오늘의 포춘쿠키 · 마음에 드는 걸 골라 깨보세요</span>
+  </div>
 
   <div class="ticket-zone" id="ticketZone"></div>
   <div class="sr-only" id="announce" role="status" aria-live="polite" aria-atomic="true"></div>
@@ -1180,13 +1183,28 @@ const COOKIE_FORTUNES = [
   "당신의 정직함이 가장 큰 재산입니다.",
   "오늘은 운이 아니라 실력이 증명되는 날입니다.",
   "끝맺음을 잘하는 사람에게 새 시작이 빨리 옵니다.",
+  "오늘은 그냥 좋습니다.",
+  "다 잘 되고 있습니다.",
+  "지금 이대로 충분합니다.",
 ];
 (function () {
-  const btn = document.getElementById("cookieBtn");
+  /* 3지선다 쟁반: 고른 것만 뽀각, 나머지 둘은 미개봉 퇴장(내용 영구 미지 — 선택의 성립 조건).
+     치우면 빈 쟁반이 잠깐 숨을 쉬었다가 새 3개가 달그락 착지. 탭 리듬: 고르기 1탭 · 치우기 1탭. */
+  const tray = document.getElementById("cookieTray");
+  const slots = Array.prototype.slice.call(tray.querySelectorAll(".ck-slot"));
   const paper = document.getElementById("ckPaper");
+  const lineEl = document.getElementById("ckLine");
+  const noEl = document.getElementById("ckNo");
   const hint = document.getElementById("ckHint");
-  let recentF = [], busy = false;   // 최근 8회 재등장 금지 (룰렛과 같은 규칙)
+  const READY = "오늘의 포춘쿠키 · 마음에 드는 걸 골라 깨보세요";
+  let recentF = [], busy = false, opened = false;   // 최근 8회 재등장 금지 (룰렛과 같은 규칙)
+  const tilt = () => slots.forEach(s => {
+    s.style.setProperty("--tilt", (Math.random() * 11 - 5.5).toFixed(1) + "deg");
+    s.style.setProperty("--sz", (0.95 + Math.random() * 0.08).toFixed(3));
+  });
+  tilt();
   const pickLine = () => {
+    if (Math.random() < 0.025) return "특이사항 없음."; // 희귀 변주 — 은행 서식 어법
     const avoid = new Set(recentF);
     let i;
     do { i = Math.floor(Math.random() * COOKIE_FORTUNES.length); } while (avoid.has(i));
@@ -1194,32 +1212,49 @@ const COOKIE_FORTUNES = [
     if (recentF.length > 8) recentF.shift();
     return COOKIE_FORTUNES[i];
   };
-  const crack = () => {
-    const line = pickLine();
-    paper.textContent = line;
-    track("cookie", { line: line });
-    btn.classList.remove("snap");
-    btn.classList.add("cracked");
-    if (navigator.vibrate) navigator.vibrate([12, 40, 14]); // 톡-뽀각 (지원 기기만)
-    hint.textContent = "한 번 더 누르면 새 쿠키가 나와요";
-    document.getElementById("announce").textContent = "포춘쿠키: " + line;
+  const issueNo = () => {
+    const d = new Date();
+    return "제 " + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0") + " 호";
   };
-  btn.onclick = () => {
-    if (busy) return;
+  const reset = () => {
     busy = true;
-    if (!btn.classList.contains("cracked")) {
-      // 첫 쿠키: 톡(눌림) 한 박자 뒤 뽀각
-      btn.classList.add("snap");
-      setTimeout(() => { crack(); busy = false; }, 110);
-    } else {
-      // 재발권: 재조립 → 잠깐 뜸 → 달그락 흔들림 → 뽀각
-      btn.classList.remove("cracked");
+    paper.classList.remove("show");
+    slots.forEach(s => s.classList.add("gone")); // 깨진 놈까지 전부 퇴장 → 빈 쟁반 한 박자
+    setTimeout(() => {
+      slots.forEach(s => s.classList.remove("cracked"));
+      tilt(); // 새 배치는 앉음새가 다르다
+      slots.forEach(s => { s.classList.remove("gone"); s.classList.add("settle"); });
       setTimeout(() => {
-        btn.classList.add("wobble");
-        setTimeout(() => { btn.classList.remove("wobble"); crack(); busy = false; }, 480);
-      }, 200);
-    }
+        slots.forEach(s => s.classList.remove("settle"));
+        hint.textContent = READY;
+        opened = false; busy = false;
+      }, 520);
+    }, 450);
   };
+  slots.forEach(slot => {
+    slot.onclick = e => {
+      e.stopPropagation();
+      if (busy) return;
+      if (opened) { reset(); return; } // 깨진 쿠키(키보드 포커스 포함)를 다시 누르면 치우기
+      busy = true;
+      slot.classList.add("snap");
+      setTimeout(() => {
+        const line = pickLine();
+        lineEl.textContent = line;
+        noEl.textContent = issueNo();
+        track("cookie", { line: line });
+        slot.classList.remove("snap");
+        slot.classList.add("cracked");
+        slots.forEach(s => { if (s !== slot) s.classList.add("gone"); });
+        paper.classList.add("show");
+        if (navigator.vibrate) navigator.vibrate([12, 40, 14]); // 톡-뽀각 (지원 기기만)
+        hint.textContent = "한 번 더 누르면 새 쿠키 세 개가 준비돼요";
+        document.getElementById("announce").textContent = "포춘쿠키: " + line;
+        opened = true; busy = false;
+      }, 110);
+    };
+  });
+  tray.onclick = () => { if (!busy && opened) reset(); }; // 쪽지·여백 어디를 눌러도 치우기
 })();
 
 /* ── 필터 로직 (무드·종류·거리 모두 다중 OR) ── */
