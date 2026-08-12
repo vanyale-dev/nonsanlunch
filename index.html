@@ -318,7 +318,8 @@
   .sort-row .chip[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: var(--paper); }
   .search-row { position: relative; margin-top: 9px; }
   .search-row input {
-    width: 100%; font-family: inherit; font-size: 14.5px; font-weight: 600;
+    /* 16px 미만이면 아이폰이 포커스 때 화면을 자동 확대한다 — 16px이 잠금 해제 조건 */
+    width: 100%; font-family: inherit; font-size: 16px; font-weight: 600;
     padding: 12px 40px 12px 40px; border-radius: 9px;
     border: 1.5px solid var(--wall-sub); background: var(--paper); color: var(--ink);
     -webkit-appearance: none;
