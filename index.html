@@ -434,9 +434,10 @@
   }
   .news-head { display: flex; align-items: baseline; gap: 6px; width: 100%; padding: 9px 0 8px;
     background: none; border: 0; font-family: inherit; color: inherit; cursor: pointer; text-align: left; }
-  .news-title { font-size: 12.5px; font-weight: 900; letter-spacing: -0.2px; }
+  .news-title { font-size: 10.5px; font-weight: 800; letter-spacing: .12em; color: var(--paper-ink-sub); }
   .news-hint { font-size: 10.5px; color: var(--paper-ink-sub); margin-left: auto; }
   .news-list { padding-bottom: 9px; }
+  #newsMore.news-list { padding-top: 0; margin-top: -9px; }
   .news-it { display: block; padding: 6px 0; border-top: 1px dashed var(--paper-line);
     font-size: 12.5px; line-height: 1.45; color: var(--ink); text-decoration: none; word-break: keep-all; }
   .news-it .nd { font-size: 10.5px; color: var(--paper-ink-sub); margin-right: 5px; font-variant-numeric: tabular-nums; }
@@ -652,9 +653,10 @@
   <!-- 논산 먹거리 소식 — GitHub Actions가 매일 아침 수집한 news.json(같은 출처라 CSP 무관). 실패·노후 시 미표시 -->
   <div class="news" id="newsBox" hidden>
     <button class="news-head" id="newsHead" type="button" aria-expanded="false">
-      <span class="news-title">📰 논산 먹거리 소식</span><span class="news-hint" id="newsHint">펼치기 ▾</span>
+      <span class="news-title">📰 논산 먹거리 소식</span><span class="news-hint" id="newsHint"></span>
     </button>
-    <div class="news-list" id="newsList" hidden></div>
+    <div class="news-list" id="newsList"></div>
+    <div class="news-list" id="newsMore" hidden></div>
   </div>
 
   <div class="nc-plaque">
@@ -993,20 +995,27 @@ if (NET_ON) {
   fetch("news.json").then(r => r.json()).then(nw => {
     const items = (nw.items || []).filter(i => (Date.now() - new Date(i.d)) / 86400000 <= 60);
     if (!items.length) return;
-    document.getElementById("newsList").innerHTML = items.map(i =>
+    const render = arr => arr.map(i =>
       '<a class="news-it" href="' + esc(i.u) + '" target="_blank" rel="noopener">'
       + '<span class="nd">' + esc(i.d.slice(5).replace("-", "/")) + "</span>" + esc(i.t.replace(/\s*-\s*[^-]+$/, ""))
       + (i.s ? ' <span class="nsrc">· ' + esc(i.s) + "</span>" : "") + "</a>").join("");
-    const box = document.getElementById("newsBox"), list = document.getElementById("newsList"),
+    const box = document.getElementById("newsBox"), more = document.getElementById("newsMore"),
       head = document.getElementById("newsHead"), hint = document.getElementById("newsHint");
+    // 최신 2건은 항상 노출, 나머지만 접어둔다 (2026-08-12 사장 지시)
+    document.getElementById("newsList").innerHTML = render(items.slice(0, 2));
+    const rest = items.slice(2);
     box.hidden = false;
-    head.onclick = () => {
-      const open = list.hidden;
-      list.hidden = !open;
-      head.setAttribute("aria-expanded", String(open));
-      hint.textContent = open ? "접기 ▴" : "펼치기 ▾";
-      if (open) track("news_open", { n: items.length });
-    };
+    if (rest.length) {
+      more.innerHTML = render(rest);
+      hint.textContent = "+" + rest.length + "건 ▾";
+      head.onclick = () => {
+        const open = more.hidden;
+        more.hidden = !open;
+        head.setAttribute("aria-expanded", String(open));
+        hint.textContent = open ? "접기 ▴" : "+" + rest.length + "건 ▾";
+        if (open) track("news_open", { n: items.length });
+      };
+    }
   }).catch(() => {});
 }
 if (NET_ON) {
