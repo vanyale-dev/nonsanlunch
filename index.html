@@ -308,11 +308,9 @@
   .chip[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: var(--paper); }
   .chip:disabled { opacity: .3; cursor: default; }
   .chip.sm { min-height: 40px; font-size: 12.5px; }
-  /* 칩 통일 — 서식 칸은 계급 없이 전부 같은 크기 (2026-08-12 사장 지시). 좁은 화면은 3열로 */
+  /* 칩 통일 — 서식 칸은 계급 없이 전부 같은 크기, 어느 기기서든 한 줄 4칸 (2026-08-12 사장 지시).
+     좁은 화면에서 긴 라벨은 잘리는 대신 어절 단위 두 줄(keep-all)로 접힌다. */
   #moodLabel { font-size: 13px; color: var(--ink); }
-  @media (max-width: 430px) {
-    #moodChips, #catChips, #moveChips, .pick-filters { grid-template-columns: repeat(3, 1fr); }
-  }
 
   /* ── 목록 (명부) ──────────────────────────── */
   .sort-row { margin-top: 18px; }
@@ -653,7 +651,7 @@
   <!-- 논산 먹거리 소식 — GitHub Actions가 매일 아침 수집한 news.json(같은 출처라 CSP 무관). 실패·노후 시 미표시 -->
   <div class="news" id="newsBox" hidden>
     <button class="news-head" id="newsHead" type="button" aria-expanded="false">
-      <span class="news-title">📰 논산 먹거리 소식</span><span class="news-hint" id="newsHint"></span>
+      <span class="news-title">논산 먹거리 소식</span><span class="news-hint" id="newsHint"></span>
     </button>
     <div class="news-list" id="newsList"></div>
     <div class="news-list" id="newsMore" hidden></div>
