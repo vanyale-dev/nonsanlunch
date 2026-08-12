@@ -396,11 +396,6 @@
     font-size: 13px; font-weight: 800; letter-spacing: -0.2px;
     border: 1.5px dashed var(--navy); border-radius: 10px; cursor: pointer; box-shadow: var(--shadow);
   }
-  .a2hs-hint { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 70;
-    background: var(--navy); color: #fff; font-size: 13.5px; font-weight: 700; line-height: 1.45;
-    padding: 11px 16px; border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.3);
-    text-align: center; width: max-content; max-width: 88vw; }
-  .a2hs-hint small { font-weight: 500; opacity: .85; }
   .a2hs-guide { position: fixed; inset: 0; z-index: 60; background: rgba(20, 24, 29, .55);
     display: flex; align-items: flex-end; justify-content: center; }
   .ag-box { background: var(--paper); color: var(--ink); border-radius: 14px 14px 0 0;
@@ -668,7 +663,6 @@
   </div>
 
   <button class="a2hs" id="a2hsBtn" type="button" hidden>📲 홈 화면에 앱으로 설치하기</button>
-  <div class="a2hs-hint" id="a2hsHint" hidden>열린 목록에서 <b>'홈 화면에 추가'</b>를 누르세요<br><small>안 보이면 목록을 위로 쓸어올려 보세요</small></div>
   <div class="a2hs-guide" id="a2hsGuide" hidden>
     <div class="ag-box">
       <b id="agTitle">홈 화면에 추가하는 법</b>
@@ -881,43 +875,33 @@ function stipPick(now) {
   if (!/\.github\.io$/.test(location.hostname)) return;
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
   const btn = document.getElementById("a2hsBtn"), guide = document.getElementById("a2hsGuide");
-  const hint = document.getElementById("a2hsHint");
   const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
   if (standalone) return; // 이미 설치됨
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
     || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   const isCriOS = /CriOS/.test(navigator.userAgent); // 아이폰 크롬
-  let deferred = null, hintTimer = null;
+  let deferred = null;
   window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferred = e; btn.hidden = false; });
   if (isIOS) btn.hidden = false;
   function openGuide() {
     document.getElementById("agTitle").textContent =
       "홈 화면에 추가하는 법 (" + (isCriOS ? "크롬" : "사파리") + ")";
     document.getElementById("agSteps").innerHTML = (isCriOS
-      ? ["1. 주소창 오른쪽 <b>공유 버튼</b>(⬆︎)을 누르세요",
-         "2. 목록 맨 아래 <b>'더보기(View More)'</b>를 누르세요",
-         "3. <b>'홈 화면에 추가(Add to Home Screen)'</b> → <b>추가</b> — 끝!"]
-      : ["1. 아래 <b>공유 버튼</b>(네모에 화살표 ⬆︎)을 누르세요",
+      ? ["1. 이 창을 닫고, 주소창 오른쪽 <b>공유 버튼</b>(⬆︎)을 누르세요",
+         "2. 아이콘 줄 맨 끝 <b>'더보기(View More)'</b>를 누르세요",
+         "3. 목록에서 <b>'홈 화면에 추가(Add to Home Screen)'</b>를 누르세요",
+         "4. 오른쪽 위 <b>추가</b> — 끝! 앱 아이콘이 생겨요"]
+      : ["1. 이 창을 닫고, 화면 아래 <b>공유 버튼</b>(네모에 화살표 ⬆︎)을 누르세요",
          "2. <b>'홈 화면에 추가'</b>를 누르세요 <small>(안 보이면 목록을 위로 쓸어올려요)</small>",
          "3. 오른쪽 위 <b>추가</b> — 끝! 앱 아이콘이 생겨요"]
     ).map(s => '<div class="ag-step">' + s + "</div>").join("");
     guide.hidden = false;
   }
-  btn.onclick = async () => {
+  btn.onclick = () => {
     track("a2hs", { ios: isIOS, crios: isCriOS });
     if (deferred) { deferred.prompt(); deferred = null; btn.hidden = true; return; }
-    if (isIOS && navigator.share) {
-      // 크롬(iOS)은 시스템 시트에서 '홈 화면에 추가'가 View More 안에 있음(2026-08-12 사장 실측 스크린샷)
-      hint.innerHTML = isCriOS
-        ? "열린 목록 맨 아래 <b>'더보기(View More)'</b>를 누른 뒤<br><b>'홈 화면에 추가(Add to Home Screen)'</b>를 누르세요"
-        : "열린 목록에서 <b>'홈 화면에 추가(Add to Home Screen)'</b>를 누르세요<br><small>안 보이면 목록을 위로 쓸어올려 보세요</small>";
-      hint.hidden = false;
-      clearTimeout(hintTimer);
-      hintTimer = setTimeout(() => { hint.hidden = true; }, 20000);
-      try { await navigator.share({ title: "논산런치", url: location.href }); }
-      catch (e) { /* 사용자 취소(AbortError) 등 — 조용히 */ }
-      return;
-    }
+    // navigator.share()는 기각(2026-08-12 실기기 반증): '홈 화면에 추가'는 브라우저가
+    // 자기 공유 버튼으로 시트를 열 때만 주입되는 브라우저 전용 액션이라 웹이 연 시트엔 없다.
     openGuide();
   };
   document.getElementById("a2hsClose").onclick = () => { guide.hidden = true; };
