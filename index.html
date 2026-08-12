@@ -131,14 +131,12 @@
     position: absolute; left: 6%; right: 6%; top: 50%; z-index: 2; pointer-events: none;
     transform: translateY(-50%) scale(.25) rotate(-4deg); opacity: 0;
     background: #FFFDF6; border: 1px solid #D9D2C4; border-radius: 3px;
-    padding: 13px 12px 9px; font-size: 14px; font-weight: 800; line-height: 1.4;
+    padding: 9px 12px; font-size: 14px; font-weight: 800; line-height: 1.4;
     letter-spacing: -0.3px; word-break: keep-all; text-align: center; color: #29261F;
     box-shadow: 0 2px 8px rgba(30,28,20,.16);
     transition: transform .45s cubic-bezier(.34,1.56,.64,1) .16s, opacity .3s .16s;
   }
   .ck-paper.show { transform: translateY(-50%) scale(1) rotate(0deg); opacity: 1; }
-  .ck-paper .ck-no { position: absolute; top: 3px; right: 7px; font-size: 8.5px; font-weight: 800;
-    letter-spacing: .06em; color: #8A6A1F; }
   .ck-paper.dud #ckLine { font-size: 21px; letter-spacing: 2px; color: var(--red); }
   .ck-paper .ck-dudsub { display: block; font-size: 11px; font-weight: 700; color: var(--paper-ink-sub);
     letter-spacing: -0.2px; margin-top: 2px; }
@@ -300,8 +298,8 @@
   .g3 { grid-template-columns: repeat(3, 1fr); }
   .g4 { grid-template-columns: repeat(4, 1fr); }
   .chip {
-    font-family: inherit; font-size: 13.5px; font-weight: 700; line-height: 1.25;
-    min-height: 46px; padding: 4px 6px;
+    font-family: inherit; font-size: 13px; font-weight: 700; line-height: 1.25;
+    min-height: 42px; padding: 4px 5px; word-break: keep-all;
     display: flex; align-items: center; justify-content: center; text-align: center;
     background: var(--paper); color: var(--ink);
     border: 1.5px solid #B9AF9D; border-radius: 7px;
@@ -310,12 +308,11 @@
   .chip[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: var(--paper); }
   .chip:disabled { opacity: .3; cursor: default; }
   .chip.sm { min-height: 40px; font-size: 12.5px; }
-  /* 칩 3계급 — 무드(주력) > 음식종류 > 이동수단 */
-  #moodChips .chip { min-height: 49px; font-weight: 800; }
+  /* 칩 통일 — 서식 칸은 계급 없이 전부 같은 크기 (2026-08-12 사장 지시). 좁은 화면은 3열로 */
   #moodLabel { font-size: 13px; color: var(--ink); }
-  #catChips .chip { min-height: 42px; font-size: 13px; }
-  #moveChips .chip { min-height: 36px; font-size: 12px; color: var(--paper-ink-sub); border-color: #CDC4B2; }
-  #moveChips .chip[aria-pressed="true"] { color: var(--paper); border-color: var(--navy); }
+  @media (max-width: 430px) {
+    #moodChips, #catChips, #moveChips, .pick-filters { grid-template-columns: repeat(3, 1fr); }
+  }
 
   /* ── 목록 (명부) ──────────────────────────── */
   .sort-row { margin-top: 18px; }
@@ -482,10 +479,10 @@
   .np-only.staff[aria-pressed="true"] { background: #C23B2E; color: #FDF0EE; }
   .np-only.fresh { border-color: #1F6B5C; color: #175A4E; }
   .np-only.fresh[aria-pressed="true"] { background: #1F6B5C; color: #E9F3F0; }
-  /* 특별 선정 필터 — 4열 그리드(7종 → 4+3) */
-  .pick-filters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 5px; }
+  /* 특별 선정 필터 — 4열 그리드(7종 → 4+3), 칸 규격은 .chip과 동일 */
+  .pick-filters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-top: 5px; }
   .pick-filters .np-only { justify-content: center; text-align: center; white-space: nowrap;
-    gap: 4px; padding: 9px 4px; font-size: 12px; line-height: 1; min-height: 40px; }
+    gap: 4px; padding: 4px 5px; font-size: 13px; line-height: 1.25; min-height: 42px; border-radius: 7px; }
   .pick-filters .np-only .straw, .pick-filters .np-only .ribbon { flex: none; }
   /* 직원 결재 도장 — 카드 우하단. 종이에 찍힌 인주 물성 */
   .stamp-zone { margin-left: auto; display: flex; align-items: center; gap: 5px; }
@@ -610,7 +607,7 @@
   <div class="cookie" id="cookieTray">
     <div class="ck-tray" id="ckTrayRow">
       <button class="ck-slot" type="button" aria-label="포춘쿠키 고르기"><span class="ck-stage"><span class="ck-half ck-l" aria-hidden="true">🥠</span><span class="ck-half ck-r" aria-hidden="true">🥠</span><span class="ck-crumb" style="--dx:-30px;--dy:26px"></span><span class="ck-crumb" style="--dx:-14px;--dy:38px;animation-delay:.04s"></span><span class="ck-crumb" style="--dx:4px;--dy:42px;animation-delay:.02s"></span><span class="ck-crumb" style="--dx:18px;--dy:36px;animation-delay:.06s"></span><span class="ck-crumb" style="--dx:32px;--dy:24px"></span><span class="ck-crumb" style="--dx:-2px;--dy:-18px;animation-delay:.03s"></span><span class="ck-dud" aria-hidden="true">꽝</span></span></button><button class="ck-slot" type="button" aria-label="포춘쿠키 고르기"><span class="ck-stage"><span class="ck-half ck-l" aria-hidden="true">🥠</span><span class="ck-half ck-r" aria-hidden="true">🥠</span><span class="ck-crumb" style="--dx:-30px;--dy:26px"></span><span class="ck-crumb" style="--dx:-14px;--dy:38px;animation-delay:.04s"></span><span class="ck-crumb" style="--dx:4px;--dy:42px;animation-delay:.02s"></span><span class="ck-crumb" style="--dx:18px;--dy:36px;animation-delay:.06s"></span><span class="ck-crumb" style="--dx:32px;--dy:24px"></span><span class="ck-crumb" style="--dx:-2px;--dy:-18px;animation-delay:.03s"></span><span class="ck-dud" aria-hidden="true">꽝</span></span></button><button class="ck-slot" type="button" aria-label="포춘쿠키 고르기"><span class="ck-stage"><span class="ck-half ck-l" aria-hidden="true">🥠</span><span class="ck-half ck-r" aria-hidden="true">🥠</span><span class="ck-crumb" style="--dx:-30px;--dy:26px"></span><span class="ck-crumb" style="--dx:-14px;--dy:38px;animation-delay:.04s"></span><span class="ck-crumb" style="--dx:4px;--dy:42px;animation-delay:.02s"></span><span class="ck-crumb" style="--dx:18px;--dy:36px;animation-delay:.06s"></span><span class="ck-crumb" style="--dx:32px;--dy:24px"></span><span class="ck-crumb" style="--dx:-2px;--dy:-18px;animation-delay:.03s"></span><span class="ck-dud" aria-hidden="true">꽝</span></span></button>
-      <span class="ck-paper" id="ckPaper"><span class="ck-no" id="ckNo"></span><span id="ckLine"></span></span>
+      <span class="ck-paper" id="ckPaper"><span id="ckLine"></span></span>
     </div>
     <span class="ck-hint" id="ckHint">오늘의 포춘쿠키 · 마음에 드는 걸 골라 깨보세요</span>
   </div>
@@ -621,7 +618,7 @@
   <div class="noticeboard">
     <div class="nb-title">발 권 안 내</div>
     <div class="sec-label" id="moodLabel">오늘 뭐가 당기세요?</div>
-    <div class="chips-grid g2" id="moodChips" role="group" aria-labelledby="moodLabel"></div>
+    <div class="chips-grid g4" id="moodChips" role="group" aria-labelledby="moodLabel"></div>
     <div class="sec-label" id="catLabel">음식 종류</div>
     <div class="chips-grid g4" id="catChips" role="group" aria-labelledby="catLabel"></div>
     <div class="sec-label" id="moveLabel">얼마나 멀리</div>
@@ -633,7 +630,8 @@
       <button class="np-only blue" id="blueOnly" type="button" aria-pressed="false"><i class="ribbon"></i>블루리본</button>
       <button class="np-only heritage" id="certOnly" type="button" aria-pressed="false"><i class="cert"></i>백년가게</button>
       <button class="np-only kid" id="kidOnly" type="button" aria-pressed="false">🎈 어린이날</button>
-      <button class="np-only staff" id="staffOnly" type="button" aria-pressed="false">🖋 직원추천</button>
+      <button class="np-only staff" id="staffOnly" type="button" aria-pressed="false" hidden>🖋 직원추천</button><!-- 기능 미정 — 사장 지시로 숨김(2026-08-12). 결재 도장은 유지 -->
+
       <button class="np-only fresh" id="freshOnly" type="button" aria-pressed="false">🆕 새로오픈</button>
     </div>
   </div>
@@ -716,7 +714,7 @@
     <div class="ncs-li"><i class="cert"></i> <b>백년가게 5곳</b> — 30년 넘게 이어온 노포</div>
     <div class="ncs-li">🔥 <b>인기체인 12곳</b> — 전국구가 논산까지 온 집</div>
     <div class="ncs-li">🎈 <b>어린이날 32곳</b> — 팀장님 안 계신 날, 눈치 없이 가는 특선(비싸거나, 멀거나, 구워 먹어야 하는 집)</div>
-    <div class="ncs-li">🖋 <b>직원추천</b> — 다녀온 집엔 카드 오른쪽 아래 결재란에 <b>승인/반려 도장</b>을 찍으세요. 승인 찍힌 집만 모아 보는 필터예요. (지금은 내 폰에만 저장돼요)</div>
+    <div class="ncs-li">🖋 <b>결재 도장</b> — 다녀온 집엔 카드 오른쪽 아래 결재란에 <b>승인/반려 도장</b>을 찍으세요. (지금은 내 폰에만 저장돼요)</div>
     <div class="ncs-li">🆕 <b>새로오픈</b> — 네이버에 '새로 오픈'으로 표시된 논산 신상 집. 90일 지나면 배지가 저절로 떨어져요.</div></div>
 
     <div class="ncs-h">🍓 딸기는 어떻게 매겨요?</div>
@@ -1225,7 +1223,6 @@ const COOKIE_FORTUNES = [
   const slots = Array.prototype.slice.call(tray.querySelectorAll(".ck-slot"));
   const paper = document.getElementById("ckPaper");
   const lineEl = document.getElementById("ckLine");
-  const noEl = document.getElementById("ckNo");
   const hint = document.getElementById("ckHint");
   const READY = "오늘의 포춘쿠키 · 셋 중 하나, 신중히";
   let recentF = [], busy = false, opened = false;   // 최근 8회 재등장 금지 (룰렛과 같은 규칙)
@@ -1259,10 +1256,6 @@ const COOKIE_FORTUNES = [
     recentF.push(i);
     if (recentF.length > 8) recentF.shift();
     return COOKIE_FORTUNES[i];
-  };
-  const issueNo = () => {
-    const d = new Date();
-    return "제 " + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0") + " 호";
   };
   const reset = () => {
     busy = true;
@@ -1310,7 +1303,6 @@ const COOKIE_FORTUNES = [
           });
           if (navigator.vibrate) navigator.vibrate([12, 40, 14]); // 톡-뽀각 (지원 기기만)
         }
-        noEl.textContent = issueNo();
         track("cookie", { line: line, dud: isDud, dodged: !isDud && dudIdx >= 0 });
         paper.classList.add("show");
         hint.textContent = "한 번 더 누르면 새 쿠키 세 개가 준비돼요";
