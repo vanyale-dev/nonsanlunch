@@ -711,7 +711,8 @@
     <div class="ncs-li">🔥 <b>인기체인 12곳</b> — 전국구가 논산까지 온 집</div>
     <div class="ncs-li">🎈 <b>어린이날 32곳</b> — 팀장님 안 계신 날, 눈치 없이 가는 특선(비싸거나, 멀거나, 구워 먹어야 하는 집)</div>
     <div class="ncs-li">🖋 <b>결재 도장</b> — 다녀온 집엔 카드 오른쪽 아래 결재란에 <b>승인/반려 도장</b>을 찍으세요. (지금은 내 폰에만 저장돼요)</div>
-    <div class="ncs-li">🆕 <b>새로오픈</b> — 네이버에 '새로 오픈'으로 표시된 논산 신상 집. 90일 지나면 배지가 저절로 떨어져요.</div></div>
+    <div class="ncs-li">🆕 <b>새로오픈</b> — 네이버에 '새로 오픈'으로 표시된 논산 신상 집. 90일 지나면 배지가 저절로 떨어져요.</div>
+    <div class="ncs-li">📊 <b>통계</b> — 버튼이 몇 번 눌리는지만 셉니다. 누가 눌렀는지, 뭘 검색했는지는 안 봅니다.</div></div>
 
     <div class="ncs-h">🍓 딸기는 어떻게 매겨요?</div>
     <div class="ncs-p"><b>논산 토박이 맛집 전용</b>입니다. 손님 별점이 아주 높거나, 블루리본·백년가게가 인정한 집 — 어느 쪽이든 <b>진짜 글 후기</b>가 받쳐줘야 합니다. 윗등급(2·3딸기)은 <b>네이버에 별점이 공개된 집만</b> 답니다.</div>
@@ -883,7 +884,7 @@ function stipPick(now) {
   const isCriOS = /CriOS/.test(navigator.userAgent); // 아이폰 크롬
   let deferred = null;
   window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferred = e; btn.hidden = false; });
-  window.addEventListener("appinstalled", () => { btn.hidden = true; });
+  window.addEventListener("appinstalled", () => { btn.hidden = true; track("a2hs_installed", {}); });
   if (isIOS) btn.hidden = false;
   function openGuide() {
     document.getElementById("agTitle").textContent =
@@ -909,7 +910,7 @@ function stipPick(now) {
       const p = deferred; deferred = null; btn.hidden = true;
       p.prompt();
       // 거절하면 버튼을 되살린다 — 마음 바뀌었을 때 새로고침 없이 다시 시도 가능
-      p.userChoice.then(c => { if (c.outcome !== "accepted") btn.hidden = false; }).catch(() => { btn.hidden = false; });
+      p.userChoice.then(c => { track("a2hs_result", { outcome: c.outcome }); if (c.outcome !== "accepted") btn.hidden = false; }).catch(() => { btn.hidden = false; });
       return;
     }
     // navigator.share()는 기각(2026-08-12 실기기 반증): '홈 화면에 추가'는 브라우저가
@@ -934,6 +935,7 @@ if (NET_ON && GA_ID.indexOf("G-") === 0) {
   gtag("config", GA_ID);
 }
 const track = (ev, p) => { if (NET_ON && GA_ID.indexOf("G-") === 0) gtag("event", ev, p || {}); };
+if (matchMedia("(display-mode: standalone)").matches || navigator.standalone) track("standalone_open", {});
 /* 날씨(논산 시간별·현재, open-meteo) — 데이터 연동만, 화면 활용은 추후 구체화 */
 window.WEATHER = null;
 /* 점심 창구 기상 안내 — 오늘(14:30 이후엔 내일) 10~14시. 판단문이 주인공, 스트립은 근거.
@@ -1400,7 +1402,7 @@ const matches = r => !!r &&
     state.q = normQ(inp.value);
     clr.classList.toggle("on", inp.value.length > 0);
     clearTimeout(qT);
-    if (state.q) qT = setTimeout(() => track("search", { q: inp.value.trim() }), 1200);
+    if (state.q) qT = setTimeout(() => track("search", { n: state.q.length }), 1200); // 원문 미송신 — 사생활
     invalidateBoard();
     listCollapsed = false; render();
   };
@@ -1543,6 +1545,9 @@ function card(r) {
 
 /* ── 직원 결재 도장 — 다녀온 집에 승인/반려. v1: 이 기기(localStorage)에만 저장. ── */
 let STAMPS = {};
+let ISSUED = [];
+try { ISSUED = JSON.parse(localStorage.getItem("nslunch_issued") || "[]") || []; } catch (e) {}
+if (!Array.isArray(ISSUED)) ISSUED = [];
 try { STAMPS = JSON.parse(localStorage.getItem("stamps") || "{}") || {}; } catch (e) {}
 if (typeof STAMPS !== "object" || Array.isArray(STAMPS) || STAMPS === null) STAMPS = {}; // 손상 저장값 방어
 const stampOpen = new Set();
@@ -1568,7 +1573,7 @@ document.getElementById("list").addEventListener("click", e => {
   if (act === "open") { stampOpen.add(nm); }
   else if (act === "close") { stampOpen.delete(nm); }
   else if (act === "clear") { delete STAMPS[nm]; stampOpen.delete(nm); }
-  else { STAMPS[nm] = act; stampOpen.delete(nm); track("stamp", { name: nm, act: act }); }
+  else { STAMPS[nm] = act; stampOpen.delete(nm); track("stamp", { act: act, tk: ISSUED.indexOf(nm) >= 0 }); } // 상호명 미송신 — 평가는 사적 기록
   try { localStorage.setItem("stamps", JSON.stringify(STAMPS)); } catch (e2) {}
   render();
 });
@@ -1742,6 +1747,8 @@ function land(pick) {
   try { ist = JSON.parse(localStorage.getItem("nslunch_issue")); } catch (e) {}
   issueCount = ((ist && ist.d === today) ? ist.n : 0) + 1;
   try { localStorage.setItem("nslunch_issue", JSON.stringify({ d: today, n: issueCount })); } catch (e) {}
+  if (ISSUED.indexOf(pick.name) < 0) { ISSUED.push(pick.name); if (ISSUED.length > 40) ISSUED.shift(); }
+  try { localStorage.setItem("nslunch_issued", JSON.stringify(ISSUED)); } catch (e) {}
   track("ticket", { name: pick.name, nc: pick.nc, cat: pick.category, move: pick.move, issue: issueCount });
   const bd = document.getElementById("board");
   bd.classList.remove("idle"); bd.classList.add("called");
@@ -1769,7 +1776,7 @@ document.getElementById("spin").onclick = () => {
   track("spin", { pool: pool.length,
     mood: [...state.moodSet].join("·"), cat: [...state.catSet].join("·"), move: [...state.moveSet].join("·"),
     pick_filter: ncOnly ? "논슐랭" : chainOnly ? "인기체인" : blueOnly ? "블루리본" : certOnly ? "백년가게" : kidOnly ? "어린이날" : "",
-    q: state.q || "" });
+    q_len: (state.q || "").length });
   spinning = true; setBtn(true);
   stopWarm();
   // 숨겨진 탭에서는 rAF가 멈춰 릴이 영원히 안 끝난다 — 즉시 착지 (visibilitychange의 시작 시점 판)
