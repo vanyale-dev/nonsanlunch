@@ -425,6 +425,7 @@
     background-image: linear-gradient(90deg, var(--paper-line) 0 5px, transparent 5px 10px);
     background-size: 10px 2px; background-repeat: repeat-x; background-position: 0 0;
   }
+  .news-head:disabled { cursor: default; }
   .news-head { display: flex; align-items: baseline; gap: 6px; width: 100%; padding: 9px 0 8px;
     background: none; border: 0; font-family: inherit; color: inherit; cursor: pointer; text-align: left; }
   .news-title { font-size: 10.5px; font-weight: 800; letter-spacing: .12em; color: var(--paper-ink-sub); }
@@ -600,10 +601,10 @@
 
   <div class="cookie" id="cookieTray">
     <div class="ck-tray" id="ckTrayRow">
-      <button class="ck-slot" type="button" aria-label="포춘쿠키 고르기"><span class="ck-stage"><span class="ck-half ck-l" aria-hidden="true">🥠</span><span class="ck-half ck-r" aria-hidden="true">🥠</span><span class="ck-crumb" style="--dx:-30px;--dy:26px"></span><span class="ck-crumb" style="--dx:-14px;--dy:38px;animation-delay:.04s"></span><span class="ck-crumb" style="--dx:4px;--dy:42px;animation-delay:.02s"></span><span class="ck-crumb" style="--dx:18px;--dy:36px;animation-delay:.06s"></span><span class="ck-crumb" style="--dx:32px;--dy:24px"></span><span class="ck-crumb" style="--dx:-2px;--dy:-18px;animation-delay:.03s"></span><span class="ck-dud" aria-hidden="true">꽝</span></span></button><button class="ck-slot" type="button" aria-label="포춘쿠키 고르기"><span class="ck-stage"><span class="ck-half ck-l" aria-hidden="true">🥠</span><span class="ck-half ck-r" aria-hidden="true">🥠</span><span class="ck-crumb" style="--dx:-30px;--dy:26px"></span><span class="ck-crumb" style="--dx:-14px;--dy:38px;animation-delay:.04s"></span><span class="ck-crumb" style="--dx:4px;--dy:42px;animation-delay:.02s"></span><span class="ck-crumb" style="--dx:18px;--dy:36px;animation-delay:.06s"></span><span class="ck-crumb" style="--dx:32px;--dy:24px"></span><span class="ck-crumb" style="--dx:-2px;--dy:-18px;animation-delay:.03s"></span><span class="ck-dud" aria-hidden="true">꽝</span></span></button><button class="ck-slot" type="button" aria-label="포춘쿠키 고르기"><span class="ck-stage"><span class="ck-half ck-l" aria-hidden="true">🥠</span><span class="ck-half ck-r" aria-hidden="true">🥠</span><span class="ck-crumb" style="--dx:-30px;--dy:26px"></span><span class="ck-crumb" style="--dx:-14px;--dy:38px;animation-delay:.04s"></span><span class="ck-crumb" style="--dx:4px;--dy:42px;animation-delay:.02s"></span><span class="ck-crumb" style="--dx:18px;--dy:36px;animation-delay:.06s"></span><span class="ck-crumb" style="--dx:32px;--dy:24px"></span><span class="ck-crumb" style="--dx:-2px;--dy:-18px;animation-delay:.03s"></span><span class="ck-dud" aria-hidden="true">꽝</span></span></button>
+      <button class="ck-slot" type="button" aria-label="포춘쿠키 1번 고르기"><span class="ck-stage"><span class="ck-half ck-l" aria-hidden="true">🥠</span><span class="ck-half ck-r" aria-hidden="true">🥠</span><span class="ck-crumb" style="--dx:-30px;--dy:26px"></span><span class="ck-crumb" style="--dx:-14px;--dy:38px;animation-delay:.04s"></span><span class="ck-crumb" style="--dx:4px;--dy:42px;animation-delay:.02s"></span><span class="ck-crumb" style="--dx:18px;--dy:36px;animation-delay:.06s"></span><span class="ck-crumb" style="--dx:32px;--dy:24px"></span><span class="ck-crumb" style="--dx:-2px;--dy:-18px;animation-delay:.03s"></span><span class="ck-dud" aria-hidden="true">꽝</span></span></button><button class="ck-slot" type="button" aria-label="포춘쿠키 2번 고르기"><span class="ck-stage"><span class="ck-half ck-l" aria-hidden="true">🥠</span><span class="ck-half ck-r" aria-hidden="true">🥠</span><span class="ck-crumb" style="--dx:-30px;--dy:26px"></span><span class="ck-crumb" style="--dx:-14px;--dy:38px;animation-delay:.04s"></span><span class="ck-crumb" style="--dx:4px;--dy:42px;animation-delay:.02s"></span><span class="ck-crumb" style="--dx:18px;--dy:36px;animation-delay:.06s"></span><span class="ck-crumb" style="--dx:32px;--dy:24px"></span><span class="ck-crumb" style="--dx:-2px;--dy:-18px;animation-delay:.03s"></span><span class="ck-dud" aria-hidden="true">꽝</span></span></button><button class="ck-slot" type="button" aria-label="포춘쿠키 3번 고르기"><span class="ck-stage"><span class="ck-half ck-l" aria-hidden="true">🥠</span><span class="ck-half ck-r" aria-hidden="true">🥠</span><span class="ck-crumb" style="--dx:-30px;--dy:26px"></span><span class="ck-crumb" style="--dx:-14px;--dy:38px;animation-delay:.04s"></span><span class="ck-crumb" style="--dx:4px;--dy:42px;animation-delay:.02s"></span><span class="ck-crumb" style="--dx:18px;--dy:36px;animation-delay:.06s"></span><span class="ck-crumb" style="--dx:32px;--dy:24px"></span><span class="ck-crumb" style="--dx:-2px;--dy:-18px;animation-delay:.03s"></span><span class="ck-dud" aria-hidden="true">꽝</span></span></button>
       <span class="ck-paper" id="ckPaper"><span id="ckLine"></span></span>
     </div>
-    <span class="ck-hint" id="ckHint">오늘의 포춘쿠키 · 마음에 드는 걸 골라 깨보세요</span>
+    <span class="ck-hint" id="ckHint">오늘의 포춘쿠키 · 셋 중 하나, 신중히</span>
   </div>
 
   <div class="ticket-zone" id="ticketZone"></div>
@@ -692,7 +693,7 @@
 
 <div id="ncSheetWrap" hidden>
   <div class="nc-backdrop" id="ncBackdrop"></div>
-  <div class="nc-sheet" id="ncSheet" role="dialog" aria-modal="true" aria-label="이용 안내">
+  <div class="nc-sheet" id="ncSheet" role="dialog" aria-modal="true" aria-label="이용 안내" tabindex="-1">
     <div class="ncs-head">
       <div><b>이용 안내</b><div class="ncs-sub">궁금한 것만 골라 읽으세요</div></div>
       <button class="ncs-x" id="ncClose" type="button" aria-label="닫기">✕</button>
@@ -779,7 +780,7 @@ const STIP_SEASONS = [
   { f:[11,15],t:[2,28],  when:"겨울",   pr:1, s:"🥯", h:"겨울 간식 개장", tips:["붕어빵·호떡·군고구마가 돌아오는 때 — 점심 후 디저트는 길에서.","호떡의 '호'는 중국에서 건너왔다는 뜻이에요. 이름에 출신이 그대로 남았어요.","머리부터냐 꼬리부터냐, 겨울마다 돌아오는 사무실 단골 논쟁이에요.","붕어빵의 조상은 일본의 도미빵이라고 해요. 건너오면서 도미가 붕어가 됐고요.","팥이냐 슈크림이냐로 편이 갈려요. 요즘은 한 봉지에 섞어 담는 쪽이 늘었고요.","비닐봉지에 오래 두면 김이 서려 눅눅해져요. 종이봉투 쪽이 바삭함이 오래가요.","갓 구운 순간이 절정이라, 걸어가면서 먹는 게 제일 맛있는 방법이에요.","고구마는 냉장고에 넣으면 오히려 상해요. 서늘한 자리에 두는 편이 맞아요.","군고구마는 세로로 반 갈라 숟가락으로 파먹으면 손에 안 묻어요.","군고구마엔 동치미나 김치, 아니면 우유 한 잔. 목 막히는 걸 막아줘요.","호떡 속 흑설탕은 생각보다 훨씬 뜨거워요. 첫 입은 가장자리부터가 안전해요.","씨앗호떡은 부산에서 시작된 방식이에요. 설탕 대신 견과가 우수수 들어가요.","밤고구마는 퍽퍽하고 진하고, 호박고구마는 촉촉하고 달아요. 취향 차이예요.","식은 군고구마를 얼려두면 아이스크림 비슷한 간식이 돼요.","계란빵은 붕어빵 옆의 조용한 강자예요. 안 달아서 점심 뒤에도 부담이 덜해요.","호빵은 전자레인지보다 찜기가 나아요. 급하면 물을 살짝 뿌리고 돌려도 되고요.","꼬리까지 팥이 차 있느냐로 그 집 인심을 가늠하는 사람도 있어요.","찬바람 불면 열리고 2월이면 하나둘 사라져요. 보이면 그날이 기회예요.","겨울 간식은 손난로 노릇도 해요. 봉투 쥐고 걷는 동안이 제일 따뜻하고요.","한 봉지 사서 돌리면 그날 오후 분위기가 조금 부드러워져요."] },
   { f:[11,15],t:[1,31],  when:"겨울",   pr:1, s:"🍊", h:"귤의 계절", tips:["손끝 노래지게 까먹는 계절 — 노지귤은 11월부터가 진짜예요.","껍질이 얇고 살짝 납작한 게 대체로 달아요. 큰 것보다 중간 크기가 실패가 적고요.","박스째 두면 아래쪽부터 물러요. 꺼내서 서늘한 데 펴 두면 훨씬 오래가요.","껍질 안쪽 흰 실은 떼지 말고 같이 먹는 편이 나아요. 식이섬유가 거기 붙어 있어요.","곰팡이 핀 한 알을 두면 옆으로 번져요. 보이는 대로 골라내는 게 나아요.","많이 먹으면 손이 노래지는 건 색소 때문이에요. 좀 줄이면 원래대로 돌아와요.","주무르면 달아진다는 말, 다들 한 번쯤 해봤죠. 믿거나 말거나 재미는 있어요.","말린 귤껍질은 차로 우려 마시기도 해요. 한약에서 쓰는 진피가 바로 그거예요.","1월이 지나면 한라봉이나 천혜향 쪽으로 바통이 넘어가요.","다 먹은 껍질을 그릇에 담아 두면 방 냄새가 좀 가셔요.","물량이 쏟아지는 초겨울이 값도 제일 순해요. 박스로 들이기 좋은 때고요.","제주에선 화로에 구워 먹기도 해요. 따뜻해지면 신맛이 덜해진대요.","책상 서랍에 몇 알 두면 오후가 한결 견딜 만해져요."] },
   { f:[12,15],t:[3,15],  when:"한겨울", pr:1, s:"🥗", h:"봄동", tips:["언 땅에 납작 붙어 자란 배추 — 추울수록 달아요. 겉절이나 된장국으로.","속이 안 차고 옆으로 퍼지는 배추예요. 겨울을 밖에서 나느라 그렇게 자라요.","잎이 두껍고 색이 짙은 걸 고르면 실패가 적어요. 너무 큰 건 질길 수 있고요.","겉절이는 무치자마자가 절정이에요. 두면 숨이 죽고 물이 생겨요.","가운데 노란 속잎이 많은 쪽이 부드러워요. 질긴 겉잎은 국에 넣으면 되고요.","된장국에 넣으면 국물이 순해져요. 오래 끓이면 흐물해지니 마지막에 넣고요.","삼겹살 쌈으로 싸면 상추보다 아삭해요. 된장이랑 특히 잘 맞고요.","씻지 말고 신문지에 싸서 채소칸에 두면 며칠은 버텨요.","바지락이랑 같이 끓인 봄동국은 겨울 속풀이로 자주 오르는 조합이에요.","밑동을 잘라 한 잎씩 떼어 씻어야 흙이 제대로 빠져요.","3월로 넘어가면 가운데 꽃대가 올라오면서 억세져요. 지금이 부드러울 때고요.","데치면 부피가 확 줄어요. 한 통 다 넣어도 한 접시밖에 안 나와요.","겨울에 채소값이 들썩일 때도 값 부담이 덜한 편이에요.","살짝 데쳐 된장에 무치면 반찬 하나가 금방 나와요.","한겨울 노지에서 크는 채소라, 남쪽에서 올라온 걸 만나기 쉬워요.","밀가루 얇게 입혀 부치면 단맛이 더 도드라져요.","겨울 밥상에 초록이 귀할 때 자리를 채워주는 채소예요.","겉절이 양념은 단출할수록 나아요. 세게 하면 봄동 단맛이 가려져요.","시장에 납작한 초록 다발이 쌓이기 시작하면 봄동 철이 온 거예요."] },
-  { f:[1,1],  t:[1,5],   when:"새해",   pr:2, s:"🍜", h:"새해 떡국", tip:"떡국 한 그릇에 나이 한 살 — 긴 가래떡엔 장수, 동전 모양 떡엔 부자 되란 뜻이래요." },
+  { f:[1,1],  t:[1,5],   when:"새해",   pr:3, s:"🍜", h:"새해 떡국", tips:["떡국 한 그릇에 나이 한 살 — 긴 가래떡엔 장수, 동전 모양 떡엔 부자 되란 뜻이래요.","새해 첫 주엔 떡국집이 은근히 붐벼요. 집에서 못 챙긴 사람들이 꽤 많거든요.","떡국 떡은 물에 불렸다 끓여야 국물이 맑아요. 식당 떡국이 부드러운 비결이기도 해요.","'꿩 대신 닭'이란 말이 떡국에서 나왔대요. 원래 꿩고기로 국물을 냈다고 해요.","떡국에 만두를 넣을지 말지는 집집마다 달라요. 반반으로 시키면 싸움이 안 나고요."] },
   { f:[3,1],  t:[4,30],  when:"봄",     pr:1, s:"🌿", h:"봄나물", tips:["냉이·달래·쑥이 식탁에 오르는 때 — 향으로 봄을 먼저 아는 채소들이에요.","향이 열에 잘 날아가요. 국에 넣을 땐 불 끄기 직전이 좋아요.","냉이는 뿌리에 향이 몰려 있어요. 흙 털기 귀찮아도 뿌리째 쓰는 게 맞아요.","달래는 간장에 고춧가루랑 참기름만 더하면 끝이에요. 밥에 비비면 한 그릇 뚝딱이고요.","쑥은 어릴수록 부드러워요. 자라면 쓴맛이 세져서 떡 쪽으로 가게 되고요.","길가나 밭둑 가까이 자란 건 피하는 게 좋아요. 먼지를 그대로 뒤집어써서요.","두릅은 데쳐서 초고추장에 찍는 게 기본이에요. 생으로는 먹지 않는 나물이고요.","봄나물은 오래 못 버텨요. 젖은 키친타월에 싸 두고 하루 이틀 안에 먹는 게 좋아요.","데칠 때 소금을 조금 넣고 찬물에 바로 헹구면 색이 살아요.","봄에 입맛이 없을 때 한 접시 올리면 젓가락이 먼저 움직여요.","결국 된장으로 모여요. 냉이도 달래도 된장과 붙여 놓으면 웬만하면 되거든요.","4월도 중순을 넘기면 대가 서고 억세져요. 향으로 먹는 채소라 이를수록 좋고요.","많이 샀으면 데쳐서 나눠 얼려 두면 돼요. 향은 좀 줄지만 두고 먹을 수 있어요."] },
   { f:[3,1],  t:[4,30],  when:"봄",     pr:1, s:"🐙", h:"봄 주꾸미", tips:["알이 차는 봄 주꾸미 — 통통한 몸통에 든 '쌀밥'이 이 철의 별미예요.","쭈꾸미라고 쓰는 사람이 많은데, 맞는 말은 주꾸미예요. 메뉴판마다 다르죠.","머리에 알이 찼다고들 하지만, 그 동그란 부분은 사실 몸통이에요.","'봄 주꾸미, 가을 낙지'라는 말이 있어요. 지금은 주꾸미 차례예요.","몸통을 살짝 눌렀을 때 단단하게 버티면 알이 잘 든 거예요.","센 불에 오래 두면 금세 질겨져요. 살짝 데쳐 건질 때가 제일 부드러워요.","삼겹살이랑 같이 볶는 조합이 흔해요. 기름진 맛을 주꾸미가 눌러 줘요.","볶고 남은 양념에 밥을 넣어 볶으면 한 그릇이 더 나와요.","손질할 때 밀가루를 조금 뿌려 주무르면 빨판 사이 뻘이 잘 빠져요.","서천이랑 보령 앞바다에서 많이 올라와요. 논산에서는 꽤 가까운 바다예요.","5월로 넘어가면 알이 빠지기 시작해요. 지금이 딱 한창일 때예요."] },
   { f:[3,1],  t:[4,15],  when:"봄",     pr:1, s:"🐠", h:"도다리쑥국", tips:["'봄 도다리, 가을 전어' — 통영에서 올라온 봄의 맛이에요.","눈이 왼쪽에 몰린 게 광어, 오른쪽이면 도다리예요. 좌광우도라고 외워요.","이름은 생선이 앞에 붙지만, 이 국의 향을 정하는 쪽은 쑥이에요.","쑥은 불을 끄기 직전에 넣을 때 향이 가장 살아 있어요.","고춧가루 없이 맑게 끓이는 국이에요. 된장도 아주 조금만 들어가요.","억세지기 전 여린 쑥으로만 끓여요. 4월 중순이면 이 국도 끝나요.","남해안에서 봄에만 끓이는 국이라, 내륙에서는 만나기가 쉽지 않아요.","도다리쑥국엔 된장을 살짝만 풀어요. 쑥 향이 주인공이라 간은 뒤로 물러나요."] },
@@ -823,7 +824,7 @@ function stipCore(now) {
   if (DONGJI[y]) { const df = diffD(DONGJI[y][0], DONGJI[y][1]);
     if (df === 0) list.push({ pr: 5, when: "오늘", s: "🫘", h: "오늘 동지", tip: "1년 중 밤이 가장 긴 날 — 팥죽에 새알심은 나이만큼이래요." }); }
   if (BOREUM[y]) { const df = diffD(BOREUM[y][0], BOREUM[y][1]);
-    if (df === 0) list.push({ pr: 4, when: "오늘", s: "🌕", h: "정월대보름", tip: "아침 부럼(호두·땅콩) 깨무셨나요 — 오곡밥에 나물 먹는 날이에요." }); }
+    if (df === 0) list.push({ pr: 5, when: "오늘", s: "🌕", h: "정월대보름", tip: "아침 부럼(호두·땅콩) 깨무셨나요 — 오곡밥에 나물 먹는 날이에요." }); }
   [SEOLLAL, CHUSEOK].forEach((T, ti) => {
     if (!T[y]) return;
     const df = -diffD(T[y][0], T[y][1]);
@@ -837,7 +838,7 @@ function stipCore(now) {
   if (md === 303) list.push({ pr: 4, when: "3/3", s: "🥓", h: "삼겹살데이", tip: "3이 겹치는 날 — 마트 삼겹살 할인이 몰리는 날이에요. 저녁 회식각?" });
   if (md === 414) list.push({ pr: 3, when: "4/14", s: "🍜", h: "블랙데이", tip: "짜장면 먹는 날 — 솔로가 아니어도 먹을 수 있습니다." });
   if (md === 1111) list.push({ pr: 3, when: "11/11", s: "🍫", h: "빼빼로데이 · 가래떡데이", tip: "어느 쪽이든 과자와 떡은 간식 — 점심은 따로 챙기세요." });
-  if (md === 1101) list.push({ pr: 2, when: "11/1", s: "🐂", h: "한우데이", tip: "숫자 1 세 개가 소 우(牛)자를 닮아 정해진 날이래요 — 한우 어때요." });
+  if (md === 1101) list.push({ pr: 3, when: "11/1", s: "🐂", h: "한우데이", tip: "숫자 1 세 개가 소 우(牛)자를 닮아 정해진 날이래요 — 한우 어때요." });
   if (!list.length) return null;
   const top = Math.max(...list.map(e => e.pr));
   // 이벤트일(pr3+)만 독점 표시. 시즌 팁(pr1·2)끼리는 전부 섞어 날마다 순환 — 긴 시즌 배너 실명 방지.
@@ -881,24 +882,35 @@ function stipPick(now) {
   const isCriOS = /CriOS/.test(navigator.userAgent); // 아이폰 크롬
   let deferred = null;
   window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferred = e; btn.hidden = false; });
+  window.addEventListener("appinstalled", () => { btn.hidden = true; });
   if (isIOS) btn.hidden = false;
   function openGuide() {
     document.getElementById("agTitle").textContent =
-      "홈 화면에 추가하는 법 (" + (isCriOS ? "크롬" : "사파리") + ")";
+      "홈 화면에 추가하는 법 (" + (isCriOS ? "크롬" : isIOS ? "사파리" : "이 브라우저") + ")";
     document.getElementById("agSteps").innerHTML = (isCriOS
       ? ["1. 이 창을 닫고, 주소창 오른쪽 <b>공유 버튼</b>(⬆︎)을 누르세요",
          "2. 아이콘 줄 맨 끝 <b>'더보기(View More)'</b>를 누르세요",
          "3. 목록에서 <b>'홈 화면에 추가(Add to Home Screen)'</b>를 누르세요",
          "4. 오른쪽 위 <b>추가</b> — 끝! 앱 아이콘이 생겨요"]
-      : ["1. 이 창을 닫고, 화면 아래 <b>공유 버튼</b>(네모에 화살표 ⬆︎)을 누르세요",
+      : isIOS
+      ? ["1. 이 창을 닫고, 화면 아래 <b>공유 버튼</b>(네모에 화살표 ⬆︎)을 누르세요",
          "2. <b>'홈 화면에 추가'</b>를 누르세요 <small>(안 보이면 목록을 위로 쓸어올려요)</small>",
          "3. 오른쪽 위 <b>추가</b> — 끝! 앱 아이콘이 생겨요"]
+      : ["1. 브라우저 <b>메뉴</b>(⋮ 또는 ⋯)를 여세요",
+         "2. <b>'홈 화면에 추가'</b> 또는 <b>'앱 설치'</b>를 누르세요",
+         "3. <b>추가</b> — 끝! 앱 아이콘이 생겨요"]
     ).map(s => '<div class="ag-step">' + s + "</div>").join("");
     guide.hidden = false;
   }
   btn.onclick = () => {
     track("a2hs", { ios: isIOS, crios: isCriOS });
-    if (deferred) { deferred.prompt(); deferred = null; btn.hidden = true; return; }
+    if (deferred) {
+      const p = deferred; deferred = null; btn.hidden = true;
+      p.prompt();
+      // 거절하면 버튼을 되살린다 — 마음 바뀌었을 때 새로고침 없이 다시 시도 가능
+      p.userChoice.then(c => { if (c.outcome !== "accepted") btn.hidden = false; }).catch(() => { btn.hidden = false; });
+      return;
+    }
     // navigator.share()는 기각(2026-08-12 실기기 반증): '홈 화면에 추가'는 브라우저가
     // 자기 공유 버튼으로 시트를 열 때만 주입되는 브라우저 전용 액션이라 웹이 연 시트엔 없다.
     openGuide();
@@ -988,6 +1000,7 @@ if (NET_ON) {
     box.hidden = false;
     if (rest.length) {
       more.innerHTML = render(rest);
+      head.disabled = false;
       hint.textContent = "+" + rest.length + "건 ▾";
       head.onclick = () => {
         const open = more.hidden;
@@ -996,6 +1009,9 @@ if (NET_ON) {
         hint.textContent = open ? "접기 ▴" : "+" + rest.length + "건 ▾";
         if (open) track("news_open", { n: items.length });
       };
+    } else {
+      head.disabled = true; // 더 볼 게 없으면 접기 버튼 노릇을 하지 않는다
+      head.removeAttribute("aria-expanded");
     }
   }).catch(() => {});
 }
@@ -1013,7 +1029,7 @@ const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 // 무드·음식종류는 다중 선택(빈 Set = 전체, 여러 개 = OR). 이동·정렬은 단일.
 const state = { moodSet: new Set(), catSet: new Set(), moveSet: new Set(), sort: "reco", q: "" };
 // 검색어 정규화 + 동의어 접기 (돈까스=돈가스=돈카츠 등) — 데이터 blob과 동일 규칙
-const SYN = {"돈가스": "돈까스", "돈카츠": "돈까스", "돈카스": "돈까스", "카츠": "돈까스", "주꾸미": "쭈꾸미", "쮸꾸미": "쭈꾸미", "자장": "짜장", "짜장면": "짜장", "짜장밥": "짜장", "떡복이": "떡볶이", "떡뽀끼": "떡볶이", "칼제비": "칼국수", "까페": "카페", "스파게티": "파스타", "스시": "초밥", "사시미": "회", "쌈밥": "쌈", "부침개": "전", "빈대떡": "전", "막국수": "냉면", "물냉": "냉면", "비빔냉": "냉면", "밀면": "냉면", "삼계탕": "백숙", "닭백숙": "백숙"};
+const SYN = {"돈가스": "돈까스", "돈카츠": "돈까스", "돈카스": "돈까스", "카츠": "돈까스", "주꾸미": "쭈꾸미", "쮸꾸미": "쭈꾸미", "자장": "짜장", "짜장면": "짜장", "짜장밥": "짜장", "떡복이": "떡볶이", "떡뽀끼": "떡볶이", "칼제비": "칼국수", "까페": "카페", "스파게티": "파스타", "스시": "초밥", "막국수": "냉면", "물냉": "냉면", "비빔냉": "냉면", "밀면": "냉면", "삼계탕": "백숙", "닭백숙": "백숙"};
 const normQ = s => {
   let t = String(s || "").toLowerCase().replace(/[\s·,().]/g, "");
   for (const k in SYN) t = t.split(k).join(SYN[k]);
@@ -1225,9 +1241,9 @@ const COOKIE_FORTUNES = [
   tilt(); rollDud();
   // 첫인상 — 쿠키 셋이 시차를 두고 툭·툭·툭 떨어져 앉는다
   slots.forEach((s, i) => {
-    s.classList.add("gone");
+    s.classList.add("gone"); s.disabled = true;
     setTimeout(() => {
-      s.classList.remove("gone"); s.classList.add("settle");
+      s.classList.remove("gone"); s.disabled = false; s.classList.add("settle");
       setTimeout(() => s.classList.remove("settle"), 520);
     }, 180 + i * 110);
   });
@@ -1250,11 +1266,11 @@ const COOKIE_FORTUNES = [
   const reset = () => {
     busy = true;
     paper.classList.remove("show");
-    slots.forEach(s => { s.classList.remove("lingergone", "revealdud"); s.classList.add("gone"); });
+    slots.forEach(s => { s.classList.remove("lingergone", "revealdud"); s.classList.add("gone"); s.disabled = true; });
     setTimeout(() => {
       slots.forEach(s => s.classList.remove("cracked"));
       tilt(); rollDud(); // 새 배치 — 앉음새도 꽝 위치도 새로
-      slots.forEach(s => { s.classList.remove("gone"); s.classList.add("settle"); });
+      slots.forEach(s => { s.classList.remove("gone"); s.disabled = false; s.classList.add("settle"); });
       setTimeout(() => {
         slots.forEach(s => s.classList.remove("settle"));
         hint.textContent = READY;
@@ -1280,7 +1296,7 @@ const COOKIE_FORTUNES = [
           line = "꽝";
           lineEl.innerHTML = '꽝<span class="ck-dudsub">다음 기회에</span>';
           paper.classList.add("dud");
-          slots.forEach(s => { if (s !== slot) s.classList.add("gone"); });
+          slots.forEach(s => { if (s !== slot) { s.classList.add("gone"); s.disabled = true; } });
           if (navigator.vibrate) navigator.vibrate([8, 60, 8]);
         } else {
           line = pickLine();
@@ -1288,6 +1304,7 @@ const COOKIE_FORTUNES = [
           paper.classList.remove("dud");
           slots.forEach((s, j) => {
             if (s === slot) return;
+            s.disabled = true;
             if (j === dudIdx) { s.classList.add("revealdud", "lingergone", "gone"); } // 피한 꽝 — 도장 찍혀 천천히 퇴장
             else s.classList.add("gone");
           });
@@ -1318,7 +1335,7 @@ function chips(el, items, key) {
     c.onclick = () => {
       state[key] = v;
       box.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.value === v)));
-      if (spinning) cancelSpin();
+      invalidateBoard();
       listCollapsed = false; render();
     };
     box.appendChild(c);
@@ -1337,9 +1354,10 @@ function multiChips(el, items, setKey) {
     c.onclick = () => {
       if (v === "전체") set.clear();
       else { set.has(v) ? set.delete(v) : set.add(v); }
+      if (set.size === items.length) set.clear(); // 전부 선택 = 전체와 동일 — '전체'로 접는다
       sync();
       track("filter", { group: el, value: v, on: v === "전체" ? "clear" : String(set.has(v)) });
-      if (spinning) cancelSpin();
+      invalidateBoard();
       listCollapsed = false; render();
     };
     box.appendChild(c);
@@ -1371,8 +1389,9 @@ const matches = r => !!r &&
   (!state.q || r.search.includes(state.q)) &&
   (state.moodSet.size === 0 || r.moods.some(m => state.moodSet.has(m))) &&
   (state.catSet.size === 0 || state.catSet.has(r.category)) &&
-  // 특별 선정 필터를 켜면 거리 무관하게 전부 보인다 — 먼 곳 명소가 숨지 않도록
-  ((ncOnly || chainOnly || blueOnly || certOnly || kidOnly || staffOnly || freshOnly) ? true : moveOk(r));
+  // 거리 필터는 특별 선정과 교집합 — '걸어서'+'인기체인'이면 걸어갈 수 있는 체인만.
+  // (과거의 '특별 선정 시 거리 무시'는 기본값 '전체'에선 무의미하고 명시 선택만 뒤집던 결함 — 2026-08-12 사장 적발)
+  moveOk(r);
 (function () {
   const inp = document.getElementById("searchInput"), clr = document.getElementById("searchClear");
   let qT = 0;
@@ -1381,7 +1400,7 @@ const matches = r => !!r &&
     clr.classList.toggle("on", inp.value.length > 0);
     clearTimeout(qT);
     if (state.q) qT = setTimeout(() => track("search", { q: inp.value.trim() }), 1200);
-    if (spinning) cancelSpin();
+    invalidateBoard();
     listCollapsed = false; render();
   };
   inp.addEventListener("input", apply);
@@ -1398,7 +1417,7 @@ function bindOnly(id, setFn) {
     document.getElementById("kidOnly").setAttribute("aria-pressed", String(kidOnly));
     document.getElementById("staffOnly").setAttribute("aria-pressed", String(staffOnly));
     document.getElementById("freshOnly").setAttribute("aria-pressed", String(freshOnly));
-    if (spinning) cancelSpin();
+    invalidateBoard();
     listCollapsed = false; render();
   };
 }
@@ -1416,16 +1435,14 @@ const spinPool = hit => hit.filter(r => (r.stars != null || r.force_roulette) &&
   && (state.catSet.has("카페") || r.category !== "카페"));
 // 최근 뽑은 곳 회피(shuffle-bag) — 직전 최대 8곳은 다시 안 뽑아 '방금 나온 집이 또' 방지.
 // 랜덤성은 유지(회피 목록 밖에서 균등 추첨). 풀이 작으면 회피 수를 자동 축소, 새로고침하면 초기화.
-let recentPicks = [];
+let recentPicks = [], pendingPick = null;
 const drawFrom = pool => {
   const avoidN = Math.min(8, pool.length - 1);
   const skip = new Set(recentPicks.slice(-avoidN));
   const bag = pool.filter(r => !skip.has(r.name));
   const src = bag.length ? bag : pool;
-  const pick = src[Math.floor(Math.random() * src.length)];
-  recentPicks.push(pick.name);
-  if (recentPicks.length > 8) recentPicks.shift();
-  return pick;
+  // 기록은 land() 성공 시에만 — 스핀 취소가 가방을 오염시키지 않게
+  return src[Math.floor(Math.random() * src.length)];
 };
 
 const SORT_OPTIONS = [["reco", "추천순"], ["dist", "가까운 순"], ["stars", "별점"], ["reviews", "리뷰 많은"]];
@@ -1455,18 +1472,21 @@ const COMPARATORS = {
 /* ── 논슐랭 ── */
 const strawImgs = n => '<i class="straw"></i>'.repeat(n);
 const ncWrap = document.getElementById("ncSheetWrap"), ncSheet = document.getElementById("ncSheet");
+let ncT = 0;
 function openNc() {
+  clearTimeout(ncT); // 닫힘 300ms 안에 재열림 → 유령 숨김+스크롤 잠금 방지
   ncWrap.hidden = false;
   track("faq_open", {});
   document.body.style.overflow = "hidden";
-  requestAnimationFrame(() => requestAnimationFrame(() => ncSheet.classList.add("open")));
+  requestAnimationFrame(() => requestAnimationFrame(() => { ncSheet.classList.add("open"); ncSheet.focus(); }));
 }
 function closeNc() {
   ncSheet.classList.remove("open");
   track("faq_close", {});
   document.body.style.overflow = "";
-  setTimeout(() => { ncWrap.hidden = true; }, 300);
+  ncT = setTimeout(() => { ncWrap.hidden = true; }, 300);
 }
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !ncWrap.hidden) closeNc(); });
 document.getElementById("ncOpen").onclick = openNc;
 document.getElementById("ncClose").onclick = closeNc;
 document.getElementById("ncBackdrop").onclick = closeNc;
@@ -1501,7 +1521,7 @@ function card(r) {
   return `<div class="card">
     <div class="row1">
       <span class="name">${esc(r.name)}</span>
-      ${r.nc ? '<button type="button" class="ncb" aria-label="논슐랭 ' + r.nc + '딸기 — 심사 기준 보기">' + strawImgs(r.nc) + "</button>" : ""}
+      ${r.nc ? '<button type="button" class="ncb" aria-label="논슐랭 ' + r.nc + '딸기 — 이용 안내 열기">' + strawImgs(r.nc) + "</button>" : ""}
       ${catChip(r.category)}
       ${r.chain ? '<span class="tag chain">🔥 인기 체인</span>' : ""}
       ${r.blue ? '<span class="tag blue"><i class="ribbon"></i>블루리본' + (r.ribbon >= 2 ? " " + r.ribbon + "리본" : "") + "</span>" : ""}
@@ -1523,6 +1543,7 @@ function card(r) {
 /* ── 직원 결재 도장 — 다녀온 집에 승인/반려. v1: 이 기기(localStorage)에만 저장. ── */
 let STAMPS = {};
 try { STAMPS = JSON.parse(localStorage.getItem("stamps") || "{}") || {}; } catch (e) {}
+if (typeof STAMPS !== "object" || Array.isArray(STAMPS) || STAMPS === null) STAMPS = {}; // 손상 저장값 방어
 const stampOpen = new Set();
 function stampHtml(nm) {
   const st = STAMPS[nm];
@@ -1597,7 +1618,8 @@ function render() {
     if (poolN === 0) {
       stopWarm();
       nameEl.classList.add("msg");
-      nameEl.textContent = (state.catSet.size === 1 && state.catSet.has("카페")) ? "카페는 구경 전용 창구예요 ☕" : "이 조건은 구경 전용이에요";
+      nameEl.textContent = hit.length === 0 ? "조건에 맞는 곳이 없어요"
+        : (state.catSet.size === 1 && state.catSet.has("카페")) ? "카페는 구경 전용 창구예요 ☕" : "이 조건은 구경 전용이에요";
       document.getElementById("spin").setAttribute("aria-disabled", "true");
     } else {
       nameEl.classList.remove("msg");
@@ -1615,11 +1637,15 @@ function setBtn(busy) {
 }
 /* 대기 상태: 어두운 이름들이 천천히 흐르는 예열 릴 — 기계는 늘 살아 있다 */
 function stopWarm() { if (warmRAF) { cancelAnimationFrame(warmRAF); warmRAF = 0; } }
+let warmSig = "";
 function startWarm() {
-  stopWarm();
   const pool = spinPool(DATA.filter(matches));
   const src = pool.length ? pool : DATA;
   const names = src.map(r => r.name);
+  const sig = names.join("|");
+  if (warmRAF && sig === warmSig) return; // 같은 풀이면 흐르던 릴을 끊지 않는다
+  warmSig = sig;
+  stopWarm();
   for (let i = names.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [names[i], names[j]] = [names[j], names[i]];
@@ -1642,11 +1668,17 @@ function resetBoard() {
   if (collapseT) { clearTimeout(collapseT); collapseT = 0; }
   const bd = document.getElementById("board");
   bd.classList.add("idle"); bd.classList.remove("called", "live");
-  document.getElementById("ticketZone").innerHTML = "";
-  document.getElementById("announce").textContent = "";
+  // 번호표는 비우지 않는다 — 취소는 전광판만 예열로 되돌린다 (새 발권만 티켓을 교체)
   startWarm();
 }
-function cancelSpin() { spinning = false; setBtn(false); resetBoard(); }
+function cancelSpin() { spinning = false; pendingPick = null; setBtn(false); resetBoard(); }
+// 조건이 바뀌면 전광판의 '호출 완료' 상태를 해제해 render()가 현 조건을 다시 말하게 한다.
+// 발급된 번호표는 지우지 않는다 — 종이표는 이미 손에 쥔 물건이다.
+function invalidateBoard() {
+  if (spinning) { cancelSpin(); return; }
+  const bd = document.getElementById("board");
+  if (bd.classList.contains("called")) { bd.classList.add("idle"); bd.classList.remove("called", "live"); }
+}
 
 function sealSvg() {
   return `<svg class="t-seal" viewBox="0 0 96 96" aria-hidden="true">
@@ -1692,7 +1724,7 @@ function ticketHtml(pick) {
       <div class="links">
         <a class="paper-btn" data-nm="${esc(pick.name)}" href="${esc(pick.naver_url)}" target="_blank" rel="noopener">네이버지도에서 보기</a>
       </div>
-      <div class="t-fine">본 번호표는 오늘 점심에 한하여 유효합니다 · 타 지점 제시 불가 · ${esc(fortune)}</div>
+      <div class="t-fine">${pick.expedition ? "⚠ 점심 거리 밖(차로 먼 곳) · " : ""}본 번호표는 오늘 점심에 한하여 유효합니다 · 타 지점 제시 불가 · ${esc(fortune)}</div>
       <div class="t-row">${barcodeSvg()}<span class="t-time">발급 ${esc(time)} · No.${esc(serial)}</span></div>
     </div>
     <div class="tkt-tear"></div>
@@ -1700,7 +1732,15 @@ function ticketHtml(pick) {
 }
 function land(pick) {
   if (!pick || !matches(pick)) { cancelSpin(); return; }
-  issueCount++;
+  pendingPick = null;
+  recentPicks.push(pick.name);
+  if (recentPicks.length > 8) recentPicks.shift();
+  // 오늘의 순번 — 날짜별로 저장해 새로고침·자정에도 이어진다
+  const today = new Date().toDateString();
+  let ist = null;
+  try { ist = JSON.parse(localStorage.getItem("nslunch_issue")); } catch (e) {}
+  issueCount = ((ist && ist.d === today) ? ist.n : 0) + 1;
+  try { localStorage.setItem("nslunch_issue", JSON.stringify({ d: today, n: issueCount })); } catch (e) {}
   track("ticket", { name: pick.name, nc: pick.nc, cat: pick.category, move: pick.move, issue: issueCount });
   const bd = document.getElementById("board");
   bd.classList.remove("idle"); bd.classList.add("called");
@@ -1724,6 +1764,7 @@ document.getElementById("spin").onclick = () => {
     return;
   }
   const pick = drawFrom(pool);
+  pendingPick = pick;
   track("spin", { pool: pool.length,
     mood: [...state.moodSet].join("·"), cat: [...state.catSet].join("·"), move: [...state.moveSet].join("·"),
     pick_filter: ncOnly ? "논슐랭" : chainOnly ? "인기체인" : blueOnly ? "블루리본" : certOnly ? "백년가게" : kidOnly ? "어린이날" : "",
@@ -1760,9 +1801,13 @@ document.getElementById("spin").onclick = () => {
 document.addEventListener("visibilitychange", () => {
   if (document.hidden && spinning) {
     if (spinRAF) { cancelAnimationFrame(spinRAF); spinRAF = 0; }
-    const pool = spinPool(DATA.filter(matches));
-    if (pool.length) land(drawFrom(pool));
+    land(pendingPick); // 릴에 심어둔 그 픽으로 즉시 착지 — 재추첨 금지
   }
+});
+// 날이 바뀐 채 다시 열면(홈 화면 앱 상주) 어제의 날씨·제철·운세가 남는다 — 새 하루로 리로드
+const LOAD_DAY = new Date().toDateString();
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && !spinning && new Date().toDateString() !== LOAD_DAY) location.reload();
 });
 
 /* ── 콘페티: 종이·잉크 색 조각 — 시간 기반 물리(60/120Hz 동일), 중앙 분수 + 좌우 캐넌 ── */
