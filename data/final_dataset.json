@@ -45,7 +45,8 @@
   "nc": 1,
   "nc_track": "crowd",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 134,
@@ -93,7 +94,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 136,
@@ -141,7 +143,8 @@
   "nc": 3,
   "nc_track": "crowd",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 9,
@@ -191,7 +194,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": true,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 3,
@@ -242,7 +246,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 11,
@@ -290,7 +295,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 4,
@@ -340,7 +346,8 @@
   "nc": 3,
   "nc_track": "crowd",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 5,
@@ -390,7 +397,8 @@
   "nc": 1,
   "nc_track": "crowd",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 8,
@@ -438,7 +446,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": true,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 13,
@@ -486,7 +495,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 15,
@@ -534,7 +544,8 @@
   "nc": 1,
   "nc_track": "crowd",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 19,
@@ -582,7 +593,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": true,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 93,
@@ -632,7 +644,8 @@
   "nc": 2,
   "nc_track": "crowd",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 104,
@@ -680,7 +693,8 @@
   "nc": 1,
   "nc_track": "crowd",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 129,
@@ -728,7 +742,8 @@
   "nc": 1,
   "nc_track": "crowd",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 135,
@@ -776,7 +791,8 @@
   "nc": 1,
   "nc_track": "crowd",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 138,
@@ -824,7 +840,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": true,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 139,
@@ -872,7 +889,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 140,
@@ -924,7 +942,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 142,
@@ -972,7 +991,8 @@
   "nc": 2,
   "nc_track": "crowd",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 144,
@@ -1020,7 +1040,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 14,
@@ -1071,7 +1092,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": true,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 16,
@@ -1122,7 +1144,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": true,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 17,
@@ -1170,7 +1193,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": true,
-  "kid": false
+  "kid": false,
+  "g3": false
  },
  {
   "idx": 18,
@@ -1218,7 +1242,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": true,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 30,
@@ -1269,7 +1294,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": true,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 95,
@@ -1317,7 +1343,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 130,
@@ -1369,7 +1396,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": true,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 131,
@@ -1421,7 +1449,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 132,
@@ -1469,7 +1498,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 137,
@@ -1517,7 +1547,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": true,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 141,
@@ -1568,7 +1599,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 143,
@@ -1616,7 +1648,8 @@
   "nc": 1,
   "nc_track": "crowd",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 92,
@@ -1668,7 +1701,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 6,
@@ -1716,7 +1750,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 7,
@@ -1766,7 +1801,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 160,
@@ -1814,7 +1850,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 168,
@@ -1862,7 +1899,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": false
  },
  {
   "idx": 20,
@@ -1915,7 +1953,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 23,
@@ -1965,7 +2004,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 24,
@@ -2013,7 +2053,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 25,
@@ -2061,7 +2102,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 26,
@@ -2113,7 +2155,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": false
  },
  {
   "idx": 28,
@@ -2161,7 +2204,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 32,
@@ -2209,7 +2253,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 102,
@@ -2261,7 +2306,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 107,
@@ -2309,7 +2355,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 118,
@@ -2359,7 +2406,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 126,
@@ -2407,7 +2455,8 @@
   "nc": 1,
   "nc_track": "crowd",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 128,
@@ -2457,7 +2506,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 172,
@@ -2507,7 +2557,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 173,
@@ -2557,7 +2608,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 112,
@@ -2609,7 +2661,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": false
  },
  {
   "idx": 21,
@@ -2657,7 +2710,8 @@
   "nc": 1,
   "nc_track": "heritage",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 35,
@@ -2705,7 +2759,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 22,
@@ -2756,7 +2811,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 117,
@@ -2809,7 +2865,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 27,
@@ -2859,7 +2916,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 29,
@@ -2910,7 +2968,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 31,
@@ -2962,7 +3021,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 103,
@@ -3010,7 +3070,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 146,
@@ -3058,7 +3119,8 @@
   "nc": 1,
   "nc_track": "heritage",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 152,
@@ -3106,7 +3168,8 @@
   "nc": 1,
   "nc_track": "heritage",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 158,
@@ -3154,7 +3217,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 166,
@@ -3205,7 +3269,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 169,
@@ -3256,7 +3321,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 101,
@@ -3309,7 +3375,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 33,
@@ -3357,7 +3424,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 34,
@@ -3408,7 +3476,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 38,
@@ -3456,7 +3525,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 108,
@@ -3506,7 +3576,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 40,
@@ -3556,7 +3627,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 41,
@@ -3604,7 +3676,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 115,
@@ -3654,7 +3727,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": false
  },
  {
   "idx": 44,
@@ -3702,7 +3776,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 45,
@@ -3752,7 +3827,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 46,
@@ -3805,7 +3881,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 47,
@@ -3853,7 +3930,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 90,
@@ -3904,7 +3982,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 124,
@@ -3952,7 +4031,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 125,
@@ -4000,7 +4080,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 161,
@@ -4048,7 +4129,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 163,
@@ -4096,7 +4178,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 170,
@@ -4147,7 +4230,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 171,
@@ -4195,7 +4279,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 94,
@@ -4243,7 +4328,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 54,
@@ -4293,7 +4379,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 42,
@@ -4344,7 +4431,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 56,
@@ -4392,7 +4480,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 43,
@@ -4440,7 +4529,8 @@
   "nc": 1,
   "nc_track": "heritage",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 57,
@@ -4490,7 +4580,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 58,
@@ -4541,7 +4632,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 59,
@@ -4591,7 +4683,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 12,
@@ -4639,7 +4732,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 48,
@@ -4691,7 +4785,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 49,
@@ -4742,7 +4837,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 50,
@@ -4792,7 +4888,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 51,
@@ -4840,7 +4937,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": false
  },
  {
   "idx": 52,
@@ -4890,7 +4988,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 53,
@@ -4940,7 +5039,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 60,
@@ -4990,7 +5090,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": false
  },
  {
   "idx": 61,
@@ -5040,7 +5141,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 63,
@@ -5090,7 +5192,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": false
  },
  {
   "idx": 99,
@@ -5141,7 +5244,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 105,
@@ -5191,7 +5295,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 110,
@@ -5242,7 +5347,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": false
  },
  {
   "idx": 120,
@@ -5292,7 +5398,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 127,
@@ -5342,7 +5449,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 151,
@@ -5390,7 +5498,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 155,
@@ -5438,7 +5547,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 162,
@@ -5486,7 +5596,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 164,
@@ -5534,7 +5645,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 167,
@@ -5582,7 +5694,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 65,
@@ -5632,7 +5745,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 0,
@@ -5680,7 +5794,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": true,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 66,
@@ -5731,7 +5846,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 67,
@@ -5783,7 +5899,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 69,
@@ -5831,7 +5948,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 71,
@@ -5879,7 +5997,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 97,
@@ -5927,7 +6046,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": false
  },
  {
   "idx": 55,
@@ -5975,7 +6095,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 98,
@@ -6025,7 +6146,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 72,
@@ -6077,7 +6199,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 73,
@@ -6128,7 +6251,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 62,
@@ -6176,7 +6300,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 64,
@@ -6228,7 +6353,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 75,
@@ -6278,7 +6404,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": false
  },
  {
   "idx": 76,
@@ -6328,7 +6455,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": false
  },
  {
   "idx": 77,
@@ -6379,7 +6507,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 91,
@@ -6430,7 +6559,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 119,
@@ -6478,7 +6608,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 145,
@@ -6529,7 +6660,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 149,
@@ -6577,7 +6709,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 150,
@@ -6627,7 +6760,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 154,
@@ -6677,7 +6811,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 159,
@@ -6725,7 +6860,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 165,
@@ -6773,7 +6909,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 68,
@@ -6821,7 +6958,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 78,
@@ -6873,7 +7011,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": false
  },
  {
   "idx": 79,
@@ -6923,7 +7062,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": false
  },
  {
   "idx": 113,
@@ -6975,7 +7115,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": false
  },
  {
   "idx": 109,
@@ -7023,7 +7164,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 80,
@@ -7073,7 +7215,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 81,
@@ -7121,7 +7264,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 111,
@@ -7171,7 +7315,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": false
  },
  {
   "idx": 121,
@@ -7221,7 +7366,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 123,
@@ -7269,7 +7415,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 148,
@@ -7319,7 +7466,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": false
  },
  {
   "idx": 153,
@@ -7369,7 +7517,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 157,
@@ -7419,7 +7568,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 122,
@@ -7467,7 +7617,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 116,
@@ -7515,7 +7666,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 83,
@@ -7563,7 +7715,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": true
+  "kid": true,
+  "g3": true
  },
  {
   "idx": 147,
@@ -7613,7 +7766,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 82,
@@ -7664,7 +7818,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 84,
@@ -7712,7 +7867,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 100,
@@ -7766,7 +7922,8 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  },
  {
   "idx": 156,
@@ -7820,6 +7977,7 @@
   "nc": 0,
   "nc_track": "",
   "popular_chain": false,
-  "kid": false
+  "kid": false,
+  "g3": true
  }
 ]
