@@ -966,10 +966,11 @@ function renderLunchWx(w) {
   const firstRain = idx.find(i => (H.precipitation_probability[i] || 0) >= 50);
   const rainH = firstRain !== undefined ? parseInt(H.time[firstRain].split("T")[1], 10) : null;
   // 판단문 — 우선순위: 비 > 폭염 > 한파 > 쌀쌀 > 쾌적 (메뉴·동선·준비물 결정 축).
-  // 말투 원칙: 명확한 상황(비 60%↑)만 단정, 경계 판단은 권유형 — 예보는 확률이니까.
+  // 말투 원칙: 명확한 상황(비 60%↑)만 단정, 경계(45~59%)만 권유. 45% 미만은 우산 언급 금지 —
+  // 30%에 우산을 권하면 맑은 날 이질감(2026-08-13 사장 실감 피드백). 시간대 띠의 % 표기가 정보를 대신한다.
   let advice;
   if (maxP >= 60) advice = "☔ 우산 꼭 챙기세요 — " + (rainH !== null ? rainH + "시부터 " : "") + "비 예보예요. 뜨끈한 국물 어때요?";
-  else if (maxP >= 30) advice = "🌂 비 올 확률 " + maxP + "% — 우산 하나 챙겨가는 게 어때요?";
+  else if (maxP >= 45) advice = "🌂 비 올 확률 " + maxP + "% — 혹시 모르니 우산 하나 챙겨갈까요?";
   else if (maxT >= 32) advice = "🥵 체감 " + Math.round(maxT) + "°까지 올라요 — 가까운 데서 시원한 걸로 어때요?";
   else if (minT <= -5) advice = "🥶 꽁꽁 어는 날이에요 — 차 타고 뜨끈한 국물 어때요?";
   else if (minT <= 3) advice = "🧤 좀 쌀쌀하겠어요 — 겉옷 하나 걸치는 게 어때요?";
