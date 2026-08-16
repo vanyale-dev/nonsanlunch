@@ -1,5 +1,5 @@
 {
- "scanned": "2026-08-11",
+ "scanned": "2026-08-16",
  "queries": {
   "식당": [
    "논산 식당",
@@ -13,8 +13,8 @@
    "논산 베이커리"
   ]
  },
- "total_new_opening": 25,
- "already_known": 22,
+ "total_new_opening": 26,
+ "already_known": 21,
  "candidates": [
   {
    "pid": "2062050332",
@@ -23,9 +23,21 @@
    "addr": "충남 논산시 양촌면 황산벌로1098번길 61-1 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 45,
+   "visitor_reviews": 46,
    "queries": [
     "논산 식당"
+   ]
+  },
+  {
+   "pid": "2022654951",
+   "name": "부대담 논산점",
+   "category": "찌개,전골",
+   "addr": "충남 논산시 연무읍 연무로 191-1 1층",
+   "kind": "식당",
+   "known": false,
+   "visitor_reviews": null,
+   "queries": [
+    "연무 식당"
    ]
   },
   {
@@ -41,13 +53,25 @@
    ]
   },
   {
+   "pid": "2019601342",
+   "name": "낭만카페",
+   "category": "카페",
+   "addr": "충남 논산시 논산대로 514 낭만카페",
+   "kind": "카페",
+   "known": false,
+   "visitor_reviews": 18,
+   "queries": [
+    "논산 카페"
+   ]
+  },
+  {
    "pid": "2060911290",
    "name": "카페 아트페어",
    "category": "카페,디저트",
    "addr": "충남 논산시 벌곡면 수락로 570 1,2층",
    "kind": "카페",
    "known": false,
-   "visitor_reviews": 2,
+   "visitor_reviews": 8,
    "queries": [
     "논산 카페"
    ]
