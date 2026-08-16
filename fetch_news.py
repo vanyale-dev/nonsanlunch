@@ -16,9 +16,12 @@ def toks4(t):
     return {w for w in re.findall(r"[가-힣A-Za-z0-9]{4,}", t) if w not in ("논산시", "충청남도")}
 
 
+def clean_cdata(raw):
+    return re.sub(r"<!\[CDATA\[(.*?)\]\]>", r"\1", raw or "", flags=re.S).strip()
+
+
 def clean_title(raw):
-    raw = re.sub(r"<!\[CDATA\[(.*?)\]\]>", r"\1", raw, flags=re.S)
-    return html.unescape(re.sub(r"<[^>]+>", "", raw)).strip()
+    return html.unescape(re.sub(r"<[^>]+>", "", clean_cdata(raw))).strip()
 
 
 def parse_items(xml):
@@ -33,7 +36,10 @@ def parse_items(xml):
             dt = parsedate_to_datetime(d.group(1))
         except Exception:
             continue
-        yield clean_title(t.group(1)), l.group(1).strip(), \
+        link = clean_cdata(l.group(1))  # 네이버 블로그 RSS는 링크도 CDATA 포장(2026-08-16 404 실사고)
+        if not link.startswith("http"):
+            continue  # 주소 형태가 아니면 명단에 올리지 않는다
+        yield clean_title(t.group(1)), link, \
             (html.unescape(s.group(1)) if s else ""), dt.strftime("%Y-%m-%d")
 
 
