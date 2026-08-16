@@ -64,11 +64,13 @@ def main():
                 pass
 
     found = {}
+    total_parsed = 0  # 파싱 붕괴 카나리아 — '신규 없음'과 '파서 고장'을 구별한다
     for kind, qs in QUERIES.items():
         for q in qs:
             try:
                 r = s.get(f"https://pcmap.place.naver.com/restaurant/list?query={quote(q)}", timeout=20)
                 items = apollo_items(r.text)
+                total_parsed += len(items)
             except Exception as e:
                 print(f"  ! {q}: {str(e)[:50]}")
                 continue
@@ -96,6 +98,10 @@ def main():
                 }
             print(f"  [{kind}] '{q}' → 신규개업 {new_cnt}건")
             time.sleep(random.uniform(1.0, 1.6))
+
+    if total_parsed == 0:
+        # '논산 식당' 검색이 0건일 수는 없다 — 마크업 변경·차단 의심. 조용한 빈 보고 대신 명시적 실패.
+        raise SystemExit("파싱 0건 — 네이버 응답 구조 변경 또는 차단 의심. 보고 미작성(거짓 '신규 없음' 방지)")
 
     fresh = [v for v in found.values() if not v["known"]]
 

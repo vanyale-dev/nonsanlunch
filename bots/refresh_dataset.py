@@ -82,6 +82,11 @@ def main():
             dead.append({"name": r["name"], "why": f"요청 실패: {str(e)[:40]}"})
         time.sleep(random.uniform(0.55, 0.95))
 
+    if checked < len(D) * 0.7:
+        # 30% 이상 접속 실패 = 실측이 아니라 차단·장애다. 이대로 기준선을 덮으면 다음 달
+        # '숨김→표시' 대량 오탐이 터진다 — 보고·기준선 모두 쓰지 않고 명시적으로 실패한다.
+        raise SystemExit(f"실측 실패 {len(D) - checked}/{len(D)} — 차단·장애 의심. 기준선 보호를 위해 중단")
+
     report = {
         "checked_at": date.today().isoformat(), "total": len(D), "reached": checked,
         "dead_suspect": dead, "renamed": renamed, "score_drift": drift,
