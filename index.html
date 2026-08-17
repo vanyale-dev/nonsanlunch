@@ -375,10 +375,13 @@
      종이·잉크는 물성이라 다크모드에서도 불변(.tkt와 동일 취급). ── */
   .slip-wrap { max-width: 330px; margin: 10px auto; transform: rotate(-.5deg);
     filter: drop-shadow(0 8px 16px rgba(30, 28, 20, .2)); }
+  /* 넓은 화면에서는 카드 컬럼(560px) 대비 왜소하지 않게 — 그래도 컬럼보다 좁아야 '뽑힌 종이' */
+  @media (min-width: 560px) { .slip-wrap { max-width: 420px; } }
+  /* 이빨 9px/12px 주기 — 굵으면 축소 화면에서 거친 톱니로 보인다 (2026-08-17 사장 지적) */
   .slip-tear {
-    height: 12px; background:
-      linear-gradient(-45deg, transparent 8px, var(--paper) 0) 0 0 / 16px 100% repeat-x,
-      linear-gradient(45deg, transparent 8px, var(--paper) 0) 8px 0 / 16px 100% repeat-x;
+    height: 9px; background:
+      linear-gradient(-45deg, transparent 6px, var(--paper) 0) 0 0 / 12px 100% repeat-x,
+      linear-gradient(45deg, transparent 6px, var(--paper) 0) 6px 0 / 12px 100% repeat-x;
   }
   .slip-tear.top { transform: scaleY(-1); } /* 이가 위를 향한다 */
   .slip { background: var(--paper); color: var(--ink); padding: 14px 16px 12px;
@@ -392,6 +395,7 @@
   .sl-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; margin-top: 7px;
     text-align: center; font-size: 10px; }
   .sl-strip .h { color: var(--paper-ink-sub); }
+  .sl-strip .i { font-size: 15px; line-height: 1.25; }   /* 이모지가 10px 상속이면 초라하다 */
   .sl-strip .t { font-weight: 800; }
   .sl-strip .p { font-size: 9px; font-weight: 800; color: #4A66A0; }
   .sl-line { font-size: 12.5px; font-weight: 700; margin-top: 3px; line-height: 1.5; word-break: keep-all; }
