@@ -984,7 +984,7 @@ const GA_ID = "G-8XRKP3CX6B";
 const NET_ON = /\.github\.io$/.test(location.hostname);
 /* 말로 하는 발권 — 문장 한 줄을 필터로 옮겨주는 창구 접수원. 엔드포인트는 빌드 시 주입하고,
    비어 있거나 https가 아니면 기능 전체가 휴면한다(키워드 검색만 그대로 동작). */
-const AI_EP = "https://nslunch-ai.nsboard-server.workers.dev/parse";
+const AI_EP = "";
 const AI_ON = NET_ON && /^https:/.test(AI_EP);
 /* 접수증 슬롯은 접수원이 있을 때만 존재한다 — 휴면 빌드(엔드포인트 없음·비네트워크)에서는
    자리 자체를 없앤다. 있지도 않은 기능을 "말로 하셔도 돼요"라고 안내하지 않기 위해서다.
