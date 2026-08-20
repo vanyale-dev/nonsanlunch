@@ -67,7 +67,7 @@
   "drive_min": 16,
   "dist_summary": "논산 전역 · 차 약 16분",
   "expedition": true,
-  "one_liner": "",
+  "one_liner": "탑정호 곁에서 마시는 커피",
   "moods": {
    "뜨끈한 국물": false,
    "매콤하게": false,
@@ -843,7 +843,7 @@
   "drive_min": 8,
   "dist_summary": "차 8분",
   "expedition": false,
-  "one_liner": "",
+  "one_liner": "고등어구이 반상 전문",
   "moods": {
    "뜨끈한 국물": false,
    "매콤하게": false,
@@ -1578,7 +1578,7 @@
   "drive_min": 10,
   "dist_summary": "차 10분",
   "expedition": false,
-  "one_liner": "",
+  "one_liner": "코코넛스무디커피 전문 카페",
   "moods": {
    "뜨끈한 국물": false,
    "매콤하게": false,
@@ -1944,7 +1944,7 @@
   "drive_min": 9,
   "dist_summary": "차 9분",
   "expedition": false,
-  "one_liner": "",
+  "one_liner": "소·돼지 무제한 샤브 뷔페",
   "moods": {
    "뜨끈한 국물": true,
    "매콤하게": false,
@@ -2680,7 +2680,7 @@
   "drive_min": 8,
   "dist_summary": "차 8분",
   "expedition": false,
-  "one_liner": "",
+  "one_liner": "민물새우 칼국수·들기름볶음밥",
   "moods": {
    "뜨끈한 국물": true,
    "매콤하게": false,
@@ -5940,7 +5940,7 @@
   "drive_min": 7,
   "dist_summary": "차 7분",
   "expedition": false,
-  "one_liner": "",
+  "one_liner": "에스프레소가 대표인 동네 카페",
   "moods": {
    "뜨끈한 국물": false,
    "매콤하게": false,
@@ -7046,7 +7046,7 @@
   "drive_min": 32,
   "dist_summary": "논산 전역 · 차 약 32분",
   "expedition": true,
-  "one_liner": "",
+  "one_liner": "돌솥밥 곁들인 한우탕 전문",
   "moods": {
    "뜨끈한 국물": true,
    "매콤하게": false,
@@ -7099,7 +7099,7 @@
   "drive_min": 29,
   "dist_summary": "논산 전역 · 차 약 29분",
   "expedition": true,
-  "one_liner": "",
+  "one_liner": "황기탕 보양식 전문 농원식당",
   "moods": {
    "뜨끈한 국물": true,
    "매콤하게": false,
@@ -7203,7 +7203,7 @@
   "drive_min": 24,
   "dist_summary": "논산 전역 · 차 약 24분",
   "expedition": true,
-  "one_liner": "",
+  "one_liner": "와인 테이스팅 체험 와이너리",
   "moods": {
    "뜨끈한 국물": false,
    "매콤하게": false,
@@ -7833,7 +7833,7 @@
   "drive_min": 24,
   "dist_summary": "논산 전역 · 차 약 24분",
   "expedition": true,
-  "one_liner": "",
+  "one_liner": "송어비빔회 전문 송어장",
   "moods": {
    "뜨끈한 국물": true,
    "매콤하게": true,
