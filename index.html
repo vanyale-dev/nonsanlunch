@@ -55,7 +55,7 @@
   .plaque img { width: 80px; height: 80px; flex: none; object-fit: contain;
     margin: -6px 0; filter: drop-shadow(0 1.5px 3px rgba(30, 28, 20, .28)); }
   .plaque h1 { font-size: 24px; font-weight: 900; letter-spacing: -0.6px; line-height: 1.2; color: var(--navy); }
-  /* 포춘쿠키 — 누르면 🥠이 반으로 쪼개지며 쪽지가 나온다 (이모지 반쪽 clip-path 트릭, 의존성 0) */
+  /* 포춘쿠키 — 누르면 쿠키가 반으로 쪼개지며 쪽지가 나온다 (자작 SVG 반쪽 clip-path, 의존성 0) */
   .cookie {
     display: block; width: 100%; margin-top: 10px; padding: 10px 12px 8px;
     background: var(--paper); color: var(--ink); cursor: pointer;
@@ -88,9 +88,11 @@
   }
   .ck-stage { position: relative; display: block; height: 78px; }
   .ck-half {
-    position: absolute; left: 50%; top: 6px; font-size: 52px; line-height: 1;
+    position: absolute; left: 50%; top: 6px; line-height: 1;
     transform: translateX(-50%);
   }
+  /* 쿠키는 자작 SVG — 이모지는 제조사마다 글리프가 달라 반쪽 clip 트릭이 깨진다 (2026-08-21) */
+  .ck-half svg { display: block; width: 52px; height: 52px; }
   .ck-l { clip-path: inset(-12% 49.5% -12% -12%); }
   .ck-r { clip-path: inset(-12% -12% -12% 49.5%); }
   /* 톡(살짝 눌림) → 뽀각(급가속 분리+오버슛) → 안착. 키프레임 초반 기울기가 스냅감의 핵심 */
@@ -144,8 +146,12 @@
     letter-spacing: .08em; color: var(--paper-ink-sub); text-align: center; }
   .ck-slot:active .ck-stage { transform: scale(.97); }
   @media (prefers-reduced-motion: reduce) {
-    .ck-half, .ck-crumb, .ck-slot.snap .ck-stage, .ck-slot.settle .ck-stage, .ck-slot.fidget .ck-stage { animation-duration: .01s; animation-delay: 0s; }
-    .ck-paper, .ck-slot, .ck-dud { transition-duration: .01s; transition-delay: 0s; }
+    /* 원본 규칙과 같은 특이도로 전부 재기술 — 낮춰 쓰면 캐스케이드에서 져서 무효가 된다(2026-08-21 검증 적발).
+       animation-delay의 !important는 부스러기 인라인 delay(스타일 속성)를 제압하기 위함. */
+    .ck-slot.cracked .ck-l, .ck-slot.cracked .ck-r, .ck-slot.cracked .ck-crumb,
+    .ck-slot.snap .ck-stage, .ck-slot.settle .ck-stage, .ck-slot.fidget .ck-stage,
+    .ck-half, .ck-crumb { animation-duration: .01s; animation-delay: 0s !important; }
+    .ck-paper, .ck-slot, .ck-slot.lingergone, .ck-dud { transition-duration: .01s; transition-delay: 0s; }
   }
   /* 기은센의 말풍선 — 오늘의 한마디 */
   .bubble {
@@ -296,13 +302,17 @@
     text-align: center; border-bottom: 1.5px solid var(--ink); padding-bottom: 8px; }
   .sec-label { font-size: 11.5px; font-weight: 800; color: var(--paper-ink-sub);
     margin: 13px 0 7px; letter-spacing: .08em; }
+  /* minmax(0,1fr) — 1fr만 쓰면 트랙 최소폭이 내용(min-content)에 붙잡혀
+     좁은 폰에서 칸이 오른쪽 벽을 넘는다. 0으로 풀어 4칸이 언제나 화면 안에 정렬(2026-08-21). */
   .chips-grid { display: grid; gap: 7px; }
-  .g2 { grid-template-columns: repeat(2, 1fr); }
-  .g3 { grid-template-columns: repeat(3, 1fr); }
-  .g4 { grid-template-columns: repeat(4, 1fr); }
+  .g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .g4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .chip {
-    font-family: inherit; font-size: 13px; font-weight: 700; line-height: 1.25;
-    min-height: 42px; padding: 4px 5px; word-break: keep-all;
+    /* 글자는 화면 폭 추종 — 390px에서 13px(현행 유지, 상한), 320px급에서 10px 하한.
+       넓은 화면이라고 더 커지지는 않는다 (2026-08-21 사장 지시: 가변 + 상한). */
+    font-family: inherit; font-size: clamp(10px, 4.3vw - 3.75px, 13px); font-weight: 700; line-height: 1.25;
+    min-height: 42px; padding: 4px 5px; word-break: keep-all; min-width: 0;
     display: flex; align-items: center; justify-content: center; text-align: center;
     background: var(--paper); color: var(--ink);
     border: 1.5px solid #B9AF9D; border-radius: 7px;
@@ -310,9 +320,9 @@
   }
   .chip[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: var(--paper); }
   .chip:disabled { opacity: .3; cursor: default; }
-  .chip.sm { min-height: 40px; font-size: 12.5px; }
+  .chip.sm { min-height: 40px; font-size: clamp(10px, 4.15vw - 3.7px, 12.5px); }
   /* 칩 통일 — 서식 칸은 계급 없이 전부 같은 크기, 어느 기기서든 한 줄 4칸 (2026-08-12 사장 지시).
-     좁은 화면에서 긴 라벨은 잘리는 대신 어절 단위 두 줄(keep-all)로 접힌다. */
+     좁은 화면에서는 글자가 폭을 따라 줄고, 그래도 긴 라벨은 어절 단위 두 줄(keep-all)로 접힌다. */
   #moodLabel { font-size: 13px; color: var(--ink); }
 
   /* ── 목록 (명부) ──────────────────────────── */
@@ -496,11 +506,24 @@
   .np-only.g3[aria-pressed="true"] { background: #26395B; color: #FAF7F0; }
   .np-only.fresh { border-color: #1F6B5C; color: #175A4E; }
   .np-only.fresh[aria-pressed="true"] { background: #1F6B5C; color: #E9F3F0; }
-  /* 특별 선정 필터 — 4열 그리드(7종 → 4+3), 칸 규격은 .chip과 동일 */
-  .pick-filters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-top: 5px; }
+  /* 특별 선정 필터 — 4열 그리드(8종 → 4+4), 칸 규격은 .chip과 동일 */
+  .pick-filters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; margin-top: 5px; }
+  /* 픽 칩 서체는 서식 칩보다 반 급 아래(캡 12.5px) — 가장 긴 라벨(식객허영만)이
+     390px 4칸에 여유 있게 들어가는 실측 조건. 칸 규격(42px)은 동일 유지. */
   .pick-filters .np-only { justify-content: center; text-align: center; white-space: nowrap;
-    gap: 4px; padding: 4px 5px; font-size: 13px; line-height: 1.25; min-height: 42px; border-radius: 7px; }
+    gap: 3px; padding: 4px 2px; font-size: clamp(10px, 4vw - 3.6px, 12.5px); line-height: 1.25;
+    letter-spacing: -0.2px; min-height: 42px; border-radius: 7px; min-width: 0; overflow: hidden; }
   .pick-filters .np-only .straw, .pick-filters .np-only .ribbon { flex: none; }
+  .pick-filters .pi { font-size: .8em; line-height: 1; flex: none; }
+  /* 협폭(399px 이하) — 간격·패딩·자간을 한 단계 조여 4칸 한 줄을 지킨다.
+     경계를 374가 아닌 399로 둔 이유: 374 기준이면 375~390px에서 조임이 풀리는데
+     글자는 이미 커져 여유가 0.1px대로 곤두박질친다(2026-08-21 검증 실측 — '골짜기'). */
+  @media (max-width: 399px) {
+    .chips-grid, .pick-filters { gap: 6px; }
+    .chip, .pick-filters .np-only { padding: 4px 3px; letter-spacing: -0.3px; }
+    .pick-filters .np-only { gap: 2px; padding: 4px 1px; }
+    .pick-filters .pi { font-size: .75em; }
+  }
   /* 직원 결재 도장 — 카드 우하단. 종이에 찍힌 인주 물성 */
   .stamp-zone { margin-left: auto; display: flex; align-items: center; gap: 5px; }
   .st-wait {
@@ -645,7 +668,7 @@
 
   <div class="cookie" id="cookieTray">
     <div class="ck-tray" id="ckTrayRow">
-      <button class="ck-slot" type="button" aria-label="포춘쿠키 1번 고르기"><span class="ck-stage"><span class="ck-half ck-l" aria-hidden="true">🥠</span><span class="ck-half ck-r" aria-hidden="true">🥠</span><span class="ck-crumb" style="--dx:-30px;--dy:26px"></span><span class="ck-crumb" style="--dx:-14px;--dy:38px;animation-delay:.04s"></span><span class="ck-crumb" style="--dx:4px;--dy:42px;animation-delay:.02s"></span><span class="ck-crumb" style="--dx:18px;--dy:36px;animation-delay:.06s"></span><span class="ck-crumb" style="--dx:32px;--dy:24px"></span><span class="ck-crumb" style="--dx:-2px;--dy:-18px;animation-delay:.03s"></span><span class="ck-dud" aria-hidden="true">꽝</span></span></button><button class="ck-slot" type="button" aria-label="포춘쿠키 2번 고르기"><span class="ck-stage"><span class="ck-half ck-l" aria-hidden="true">🥠</span><span class="ck-half ck-r" aria-hidden="true">🥠</span><span class="ck-crumb" style="--dx:-30px;--dy:26px"></span><span class="ck-crumb" style="--dx:-14px;--dy:38px;animation-delay:.04s"></span><span class="ck-crumb" style="--dx:4px;--dy:42px;animation-delay:.02s"></span><span class="ck-crumb" style="--dx:18px;--dy:36px;animation-delay:.06s"></span><span class="ck-crumb" style="--dx:32px;--dy:24px"></span><span class="ck-crumb" style="--dx:-2px;--dy:-18px;animation-delay:.03s"></span><span class="ck-dud" aria-hidden="true">꽝</span></span></button><button class="ck-slot" type="button" aria-label="포춘쿠키 3번 고르기"><span class="ck-stage"><span class="ck-half ck-l" aria-hidden="true">🥠</span><span class="ck-half ck-r" aria-hidden="true">🥠</span><span class="ck-crumb" style="--dx:-30px;--dy:26px"></span><span class="ck-crumb" style="--dx:-14px;--dy:38px;animation-delay:.04s"></span><span class="ck-crumb" style="--dx:4px;--dy:42px;animation-delay:.02s"></span><span class="ck-crumb" style="--dx:18px;--dy:36px;animation-delay:.06s"></span><span class="ck-crumb" style="--dx:32px;--dy:24px"></span><span class="ck-crumb" style="--dx:-2px;--dy:-18px;animation-delay:.03s"></span><span class="ck-dud" aria-hidden="true">꽝</span></span></button>
+      <button class="ck-slot" type="button" aria-label="포춘쿠키 1번 고르기"><span class="ck-stage"><span class="ck-half ck-l" aria-hidden="true"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="27" y="28" width="10" height="24" rx="2.5" fill="#FAF7F0" stroke="#D8CDB8" stroke-width="1"/><path d="M32 7 C15 7 5.5 24 6.8 38.5 C7.3 44.5 13.5 47 18 43.4 C23.4 39 27.5 33.5 32 33.5 C36.5 33.5 40.6 39 46 43.4 C50.5 47 56.7 44.5 57.2 38.5 C58.5 24 49 7 32 7 Z" fill="#EBB558" stroke="#B67F2E" stroke-width="2" stroke-linejoin="round"/><path d="M32 33.5 C27.5 33.5 23.4 39 18 43.4 M32 33.5 C36.5 33.5 40.6 39 46 43.4" fill="none" stroke="#C8892F" stroke-width="1.6" stroke-linecap="round" opacity=".7"/><path d="M15 22 C17 15 23 10.5 30 9.8" fill="none" stroke="#F6D28A" stroke-width="3" stroke-linecap="round" opacity=".8"/></svg></span><span class="ck-half ck-r" aria-hidden="true"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="27" y="28" width="10" height="24" rx="2.5" fill="#FAF7F0" stroke="#D8CDB8" stroke-width="1"/><path d="M32 7 C15 7 5.5 24 6.8 38.5 C7.3 44.5 13.5 47 18 43.4 C23.4 39 27.5 33.5 32 33.5 C36.5 33.5 40.6 39 46 43.4 C50.5 47 56.7 44.5 57.2 38.5 C58.5 24 49 7 32 7 Z" fill="#EBB558" stroke="#B67F2E" stroke-width="2" stroke-linejoin="round"/><path d="M32 33.5 C27.5 33.5 23.4 39 18 43.4 M32 33.5 C36.5 33.5 40.6 39 46 43.4" fill="none" stroke="#C8892F" stroke-width="1.6" stroke-linecap="round" opacity=".7"/><path d="M15 22 C17 15 23 10.5 30 9.8" fill="none" stroke="#F6D28A" stroke-width="3" stroke-linecap="round" opacity=".8"/></svg></span><span class="ck-crumb" style="--dx:-30px;--dy:26px"></span><span class="ck-crumb" style="--dx:-14px;--dy:38px;animation-delay:.04s"></span><span class="ck-crumb" style="--dx:4px;--dy:42px;animation-delay:.02s"></span><span class="ck-crumb" style="--dx:18px;--dy:36px;animation-delay:.06s"></span><span class="ck-crumb" style="--dx:32px;--dy:24px"></span><span class="ck-crumb" style="--dx:-2px;--dy:-18px;animation-delay:.03s"></span><span class="ck-dud" aria-hidden="true">꽝</span></span></button><button class="ck-slot" type="button" aria-label="포춘쿠키 2번 고르기"><span class="ck-stage"><span class="ck-half ck-l" aria-hidden="true"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="27" y="28" width="10" height="24" rx="2.5" fill="#FAF7F0" stroke="#D8CDB8" stroke-width="1"/><path d="M32 7 C15 7 5.5 24 6.8 38.5 C7.3 44.5 13.5 47 18 43.4 C23.4 39 27.5 33.5 32 33.5 C36.5 33.5 40.6 39 46 43.4 C50.5 47 56.7 44.5 57.2 38.5 C58.5 24 49 7 32 7 Z" fill="#EBB558" stroke="#B67F2E" stroke-width="2" stroke-linejoin="round"/><path d="M32 33.5 C27.5 33.5 23.4 39 18 43.4 M32 33.5 C36.5 33.5 40.6 39 46 43.4" fill="none" stroke="#C8892F" stroke-width="1.6" stroke-linecap="round" opacity=".7"/><path d="M15 22 C17 15 23 10.5 30 9.8" fill="none" stroke="#F6D28A" stroke-width="3" stroke-linecap="round" opacity=".8"/></svg></span><span class="ck-half ck-r" aria-hidden="true"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="27" y="28" width="10" height="24" rx="2.5" fill="#FAF7F0" stroke="#D8CDB8" stroke-width="1"/><path d="M32 7 C15 7 5.5 24 6.8 38.5 C7.3 44.5 13.5 47 18 43.4 C23.4 39 27.5 33.5 32 33.5 C36.5 33.5 40.6 39 46 43.4 C50.5 47 56.7 44.5 57.2 38.5 C58.5 24 49 7 32 7 Z" fill="#EBB558" stroke="#B67F2E" stroke-width="2" stroke-linejoin="round"/><path d="M32 33.5 C27.5 33.5 23.4 39 18 43.4 M32 33.5 C36.5 33.5 40.6 39 46 43.4" fill="none" stroke="#C8892F" stroke-width="1.6" stroke-linecap="round" opacity=".7"/><path d="M15 22 C17 15 23 10.5 30 9.8" fill="none" stroke="#F6D28A" stroke-width="3" stroke-linecap="round" opacity=".8"/></svg></span><span class="ck-crumb" style="--dx:-30px;--dy:26px"></span><span class="ck-crumb" style="--dx:-14px;--dy:38px;animation-delay:.04s"></span><span class="ck-crumb" style="--dx:4px;--dy:42px;animation-delay:.02s"></span><span class="ck-crumb" style="--dx:18px;--dy:36px;animation-delay:.06s"></span><span class="ck-crumb" style="--dx:32px;--dy:24px"></span><span class="ck-crumb" style="--dx:-2px;--dy:-18px;animation-delay:.03s"></span><span class="ck-dud" aria-hidden="true">꽝</span></span></button><button class="ck-slot" type="button" aria-label="포춘쿠키 3번 고르기"><span class="ck-stage"><span class="ck-half ck-l" aria-hidden="true"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="27" y="28" width="10" height="24" rx="2.5" fill="#FAF7F0" stroke="#D8CDB8" stroke-width="1"/><path d="M32 7 C15 7 5.5 24 6.8 38.5 C7.3 44.5 13.5 47 18 43.4 C23.4 39 27.5 33.5 32 33.5 C36.5 33.5 40.6 39 46 43.4 C50.5 47 56.7 44.5 57.2 38.5 C58.5 24 49 7 32 7 Z" fill="#EBB558" stroke="#B67F2E" stroke-width="2" stroke-linejoin="round"/><path d="M32 33.5 C27.5 33.5 23.4 39 18 43.4 M32 33.5 C36.5 33.5 40.6 39 46 43.4" fill="none" stroke="#C8892F" stroke-width="1.6" stroke-linecap="round" opacity=".7"/><path d="M15 22 C17 15 23 10.5 30 9.8" fill="none" stroke="#F6D28A" stroke-width="3" stroke-linecap="round" opacity=".8"/></svg></span><span class="ck-half ck-r" aria-hidden="true"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="27" y="28" width="10" height="24" rx="2.5" fill="#FAF7F0" stroke="#D8CDB8" stroke-width="1"/><path d="M32 7 C15 7 5.5 24 6.8 38.5 C7.3 44.5 13.5 47 18 43.4 C23.4 39 27.5 33.5 32 33.5 C36.5 33.5 40.6 39 46 43.4 C50.5 47 56.7 44.5 57.2 38.5 C58.5 24 49 7 32 7 Z" fill="#EBB558" stroke="#B67F2E" stroke-width="2" stroke-linejoin="round"/><path d="M32 33.5 C27.5 33.5 23.4 39 18 43.4 M32 33.5 C36.5 33.5 40.6 39 46 43.4" fill="none" stroke="#C8892F" stroke-width="1.6" stroke-linecap="round" opacity=".7"/><path d="M15 22 C17 15 23 10.5 30 9.8" fill="none" stroke="#F6D28A" stroke-width="3" stroke-linecap="round" opacity=".8"/></svg></span><span class="ck-crumb" style="--dx:-30px;--dy:26px"></span><span class="ck-crumb" style="--dx:-14px;--dy:38px;animation-delay:.04s"></span><span class="ck-crumb" style="--dx:4px;--dy:42px;animation-delay:.02s"></span><span class="ck-crumb" style="--dx:18px;--dy:36px;animation-delay:.06s"></span><span class="ck-crumb" style="--dx:32px;--dy:24px"></span><span class="ck-crumb" style="--dx:-2px;--dy:-18px;animation-delay:.03s"></span><span class="ck-dud" aria-hidden="true">꽝</span></span></button>
       <span class="ck-paper" id="ckPaper"><span id="ckLine"></span></span>
     </div>
     <span class="ck-hint" id="ckHint">오늘의 포춘쿠키 · 셋 중 하나, 신중히</span>
@@ -665,15 +688,15 @@
     <div class="sec-label" id="pickLabel">특별 선정</div>
     <div class="pick-filters" role="group" aria-labelledby="pickLabel">
       <button class="np-only" id="ncOnly" type="button" aria-pressed="false"><i class="straw"></i>논슐랭</button>
-      <button class="np-only chain" id="chainOnly" type="button" aria-pressed="false">🔥 인기체인</button>
+      <button class="np-only chain" id="chainOnly" type="button" aria-pressed="false"><span class="pi">🔥</span>인기체인</button>
       <button class="np-only blue" id="blueOnly" type="button" aria-pressed="false"><i class="ribbon"></i>블루리본</button>
       <button class="np-only heritage" id="certOnly" type="button" aria-pressed="false"><i class="cert"></i>백년가게</button>
-      <button class="np-only sikgaek" id="sikgaekOnly" type="button" aria-pressed="false">🍚 식객허영만</button>
-      <button class="np-only staff" id="staffOnly" type="button" aria-pressed="false" hidden>🖋 직원추천</button><!-- 기능 미정 — 사장 지시로 숨김(2026-08-12). 결재 도장은 유지 -->
+      <button class="np-only sikgaek" id="sikgaekOnly" type="button" aria-pressed="false"><span class="pi">🍚</span>식객허영만</button>
+      <button class="np-only staff" id="staffOnly" type="button" aria-pressed="false" hidden><span class="pi">🖋</span>직원추천</button><!-- 기능 미정 — 사장 지시로 숨김(2026-08-12). 결재 도장은 유지 -->
 
-      <button class="np-only ttogan" id="ttoganOnly" type="button" aria-pressed="false">📺 또간집</button>
-      <button class="np-only g3" id="g3Only" type="button" aria-pressed="false">🎩 G3</button>
-      <button class="np-only fresh" id="freshOnly" type="button" aria-pressed="false">🆕 새로오픈</button>
+      <button class="np-only ttogan" id="ttoganOnly" type="button" aria-pressed="false"><span class="pi">📺</span>또간집</button>
+      <button class="np-only g3" id="g3Only" type="button" aria-pressed="false"><span class="pi">🎩</span>G3</button>
+      <button class="np-only fresh" id="freshOnly" type="button" aria-pressed="false"><span class="pi">🆕</span>새로오픈</button>
     </div>
   </div>
 
