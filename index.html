@@ -464,28 +464,12 @@
   .stip-head { display: flex; align-items: baseline; gap: 6px; }
   .stip-title { font-size: 10.5px; font-weight: 800; letter-spacing: .12em; color: var(--paper-ink-sub); }
   .stip-when { font-size: 10.5px; color: var(--paper-ink-sub); margin-left: auto; }
-  /* 전국 점심 트렌드 — 중앙축 다이버징 잉크 바 (2026-08-23 재설계).
-     색은 시세판 문법: 오르면 인주(#C23B2E), 내리면 파랑(#3E63AE — 검증기 통과 조정값).
-     방향(좌우)+색+부호 삼중 인코딩이라 색약에도 안전. 숫자는 잉크색(막대가 색을 나른다). */
-  .trend-story { font-size: 13.5px; font-weight: 800; letter-spacing: -0.3px; color: var(--ink);
-    margin: 7px 0 0; word-break: keep-all; }
-  .trend-axis { display: flex; justify-content: space-between; font-size: 10px; font-weight: 800;
-    color: var(--paper-ink-sub); letter-spacing: .04em; margin: 8px 0 4px; padding: 0 52px 0 82px; }
-  .trend-rows { display: flex; flex-direction: column; gap: 4px; }
-  .trend-row { display: grid; grid-template-columns: 74px minmax(0, 1fr) 44px; gap: 8px;
-    align-items: center; background: none; border: 0; padding: 1px 0; cursor: pointer;
-    font-family: inherit; text-align: left; -webkit-tap-highlight-color: rgba(38,57,91,.12); }
-  .trend-row:active { opacity: .55; }
-  .tr-name { font-size: 13px; font-weight: 900; letter-spacing: -0.3px; color: var(--navy);
-    white-space: nowrap; overflow: hidden; }
-  .tr-track { position: relative; height: 12px; }
-  .tr-track::before { content: ""; position: absolute; left: 50%; top: -2px; bottom: -2px;
-    width: 1.5px; margin-left: -0.75px; background: var(--paper-line); }
-  .tr-bar { position: absolute; top: 1px; height: 10px; }
-  .tr-bar.up { left: 50%; background: #C23B2E; border-radius: 0 3px 3px 0; }
-  .tr-bar.down { right: 50%; background: #3E63AE; border-radius: 3px 0 0 3px; }
-  .tr-pct { font-size: 12px; font-weight: 800; color: var(--ink); text-align: right;
-    font-variant-numeric: tabular-nums; }
+  /* 트렌드 메뉴 — 종이 위 잉크 단어에 점선 밑줄, 누르면 그 이름으로 검색 */
+  .stip-line .trend-m { font: inherit; font-weight: 900; color: var(--navy); background: none;
+    border: 0; padding: 0; cursor: pointer; text-decoration: underline dotted 1.5px;
+    text-underline-offset: 3px; }
+  .stip-line .trend-pct { font-size: 11.5px; font-weight: 800; color: #2F6B3C; }
+  .stip-line .trend-pct.down { color: #5A6472; }
   .stip-line { font-size: 13.5px; font-weight: 700; letter-spacing: -0.2px; line-height: 1.5;
     margin-top: 4px; word-break: keep-all; }
   .stip-line b { font-weight: 900; }
@@ -761,9 +745,7 @@
        데이터 없음·노후(7일↑)면 미표시. 메뉴를 누르면 그 이름으로 검색된다. -->
   <div class="stip" id="trendTip" hidden>
     <div class="stip-head"><span class="stip-title">전국 점심 트렌드</span><span class="stip-when" id="trendWhen"></span></div>
-    <div class="trend-story" id="trendStory" hidden></div>
-    <div class="trend-axis" aria-hidden="true"><span>◂ 덜 찾아요</span><span>더 찾아요 ▸</span></div>
-    <div class="trend-rows" id="trendRows"></div>
+    <div class="stip-line" id="trendLine"></div>
   </div>
 
   <!-- 논산 먹거리 소식 — GitHub Actions가 매일 아침 수집한 news.json(같은 출처라 CSP 무관). 실패·노후 시 미표시 -->
@@ -1177,27 +1159,18 @@ if (NET_ON) {
     (tr.menus || []).forEach(x => { momOf[x.name] = x.momentum; });
     const prev = tr.prev_top || [];
     document.getElementById("trendWhen").textContent = tr.updated.slice(5).replace("-", "/") + " 기준 · 평소 4주 대비";
-    // 한 줄 이야기 — 봇이 집계한 계절 그룹 평균에서만 도출(작문 금지, 데이터가 말할 때만)
-    const g = tr.groups || {};
-    const storyEl = document.getElementById("trendStory");
-    if (g["여름"] <= 0.9 && g["국물"] >= 1.08) { storyEl.textContent = "여름 메뉴가 식고, 뜨끈한 국물이 올라오는 때예요"; storyEl.hidden = false; }
-    else if (g["여름"] >= 1.08 && g["국물"] <= 0.92) { storyEl.textContent = "더위가 다시 오나 봐요 — 시원한 메뉴가 올라와요"; storyEl.hidden = false; }
-    // 다이버징 바 — 상승 3 + 하락 3, 막대 폭은 6개 중 최대 변화량 기준 정규화
-    const rows = tr.top.slice(0, 3).map(m => ({ m, v: momOf[m] - 1 }))
-      .concat((tr.bottom || []).slice(0, 3).map(m => ({ m, v: momOf[m] - 1 })))
-      .filter(r => typeof r.v === "number" && isFinite(r.v));
-    const maxAbs = Math.max(...rows.map(r => Math.abs(r.v)), 0.01);
-    document.getElementById("trendRows").innerHTML = rows.map(r => {
-      const pct = (r.v >= 0 ? "+" : "−") + Math.round(Math.abs(r.v) * 100) + "%";
-      const w = Math.max(4, Math.abs(r.v) / maxAbs * 47);
-      const isNew = r.v > 0 && prev.length && prev.indexOf(r.m) < 0;
-      return '<button type="button" class="trend-m trend-row" data-m="' + esc(r.m) + '">'
-        + '<span class="tr-name">' + (isNew ? "↗ " : "") + esc(r.m) + "</span>"
-        + '<span class="tr-track"><i class="tr-bar ' + (r.v >= 0 ? "up" : "down") + '" style="width:' + w.toFixed(1) + '%"></i></span>'
-        + '<span class="tr-pct">' + pct + "</span></button>";
-    }).join("");
+    const btn = (m, sign, cls) => {
+      const pct = momOf[m] ? sign + Math.round(Math.abs(momOf[m] - 1) * 100) + "%" : "";
+      const isNew = sign === "+" && prev.length && prev.indexOf(m) < 0;
+      return '<button type="button" class="trend-m" data-m="' + esc(m) + '">'
+        + (isNew ? "\u2197 " : "") + esc(m) + (pct ? ' <span class="' + cls + '">' + pct + "</span>" : "") + "</button>";
+    };
+    let html = "\u25B2 더 찾아요 — " + tr.top.slice(0, 3).map(m => btn(m, "+", "trend-pct")).join(" · ");
+    if ((tr.bottom || []).length) // 오르는 게 있으면 내리는 것도 — 같은 자로 잰 하락(2026-08-23 사장 지시)
+      html += '<br>\u25BD 덜 찾아요 — ' + tr.bottom.slice(0, 3).map(m => btn(m, "\u2212", "trend-pct down")).join(" · ");
+    document.getElementById("trendLine").innerHTML = html;
     document.getElementById("trendTip").hidden = false;
-    document.querySelectorAll("#trendRows .trend-m").forEach(b => {
+    document.querySelectorAll("#trendLine .trend-m").forEach(b => {
       b.onclick = () => { // 누르면 그 메뉴로 창구 검색 — 타이핑과 같은 공개 경로(input+Enter)를 쓴다
         const inp = document.getElementById("searchInput");
         inp.value = b.dataset.m;
