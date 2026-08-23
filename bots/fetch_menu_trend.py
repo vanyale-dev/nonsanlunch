@@ -111,6 +111,9 @@ def main():
         "updated": latest, "baseline": BASELINE,
         "method": "네이버 데이터랩 일간·전국, '점심' 기준 정규화, 직전 4주 같은 요일 평균 대비",
         "top": [m["name"] for m in menus_out[:5] if m["momentum"] >= 1.15],
+        # 하락도 같은 자로 잰다(2026-08-23 사장 지시) — 문턱은 상승 1.15의 역수(≈0.87)
+        "bottom": [m["name"] for m in sorted(menus_out, key=lambda x: x["momentum"])[:5]
+                   if m["momentum"] <= 0.87],
         "prev_top": prev_top,
         "menus": menus_out,
     }
