@@ -30,4 +30,6 @@ jobs:
           git add data/refresh_report.json data/star_visibility_baseline.json
           S=$(python -c "import json; r=json.load(open('data/refresh_report.json')); print('폐업의심%d 개명%d 변동%d 표시변화%d' % (len(r['dead_suspect']), len(r['renamed']), len(r['score_drift']), len(r['visibility_changed'])))")
           git diff --cached --quiet || git commit -m "유지보수 점검 $(date -u -d '+9 hours' +%F) — ${S}"
+          # 봇 실행 중 다른 푸시가 끼면 non-fast-forward로 죽는다 — 리베이스 후 푸시(2026-08-23 실사고)
+          git pull --rebase origin main
           git push
