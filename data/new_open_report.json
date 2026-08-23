@@ -1,5 +1,5 @@
 {
- "scanned": "2026-08-16",
+ "scanned": "2026-08-23",
  "queries": {
   "식당": [
    "논산 식당",
@@ -13,8 +13,8 @@
    "논산 베이커리"
   ]
  },
- "total_new_opening": 26,
- "already_known": 21,
+ "total_new_opening": 25,
+ "already_known": 19,
  "candidates": [
   {
    "pid": "2062050332",
@@ -29,13 +29,25 @@
    ]
   },
   {
+   "pid": "2089133619",
+   "name": "명품염소명가",
+   "category": "육류,고기요리",
+   "addr": "충남 논산시 부창로72번길 15-9 1층",
+   "kind": "식당",
+   "known": false,
+   "visitor_reviews": null,
+   "queries": [
+    "논산 식당"
+   ]
+  },
+  {
    "pid": "2022654951",
    "name": "부대담 논산점",
    "category": "찌개,전골",
    "addr": "충남 논산시 연무읍 연무로 191-1 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": null,
+   "visitor_reviews": 1,
    "queries": [
     "연무 식당"
    ]
@@ -59,7 +71,7 @@
    "addr": "충남 논산시 논산대로 514 낭만카페",
    "kind": "카페",
    "known": false,
-   "visitor_reviews": 18,
+   "visitor_reviews": 20,
    "queries": [
     "논산 카페"
    ]
@@ -71,9 +83,9 @@
    "addr": "충남 논산시 벌곡면 수락로 570 1,2층",
    "kind": "카페",
    "known": false,
-   "visitor_reviews": 8,
+   "visitor_reviews": 11,
    "queries": [
-    "논산 카페"
+    "논산 맛집"
    ]
   }
  ]
