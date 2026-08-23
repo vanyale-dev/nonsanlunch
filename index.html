@@ -464,6 +464,10 @@
   .stip-head { display: flex; align-items: baseline; gap: 6px; }
   .stip-title { font-size: 10.5px; font-weight: 800; letter-spacing: .12em; color: var(--paper-ink-sub); }
   .stip-when { font-size: 10.5px; color: var(--paper-ink-sub); margin-left: auto; }
+  /* 트렌드 메뉴 — 종이 위 잉크 단어에 점선 밑줄, 누르면 그 이름으로 검색 */
+  .stip-line .trend-m { font: inherit; font-weight: 900; color: var(--navy); background: none;
+    border: 0; padding: 0; cursor: pointer; text-decoration: underline dotted 1.5px;
+    text-underline-offset: 3px; }
   .stip-line { font-size: 13.5px; font-weight: 700; letter-spacing: -0.2px; line-height: 1.5;
     margin-top: 4px; word-break: keep-all; }
   .stip-line b { font-weight: 900; }
@@ -487,7 +491,7 @@
   .news-it .nd { font-size: 10.5px; color: var(--paper-ink-sub); margin-right: 5px; font-variant-numeric: tabular-nums; }
   .news-it .nsrc { font-size: 10.5px; color: var(--paper-ink-sub); }
 
-  /* 이용 안내 판 — 도움말은 종이 톤(금색은 훈장 전용 색이라 여기 쓰지 않는다) */
+  /* 이용 안내 판 — 도움말은 종이 톤(금색은 배지·별점 전용 색이라 여기 쓰지 않는다) */
   .nc-plaque {
     display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 10px;
     background: var(--paper); color: var(--ink);
@@ -735,6 +739,13 @@
     <div class="stip-line" id="stipLine"></div>
   </div>
 
+  <!-- 전국 점심 트렌드 — 데이터랩 봇이 매일 계산한 data/menu_trend.json(같은 출처, CSP 무관).
+       데이터 없음·노후(7일↑)면 미표시. 메뉴를 누르면 그 이름으로 검색된다. -->
+  <div class="stip" id="trendTip" hidden>
+    <div class="stip-head"><span class="stip-title">전국 점심 트렌드</span><span class="stip-when" id="trendWhen"></span></div>
+    <div class="stip-line" id="trendLine"></div>
+  </div>
+
   <!-- 논산 먹거리 소식 — GitHub Actions가 매일 아침 수집한 news.json(같은 출처라 CSP 무관). 실패·노후 시 미표시 -->
   <div class="news" id="newsBox" hidden>
     <button class="news-head" id="newsHead" type="button" aria-expanded="false">
@@ -794,7 +805,7 @@
     <div class="ncs-p">부풀림은 없습니다. 리뷰 몇 개 없는 집의 점수는 깎아서 싣고, <span class="hl">네이버보다 높게 띄우는 일은 없습니다.</span> 영수증만 찍고 간 별점도 걸렀습니다.</div>
 
     <div class="ncs-h">좋은 집은 어떻게 알아봐요?</div>
-    <div class="ncs-p">훈장 넷, 그리고 보너스 하나.
+    <div class="ncs-p">카드에 붙는 배지들이에요. 결재 도장만 빼면 전부 <b>‘특별 선정’</b> 칸에서 골라 볼 수 있어요.
     <div class="ncs-li">🍓 <b>논슐랭 16곳</b> — 논산에만 있는 검증 맛집</div>
     <div class="ncs-li"><i class="ribbon"></i> <b>블루리본 30곳</b> — 미식 가이드가 뽑은 집</div>
     <div class="ncs-li"><i class="cert"></i> <b>백년가게 5곳</b> — 30년 넘게 이어온 노포</div>
@@ -1134,6 +1145,26 @@ if (NET_ON) {
       head.disabled = true; // 더 볼 게 없으면 접기 버튼 노릇을 하지 않는다
       head.removeAttribute("aria-expanded");
     }
+  }).catch(() => {});
+}
+/* 전국 점심 트렌드 — 데이터랩 봇 산출물(2026-08-23). 데이터 없음·7일 노후면 침묵 */
+if (NET_ON) {
+  fetch("data/menu_trend.json").then(r => r.json()).then(tr => {
+    if (!tr.updated || (Date.now() - new Date(tr.updated)) / 86400000 > 7 || !(tr.top || []).length) return;
+    document.getElementById("trendWhen").textContent = tr.updated.slice(5).replace("-", "/") + " 기준";
+    document.getElementById("trendLine").innerHTML = "요즘 전국에서 검색이 느는 점심 — " +
+      tr.top.map(m => '<button type="button" class="trend-m" data-m="' + esc(m) + '">' + esc(m) + "</button>").join(" · ");
+    document.getElementById("trendTip").hidden = false;
+    document.querySelectorAll("#trendLine .trend-m").forEach(b => {
+      b.onclick = () => { // 누르면 그 메뉴로 창구 검색 — 타이핑과 같은 공개 경로(input+Enter)를 쓴다
+        const inp = document.getElementById("searchInput");
+        inp.value = b.dataset.m;
+        inp.dispatchEvent(new Event("input", { bubbles: true }));
+        inp.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+        track("trend_tap", { m: b.dataset.m });
+        document.getElementById("searchRow").scrollIntoView({ behavior: "smooth", block: "start" });
+      };
+    });
   }).catch(() => {});
 }
 if (NET_ON) {

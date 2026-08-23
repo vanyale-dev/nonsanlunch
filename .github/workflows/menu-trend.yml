@@ -1,0 +1,29 @@
+name: 전국 점심 트렌드 봇
+# 매일 아침 네이버 데이터랩(공식 API)으로 점심 메뉴 44종의 전국 검색 추이를 수집해
+# '뜨는 메뉴'를 계산·커밋한다. 키(NAVER_CLIENT_ID/SECRET) 미설정이면 조용히 건너뛴다.
+on:
+  schedule:
+    - cron: "50 22 * * *"   # 매일 07:50 KST (뉴스 봇 07:30 뒤)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  trend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: 트렌드 수집 → data/menu_trend.json
+        env:
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+        run: python3 bots/fetch_menu_trend.py
+      - name: 변경 시 커밋
+        run: |
+          git config user.name "lunch-bot"
+          git config user.email "lunch-bot@users.noreply.github.com"
+          git add data/menu_trend.json
+          # 봇 실행 중 다른 푸시가 끼면 non-fast-forward로 죽는다 — 리베이스 후 푸시(2026-08-23 실사고)
+          git diff --cached --quiet || { git commit -m "점심 트렌드 $(date -u -d '+9 hours' +%F)"; git pull --rebase origin main; git push; }

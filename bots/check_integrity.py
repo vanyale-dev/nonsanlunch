@@ -83,6 +83,13 @@ def main():
         fu = r.get("fresh_until")
         if fu:
             check(re.fullmatch(r"\d{4}-\d{2}-\d{2}", fu), f"{r['name']}: fresh_until 형식 이상({fu})")
+    # 점심 트렌드는 키 발급 후 생성되는 파일 — 존재할 때만 신선도를 검사한다
+    tp = ROOT / "data" / "menu_trend.json"
+    if tp.exists():
+        tr = json.load(open(tp, encoding="utf-8"))
+        td = date.fromisoformat(tr.get("updated", "2000-01-01"))
+        check(date.today() - td <= timedelta(days=4),
+              f"menu_trend.json이 {td}에서 멈춤(4일 초과) — 트렌드 봇 점검 필요")
 
     if errors:
         print(f"❌ 무결성 검사 실패 {len(errors)}건:")
