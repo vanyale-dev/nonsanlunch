@@ -1,0 +1,30 @@
+name: 가동 감시 봇
+# 6시간마다 실서비스 3종을 찔러본다 — 논산런치 페이지, 논산달력 워커, tinyurl 단축주소 2개.
+# (단축주소는 인쇄 홍보물에 박혀 있어 썩으면 조용히 손님을 잃는다.)
+# 실패 = 빨간 런 → 깃허브 메일 알림. 복구 판단·조치는 사람이.
+on:
+  schedule:
+    - cron: "40 0,6,12,18 * * *"
+  workflow_dispatch:
+
+jobs:
+  uptime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: 논산런치 페이지
+        run: |
+          curl -sSf --max-time 20 "https://vanyale-dev.github.io/nonsanlunch/" | grep -q "논산런치" \
+            || { echo "::error::논산런치 페이지 이상 — 접속 실패 또는 내용 훼손"; exit 1; }
+      - name: 논산달력 워커
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "https://nonsan-cal.nsboard-server.workers.dev/")
+          case "$code" in 2*|401) : ;; *) echo "::error::논산달력 워커 HTTP $code"; exit 1;; esac
+      - name: tinyurl 단축주소
+        run: |
+          l1=$(curl -sI --max-time 20 "https://tinyurl.com/nslunch2" | tr -d '\r' | grep -i '^location' || true)
+          echo "$l1" | grep -q "vanyale-dev.github.io/nonsanlunch" \
+            || { echo "::error::tinyurl.com/nslunch2 리다이렉트 이상: $l1"; exit 1; }
+          l2=$(curl -sI --max-time 20 "https://tinyurl.com/nonsancal" | tr -d '\r' | grep -i '^location' || true)
+          echo "$l2" | grep -q "nonsan-cal.nsboard-server.workers.dev" \
+            || { echo "::error::tinyurl.com/nonsancal 리다이렉트 이상: $l2"; exit 1; }
