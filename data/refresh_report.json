@@ -1,15 +1,15 @@
 {
  "checked_at": "2026-08-23",
  "total": 167,
- "reached": 166,
- "dead_suspect": [
-  {
-   "name": "지산농원",
-   "why": "플레이스 정보 없음(폐업 의심)"
-  }
- ],
+ "reached": 167,
+ "dead_suspect": [],
  "renamed": [],
  "score_drift": [
+  {
+   "name": "탑정호 IN 가배",
+   "old": 5,
+   "new": 4.5
+  },
   {
    "name": "미태리 논산취암점",
    "old": 4.74,
@@ -19,6 +19,11 @@
    "name": "은진쭈꾸미",
    "old": 4.5,
    "new": 4.59
+  },
+  {
+   "name": "강짬뽕",
+   "old": 4.41,
+   "new": 4.35
   },
   {
    "name": "담미",
@@ -34,38 +39,11 @@
  "review_surge": [],
  "visibility_changed": [
   {
-   "name": "한국수 공주칼국수 논산점",
-   "change": "숨김→표시",
-   "value": 4.9,
-   "nc": 0,
-   "note": ""
-  },
-  {
    "name": "태능초가집갈비 논산본점",
-   "change": "표시→숨김",
+   "change": "숨김→표시",
+   "value": 4.7,
    "nc": 1,
-   "note": ""
-  },
-  {
-   "name": "홍가네순대",
-   "change": "숨김→표시",
-   "value": 4.25,
-   "nc": 0,
-   "note": ""
-  },
-  {
-   "name": "만나식당",
-   "change": "숨김→표시",
-   "value": 4.2,
-   "nc": 0,
-   "note": ""
-  },
-  {
-   "name": "진흥반점",
-   "change": "숨김→표시",
-   "value": 4.09,
-   "nc": 0,
-   "note": ""
+   "note": "상위 등급 재심 후보"
   }
  ]
 }
