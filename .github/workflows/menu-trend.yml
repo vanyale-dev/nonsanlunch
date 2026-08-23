@@ -1,6 +1,6 @@
 name: 전국 점심 트렌드 봇
 # 매일 아침 네이버 데이터랩(공식 API)으로 점심 메뉴 44종의 전국 검색 추이를 수집해
-# '뜨는 메뉴'를 계산·커밋한다. 키(NAVER_CLIENT_ID/SECRET) 미설정이면 조용히 건너뛴다.
+# '뜨는 메뉴'를 계산·커밋한다. 키(NCP_APIGW_API_KEY_ID/KEY, NAVER API HUB) 미설정이면 조용히 건너뛴다.
 on:
   schedule:
     - cron: "50 22 * * *"   # 매일 07:50 KST (뉴스 봇 07:30 뒤)
@@ -17,8 +17,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: 트렌드 수집 → data/menu_trend.json
         env:
-          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
-          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+          NCP_APIGW_API_KEY_ID: ${{ secrets.NCP_APIGW_API_KEY_ID }}
+          NCP_APIGW_API_KEY: ${{ secrets.NCP_APIGW_API_KEY }}
         run: python3 bots/fetch_menu_trend.py
       - name: 변경 시 커밋
         run: |

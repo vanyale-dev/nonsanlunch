@@ -10,8 +10,13 @@
 '뜬다' 판정: 최신일 지수 ÷ 직전 4주 같은 요일 평균 — 점심 검색은 요일 패턴이 강해
 같은 요일끼리 비교해야 정직하다.
 
-키: 환경변수 NAVER_CLIENT_ID / NAVER_CLIENT_SECRET (깃허브 시크릿).
+키: 환경변수 NCP_APIGW_API_KEY_ID / NCP_APIGW_API_KEY (깃허브 시크릿).
 없으면 조용히 건너뛴다(exit 0) — 키 발급 전 배포를 막지 않기 위해.
+
+⚠ 경로 변경(2026-08-23): 개발자센터 데이터랩 API는 2026-07-31부로 신규 신청이 차단되고
+NCP의 NAVER API HUB로 이관됐다(developers.naver.com/notice/article/32530, 2027-06-30 완전 종료).
+엔드포인트·헤더를 API HUB 규격으로 작성. 요청 본문 규격은 동일. 무료 쿼터 월 5만 회
+(이 봇은 일 11회 ≈ 월 330회). 현재 무료 요금제만 제공, 유료화 예고 있음.
 출력: data/menu_trend.json {updated, baseline, top[], menus[]}
 """
 import json
@@ -23,7 +28,7 @@ from datetime import date, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-API = "https://openapi.naver.com/v1/datalab/search"
+API = "https://naverapihub.apigw.ntruss.com/search-trend/v1/search"
 BASELINE = "점심"
 MENUS = [
     "국밥", "순대국", "해장국", "감자탕", "설렁탕", "곰탕", "갈비탕", "삼계탕", "추어탕", "육개장",
@@ -43,7 +48,7 @@ def call(cid, sec, keywords, start, end):
     body = json.dumps({"startDate": start, "endDate": end, "timeUnit": "date",
                        "keywordGroups": groups}).encode()
     req = urllib.request.Request(API, data=body, headers={
-        "X-Naver-Client-Id": cid, "X-Naver-Client-Secret": sec,
+        "X-NCP-APIGW-API-KEY-ID": cid, "X-NCP-APIGW-API-KEY": sec,
         "Content-Type": "application/json"})
     with urllib.request.urlopen(req, timeout=20) as r:
         return json.load(r)
@@ -54,9 +59,9 @@ def series_map(result):
 
 
 def main():
-    cid, sec = os.environ.get("NAVER_CLIENT_ID"), os.environ.get("NAVER_CLIENT_SECRET")
+    cid, sec = os.environ.get("NCP_APIGW_API_KEY_ID"), os.environ.get("NCP_APIGW_API_KEY")
     if not cid or not sec:
-        print("NAVER_CLIENT_ID/SECRET 미설정 — 트렌드 수집 건너뜀(키 발급 후 자동 가동)")
+        print("NCP_APIGW_API_KEY_ID/KEY 미설정 — 트렌드 수집 건너뜀(NCP API HUB 키 발급 후 자동 가동)")
         return
     end = date.today() - timedelta(days=1)          # 데이터랩은 어제까지가 최신
     start = end - timedelta(days=42)                # 같은 요일 4주 비교분 확보
