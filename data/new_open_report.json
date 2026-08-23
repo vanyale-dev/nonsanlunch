@@ -14,7 +14,7 @@
   ]
  },
  "total_new_opening": 25,
- "already_known": 19,
+ "already_known": 20,
  "candidates": [
   {
    "pid": "2062050332",
@@ -65,25 +65,13 @@
    ]
   },
   {
-   "pid": "2019601342",
-   "name": "낭만카페",
-   "category": "카페",
-   "addr": "충남 논산시 논산대로 514 낭만카페",
-   "kind": "카페",
-   "known": false,
-   "visitor_reviews": 20,
-   "queries": [
-    "논산 카페"
-   ]
-  },
-  {
    "pid": "2060911290",
    "name": "카페 아트페어",
    "category": "카페,디저트",
    "addr": "충남 논산시 벌곡면 수락로 570 1,2층",
    "kind": "카페",
    "known": false,
-   "visitor_reviews": 11,
+   "visitor_reviews": 21,
    "queries": [
     "논산 맛집"
    ]
