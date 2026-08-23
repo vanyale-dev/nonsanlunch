@@ -114,6 +114,21 @@ def main():
         # 하락도 같은 자로 잰다(2026-08-23 사장 지시) — 문턱은 상승 1.15의 역수(≈0.87)
         "bottom": [m["name"] for m in sorted(menus_out, key=lambda x: x["momentum"])[:5]
                    if m["momentum"] <= 0.87],
+        # 계절 그룹 평균 — 화면의 '한 줄 이야기'의 데이터 근거(작문이 아니라 집계값에서 도출)
+        "groups": {
+            "여름": round(sum(m["momentum"] for m in menus_out if m["name"] in
+                            {"냉면", "막국수", "콩국수", "밀면", "물회", "삼계탕"}) /
+                        max(1, sum(1 for m in menus_out if m["name"] in
+                                   {"냉면", "막국수", "콩국수", "밀면", "물회", "삼계탕"})), 3),
+            "국물": round(sum(m["momentum"] for m in menus_out if m["name"] in
+                            {"국밥", "순대국", "해장국", "감자탕", "설렁탕", "곰탕", "갈비탕", "추어탕",
+                             "육개장", "김치찌개", "된장찌개", "부대찌개", "순두부찌개", "청국장",
+                             "칼국수", "잔치국수", "우동", "라멘"}) /
+                        max(1, sum(1 for m in menus_out if m["name"] in
+                                   {"국밥", "순대국", "해장국", "감자탕", "설렁탕", "곰탕", "갈비탕", "추어탕",
+                                    "육개장", "김치찌개", "된장찌개", "부대찌개", "순두부찌개", "청국장",
+                                    "칼국수", "잔치국수", "우동", "라멘"})), 3),
+        },
         "prev_top": prev_top,
         "menus": menus_out,
     }
