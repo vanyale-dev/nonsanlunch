@@ -94,10 +94,24 @@ def main():
     if skipped:
         print(f"데이터 부족 제외 {len(skipped)}종: {skipped}")  # 침묵 절단 금지 — 무엇이 빠졌는지 남긴다
     menus_out.sort(key=lambda x: -x["momentum"])
+    # 전일 top을 기억해 '새 진입' 표시의 근거로 쓴다 — 목록이 느리게 변하는 계절성 신호라
+    # 매일의 변화는 수치(%)와 진입/이탈로 보여야 한다 (2026-08-23 사장 피드백).
+    prev_top = []
+    prev_path = ROOT / "data" / "menu_trend.json"
+    if prev_path.exists():
+        try:
+            prev = json.load(open(prev_path, encoding="utf-8"))
+            if prev.get("updated") != latest:
+                prev_top = prev.get("top", [])
+            else:
+                prev_top = prev.get("prev_top", [])  # 같은 날 재실행이면 전일 기록 유지
+        except Exception:
+            pass
     out = {
         "updated": latest, "baseline": BASELINE,
         "method": "네이버 데이터랩 일간·전국, '점심' 기준 정규화, 직전 4주 같은 요일 평균 대비",
         "top": [m["name"] for m in menus_out[:5] if m["momentum"] >= 1.15],
+        "prev_top": prev_top,
         "menus": menus_out,
     }
     json.dump(out, open(ROOT / "data" / "menu_trend.json", "w", encoding="utf-8"),

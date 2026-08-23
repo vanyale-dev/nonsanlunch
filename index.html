@@ -468,6 +468,7 @@
   .stip-line .trend-m { font: inherit; font-weight: 900; color: var(--navy); background: none;
     border: 0; padding: 0; cursor: pointer; text-decoration: underline dotted 1.5px;
     text-underline-offset: 3px; }
+  .stip-line .trend-pct { font-size: 11.5px; font-weight: 800; color: #2F6B3C; }
   .stip-line { font-size: 13.5px; font-weight: 700; letter-spacing: -0.2px; line-height: 1.5;
     margin-top: 4px; word-break: keep-all; }
   .stip-line b { font-weight: 900; }
@@ -1151,9 +1152,19 @@ if (NET_ON) {
 if (NET_ON) {
   fetch("data/menu_trend.json").then(r => r.json()).then(tr => {
     if (!tr.updated || (Date.now() - new Date(tr.updated)) / 86400000 > 7 || !(tr.top || []).length) return;
-    document.getElementById("trendWhen").textContent = tr.updated.slice(5).replace("-", "/") + " 기준";
-    document.getElementById("trendLine").innerHTML = "요즘 전국에서 검색이 느는 점심 — " +
-      tr.top.map(m => '<button type="button" class="trend-m" data-m="' + esc(m) + '">' + esc(m) + "</button>").join(" · ");
+    // 근거를 함께 보인다(2026-08-23 사장 피드백): 평소(4주 같은 요일 평균) 대비 증가율 %.
+    // 계절성이라 목록은 느리게 변한다 — 매일의 변화는 수치와 새 진입(↗)이 나른다.
+    const momOf = {};
+    (tr.menus || []).forEach(x => { momOf[x.name] = x.momentum; });
+    const prev = tr.prev_top || [];
+    document.getElementById("trendWhen").textContent = tr.updated.slice(5).replace("-", "/") + " 기준 · 평소 4주 대비";
+    document.getElementById("trendLine").innerHTML = "평소보다 검색이 늘었어요 — " +
+      tr.top.slice(0, 3).map(m => {
+        const pct = momOf[m] ? "+" + Math.round((momOf[m] - 1) * 100) + "%" : "";
+        const isNew = prev.length && prev.indexOf(m) < 0;
+        return '<button type="button" class="trend-m" data-m="' + esc(m) + '">'
+          + (isNew ? "↗ " : "") + esc(m) + (pct ? ' <span class="trend-pct">' + pct + "</span>" : "") + "</button>";
+      }).join(" · ");
     document.getElementById("trendTip").hidden = false;
     document.querySelectorAll("#trendLine .trend-m").forEach(b => {
       b.onclick = () => { // 누르면 그 메뉴로 창구 검색 — 타이핑과 같은 공개 경로(input+Enter)를 쓴다
