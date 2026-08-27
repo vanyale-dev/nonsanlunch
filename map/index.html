@@ -25,10 +25,14 @@
 <meta name="color-scheme" content="light">
 <title>점심 지도 · 논산런치</title>
 <link rel="icon" href="data:,">
-<!-- 첫 타일까지의 왕복을 줄인다(crossorigin 없음 — 스크립트·이미지는 비 CORS 요청이다) -->
+<!-- 첫 타일까지의 왕복을 줄인다(crossorigin 없음 — 스크립트·이미지는 비 CORS 요청이다).
+     호스트는 **배포(https) 실측**으로 잡은 것이다 — 네이버 SDK 는 https 출처에서 타일을
+     nrbe.pstatic.net / ssl.pstatic.net 으로 받아간다(localhost http 에서는 nrbe.map.naver.net).
+     여기서 줄어드는 건 연결 수립(TLS)뿐이고, 4G 스로틀의 첫 타일 시각은 못 줄인다 —
+     그건 대역폭에 묶여 있다(README 「배포」절 참조). -->
 <link rel="preconnect" href="https://oapi.map.naver.com">
-<link rel="preconnect" href="https://nrbe.map.naver.net">
-<link rel="preconnect" href="https://static.naver.net">
+<link rel="preconnect" href="https://nrbe.pstatic.net">
+<link rel="preconnect" href="https://ssl.pstatic.net">
 <style>
   /* ── 팔레트 (이 밖의 색을 쓰지 않는다) ───────────────────────────── */
   :root {

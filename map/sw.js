@@ -7,15 +7,22 @@
    2. 같은 출처는 네트워크 우선 + 실패 시 캐시(오래된 데이터를 조용히 굳히지 않는다).
    3. 미리 담기(precache)는 페이지가 "첫 타일 그린 뒤"에 보내는 메시지로만 한다 —
       첫 화면의 대역폭을 뺏지 않기 위해서다.
+   4. **낡은 캐시 청소는 우리 것(`nl-map-*`)만 한다.** CacheStorage 는 스코프가 아니라
+      출처(origin) 단위라, 같은 출처에 사는 발권기 본 앱의 캐시(`nslunch-*`)가 여기서 다 보인다.
+      "내 이름이 아니면 지운다"로 쓰면 지도를 한 번 여는 것만으로 발권기의 오프라인 폴백이
+      통째로 지워진다(2026-08-27 실URL 실측으로 확인 — 지도 진입 뒤 `nslunch-v2` 소멸).
 */
 var V = "nl-map-v1";
+var MINE = "nl-map-";      /* 이 접두사가 붙은 캐시만 우리 것이다 */
 
 self.addEventListener("install", function(e){ self.skipWaiting(); });
 
 self.addEventListener("activate", function(e){
   e.waitUntil(
     caches.keys()
-      .then(function(ks){ return Promise.all(ks.map(function(k){ return k === V ? null : caches.delete(k); })); })
+      .then(function(ks){ return Promise.all(ks.map(function(k){
+        return (k.indexOf(MINE) === 0 && k !== V) ? caches.delete(k) : null;   /* 남의 캐시는 손대지 않는다 */
+      })); })
       .then(function(){ return self.clients.claim(); })
   );
 });
