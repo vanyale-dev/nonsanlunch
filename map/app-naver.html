@@ -1646,23 +1646,27 @@ function start(){
    열었을 때 발권기 대신 이 지도가 뜬다 — 북극성(발권)을 직접 깎는 사고다.
    지도는 본 앱 파일을 한 글자도 고칠 수 없으므로, 오염을 **런타임에 감지해 그 자리만**
    원래 발권기 문서로 되돌린다. 오염이 없으면(캐시 없음 · 정상 문서) 아무 일도 하지 않는다.
-   주의: 캐시 이름은 본 앱 sw.js 의 상수를 베낀 것이라, 본 앱이 버전을 올리면 이 보호는
-   조용히 무효가 된다(README 「배포」절에 적어 둔다). */
+   주의: 캐시 이름은 본 앱 sw.js 의 CACHE 상수를 **접두사**로만 참조한다 —
+   본 앱이 v3, v4… 로 올라가도 이 보호는 따라간다(버전을 박으면 조용히 무동작이 된다). */
 function healHostCache(){
   try {
-    if (!window.caches || !caches.has) return;
-    var NAME = "nslunch-v2";            /* site/sw.js 의 CACHE 상수 */
+    if (!window.caches || !caches.keys) return;
+    var PREFIX = "nslunch-";            /* site/sw.js 의 CACHE 상수 접두사 — 버전은 박지 않는다 */
     var KEY  = "../index.html";         /* 이 페이지 기준 → /nonsanlunch/index.html */
-    caches.has(NAME).then(function(has){
-      if (!has) return;                 /* 발권기를 쓴 적 없는 기기 — 손대지 않는다 */
-      return caches.open(NAME).then(function(c){
-        return c.match(KEY, { ignoreSearch:true }).then(function(hit){
-          if (!hit || !hit.url || hit.url.indexOf("/map/") < 0) return;   /* 오염 아님 */
-          return fetch(KEY, { cache:"no-cache" }).then(function(res){
-            if (res && res.ok) return c.put(KEY, res.clone());
+    caches.keys().then(function(keys){
+      var mine = [];
+      for (var i = 0; i < keys.length; i++) if (keys[i].indexOf(PREFIX) === 0) mine.push(keys[i]);
+      if (!mine.length) return;         /* 발권기를 쓴 적 없는 기기 — 손대지 않는다 */
+      return Promise.all(mine.map(function(NAME){
+        return caches.open(NAME).then(function(c){
+          return c.match(KEY, { ignoreSearch:true }).then(function(hit){
+            if (!hit || !hit.url || hit.url.indexOf("/map/") < 0) return;   /* 오염 아님 */
+            return fetch(KEY, { cache:"no-cache" }).then(function(res){
+              if (res && res.ok) return c.put(KEY, res.clone());
+            });
           });
         });
-      });
+      }));
     }).catch(function(){});
   } catch (e) {}
 }

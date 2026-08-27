@@ -274,6 +274,43 @@
   .status-line { text-align: center; font-size: 11px; color: #8B93A0; margin-top: 7px; }
   .status-line b { color: var(--led); font-variant-numeric: tabular-nums; }
 
+  /* ── 선택지 전광판 ────────────────────────────
+     "지금 무엇을 골랐고(윗줄) 그 결과 몇 곳인가(아랫줄)" — 원인과 결과를 위아래로 붙인다.
+     전광판이므로 LED 앰버 허용 구역이고, 보드 색은 다크모드에서도 불변(물성).
+     높이는 데이터와 무관하게 파싱 시점에 확정한다 — 167→19→3에서 레이아웃이 흔들리면 안 된다.
+     포춘쿠키를 이기지 않도록 낮게 깔고, 앰버는 숫자 하나에만 준다. */
+  .optboard {
+    margin-top: 10px; padding: 8px 12px 9px; border-radius: 6px;
+    background: var(--board); border: 1px solid var(--board-line);
+    box-shadow: var(--shadow); text-align: center;
+  }
+  /* 두 줄 모두 고정 높이 + nowrap — 글자 수가 늘어도 스트립이 자라거나 줄 바꿈하지 않는다 */
+  .ob-what {
+    height: 15px; line-height: 15px; font-size: 11px; font-weight: 700;
+    color: #8B93A0; letter-spacing: .02em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .ob-row {
+    position: relative; height: 30px; line-height: 30px; white-space: nowrap; overflow: hidden;
+    display: flex; align-items: baseline; justify-content: center; gap: 3px;
+  }
+  .ob-n { font-size: 25px; font-weight: 900; letter-spacing: -.01em; color: var(--led);
+    font-variant-numeric: tabular-nums; text-shadow: 0 0 11px rgba(255,179,0,.28); }
+  .ob-u { font-size: 12px; font-weight: 700; color: #8B93A0; }
+  /* 부속 표기는 흐름 밖에 세운다 — 있고 없고에 따라 가운데 숫자가 좌우로 밀리면 안 된다 */
+  /* 각주다 — 큰 앰버 숫자와 같은 줄에 서므로 '두 숫자가 나란히'로 읽히면 명세 위반이다.
+     색은 새로 만들지 않는다: 보드 구역의 기존 회색(#8B93A0, .status-line과 같은 값)을 낮춰 쓴다. */
+  .ob-note { position: absolute; right: 0; bottom: 4px; font-size: 9px;
+    color: #8B93A0; opacity: .62; letter-spacing: -.01em; }
+  /* 이산적 조작(칩·토글)일 때만 한 번. 타이핑 중에는 붙이지 않는다 */
+  .ob-n.pulse { animation: obGlow .42s ease-out 1; }
+  @keyframes obGlow {
+    0%   { text-shadow: 0 0 11px rgba(255,179,0,.28); }
+    38%  { text-shadow: 0 0 19px rgba(255,179,0,.72), 0 0 32px rgba(255,179,0,.30); }
+    100% { text-shadow: 0 0 11px rgba(255,179,0,.28); }
+  }
+  @media (prefers-reduced-motion: reduce) { .ob-n.pulse { animation: none; } }
+
   /* ── 번호표 ───────────────────────────────── */
   .ticket-zone { margin-top: 16px; }
   .tkt { filter: drop-shadow(0 10px 18px rgba(30,28,20,.2)); animation: issue .5s cubic-bezier(.2,1.2,.4,1); }
@@ -726,6 +763,14 @@
     </div>
     <span class="ck-hint" id="ckHint">오늘의 포춘쿠키 · 셋 중 하나, 신중히</span>
   </div>
+
+  <!-- 선택지 전광판 — 눈으로 읽는 스트립은 aria에서 격리한다(카운트업 중간값을 낭독하지 않게).
+       낭독은 아래 sr-only 한 줄이 전담하고, 값이 멎은 뒤 최종값만 한 번 말한다. -->
+  <div class="optboard" id="optBoard" aria-hidden="true">
+    <div class="ob-what" id="obWhat">전 체</div>
+    <div class="ob-row"><span class="ob-n" id="obN">0</span><span class="ob-u">곳</span><span class="ob-note" id="obNote"></span></div>
+  </div>
+  <div class="sr-only" id="obSay" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <div class="ticket-zone" id="ticketZone"></div>
   <div class="sr-only" id="announce" role="status" aria-live="polite" aria-atomic="true"></div>
@@ -1653,7 +1698,7 @@ let nlLast = "";
     else if (st === "miss") aiEchoState("idle"); // 못 받아 적은 안내는 타이핑하는 즉시 원래 안내로
     nlSchedule();
     invalidateBoard(); // 전광판 '호출 완료' 해제는 즉시 — 유보했다간 방금 누른 발권을 뒤늦게 죽인다
-    renderCount();     // 즉시 답 — 창구 수 숫자만
+    renderCount({ typed: true }); // 즉시 답 — 숫자만. typed 표시가 전광판의 트윈을 끈다
     settleSchedule();  // 인쇄(목록·판정)는 손이 멈춘 뒤 한 번
   };
   /* 자연어 접수 — 위 키워드 검색은 손대지 않는다(즉시 반응 유지). 문장다운 입력일 때만 접수원에게 보낸다.
@@ -2091,12 +2136,77 @@ function updateChipStates() {
     });
   }
 }
+/* ── 선택지 전광판 ────────────────────────────────────────────────────────
+   숫자를 새로 계산하지 않는다 — renderCount()가 이미 센 hit.length에서 갈래만 뻗는다.
+   두 곳이 다른 숫자를 말하는 사고를 구조적으로 막기 위해서다. */
+// 특별 선정 토글의 이름표 — matches()가 읽는 순서 그대로. staffOnly는 숨김이지만
+// 스냅샷 복원으로 되살아날 수 있어 빼지 않는다(원인 없이 줄어든 숫자를 보여주지 않으려고).
+const OB_PICKS = () => [
+  [ncOnly, "논슐랭"], [chainOnly, "인기체인"], [blueOnly, "블루리본"], [certOnly, "백년가게"],
+  [sikgaekOnly, "식객허영만"], [g3Only, "G3"], [staffOnly, "직원추천"],
+  [freshOnly, "새로오픈"], [ttoganOnly, "또간집"],
+];
+function obLabel() {
+  const parts = [];
+  for (const [on, name] of OB_PICKS()) if (on) parts.push(name);
+  state.moodSet.forEach(v => parts.push(v));
+  state.catSet.forEach(v => parts.push(v));
+  state.moveSet.forEach(v => parts.push(v));
+  // 검색어는 칩이 아니지만 지금 걸려 있는 조건이다 — 빼면 윗줄이 '전 체'라고 거짓말한다.
+  // 정규화본(state.q)이 아니라 손님이 친 원문을 보여준다("돈까스"를 "돈가스"로 되받지 않게).
+  const box = document.getElementById("searchInput");
+  const raw = box ? box.value.trim() : "";
+  if (raw && state.q) parts.push("'" + raw + "'"); // 홑따옴표 — 집안 표기(명패 문구와 같은 관용)
+  return parts.length ? parts.join(" · ") : "전 체";
+}
+let obPrev = null, obRAF = 0, obSayT = 0;
+function obPaint(n, poolN, animate) {
+  const el = document.getElementById("obN");
+  if (!el) return;
+  if (obRAF) { cancelAnimationFrame(obRAF); obRAF = 0; } // 진행 중인 카운트업은 무조건 끊는다
+  document.getElementById("obWhat").textContent = obLabel();
+  const note = document.getElementById("obNote");
+  // 발권 대상이 다를 때만 아주 작게 — 두 숫자를 나란히 크게 띄우지 않는다
+  note.textContent = poolN < n ? "· 발권 대상 " + poolN + "곳" : "";
+  const from = obPrev;
+  obPrev = n;
+  const canTween = animate && from !== null && from !== n && !REDUCED
+    && typeof requestAnimationFrame === "function" && typeof performance === "object";
+  el.classList.remove("pulse");
+  if (!canTween) { el.textContent = n; }
+  else {
+    void el.offsetWidth; // 글로우를 다시 처음부터 — 연타해도 매번 한 번씩 빛난다
+    el.classList.add("pulse");
+    const t0 = performance.now();
+    const step = now => {
+      const p = Math.min(1, (now - t0) / 180);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(from + (n - from) * e);
+      if (p < 1) obRAF = requestAnimationFrame(step);
+      else { obRAF = 0; el.textContent = n; }
+    };
+    obRAF = requestAnimationFrame(step);
+  }
+  /* 낭독은 값이 멎은 뒤 한 번만 — 트윈 중간값도, 키 입력마다의 중간 상태도 흘리지 않는다 */
+  clearTimeout(obSayT);
+  obSayT = setTimeout(() => {
+    const say = document.getElementById("obSay");
+    if (!say) return;
+    // 같은 문장을 다시 넣지 않는다 — textContent 재대입은 값이 같아도 live region을 다시 낭독시킨다.
+    // render()는 도장·정렬·발권·AI에서도 도는데, 그때마다 "전 체 167곳"이 반복되면 소음이 된다.
+    const msg = obLabel().replace(/ · /g, ", ") + " " + n + "곳";
+    if (say.textContent !== msg) say.textContent = msg;
+  }, 500);
+}
 /* 창구 수만 즉시 — 타이핑 중에는 이 숫자 하나가 답을 전담한다(목록은 정착 후에 찍는다) */
-function renderCount() {
+function renderCount(opts) {
   const hit = DATA.filter(matches);
   document.getElementById("cnt").textContent = hit.length;
   const poolN = spinPool(hit).length;
   document.getElementById("cntNote").textContent = poolN < hit.length ? ` · 발권 대상 ${poolN}곳` : "";
+  // 전광판 갈래 — 타이핑발(發)이면 즉시 갱신, 애니메이션 없음.
+  // 트윈을 걸면 숫자가 실제보다 늦게 도착해 "타이핑 정착 전 무변동" 게이트를 위반한다.
+  obPaint(hit.length, poolN, !(opts && opts.typed));
   return hit;
 }
 // 직전에 찍은 명부의 서명(=만들어진 HTML 그 자체) · 실제로 다시 찍은 횟수(테스트가 보는 마커)
@@ -2105,7 +2215,7 @@ function render(opts) {
   opts = opts || {};
   // 타이핑 정착이 아닌 렌더(칩·토글·정렬·발권·도장·되돌리기)는 예약된 정착을 흡수한다 — 같은 그림을 두 번 찍지 않는다
   if (!opts.typed && settleT) { clearTimeout(settleT); settleT = 0; settleHold = 0; }
-  const hit = renderCount();
+  const hit = renderCount(opts);
   /* 0건 역설 — 접수원이 아직 답하는 중이면 '없어요'를 찍지 않는다. 문장은 원래 키워드로 0건이고,
      그 0건은 질문이 끝나기 전의 중간 상태일 뿐이다. 답(성공·실패)이 확정된 뒤에 판정한다.
      홀드가 영영 풀리지 않는 일은 없다 — 디바운스·응답·실패·타임아웃 모두 render()로 끝난다. */
