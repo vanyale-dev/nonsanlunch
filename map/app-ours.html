@@ -1,0 +1,1921 @@
+<!doctype html>
+<!--
+  논산런치 · 점심 지도 (배포판)
+
+  ── 쌍둥이 파일 ─────────────────────────────────────────────────────────
+  app-naver.html : BACKEND="naver" — 기본 배포판(네이버 Maps Web Dynamic Map)
+  app-ours.html  : BACKEND="ours"  — 되돌릴 길(MapLibre + 자체 호스팅 벡터타일)
+
+  두 파일은 아래 `var BACKEND` 한 줄과 <title> 한 줄을 빼면 **같은 내용**이다.
+  고칠 때는 app-naver.html 만 고치고 `qa/make-ours.sh` 로 복제한다. 손으로 두 번 고치지 말 것.
+  ────────────────────────────────────────────────────────────────────────
+
+  NCP Maps 클라이언트 키(ncpKeyId) 기본값: uu5vs9jn56
+  등록된 Web 서비스 URL: http://localhost · http://vanyale-dev.github.io · https://vanyale-dev.github.io
+  클라이언트 키는 HTML 노출이 전제이고 도메인 제한이 실제 보호막이라 파일에 둔다.
+  활성 API 는 Dynamic Map 하나뿐 — Geocoding·Static Map·Directions 를 호출하면 429 다.
+
+  QA: window.__qa v1 (계약서 qa/HOOKS.md) · 관문 `node qa/gate.mjs <baseUrl> <page>`
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#26395B">
+<meta name="color-scheme" content="light">
+<title>점심 지도 · 논산런치 (우리 지도)</title>
+<link rel="icon" href="data:,">
+<!-- 첫 타일까지의 왕복을 줄인다(crossorigin 없음 — 스크립트·이미지는 비 CORS 요청이다) -->
+<link rel="preconnect" href="https://oapi.map.naver.com">
+<link rel="preconnect" href="https://nrbe.map.naver.net">
+<link rel="preconnect" href="https://static.naver.net">
+<style>
+  /* ── 팔레트 (이 밖의 색을 쓰지 않는다) ───────────────────────────── */
+  :root {
+    --ink:#29261F; --navy:#26395B; --navy-deep:#1A2A44; --red:#C23B2E;
+    --paper:#FAF7F0; --paper-dim:#F1ECE0; --paper-line:#D9D2C4; --paper-ink-sub:#6B6558;
+    --wall:#E9E6DF; --wall-ink:#33383F; --wall-sub:#77706A;
+    --ink-blue:#2C4A85; --ink-chain:#9C4A21; --ink-hundred:#70522A;
+    --ink-teal:#1F6B5C; --ink-green:#2F6B3C; --ink-pink:#B4527A; --ink-purple:#8672AC;
+    --shadow:0 1px 2px rgba(30,28,20,.10), 0 8px 22px rgba(30,28,20,.09);
+    --shadow-s:0 1px 2px rgba(30,28,20,.14);
+    --lgh:0px;          /* 범례 높이 — 보기 전환 때 JS 가 채운다 */
+    --prov:0px;         /* 바탕지도 공급자 표기(네이버 로고·저작권)를 위해 비우는 아래 여백 */
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { margin:0; padding:0; height:100%; overscroll-behavior:none; }
+  body {
+    font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
+    background:var(--wall); color:var(--ink); font-size:14px; line-height:1.45;
+    -webkit-text-size-adjust:100%;
+  }
+  #app { display:flex; flex-direction:column; height:100%; width:100%; background:var(--paper); }
+
+  /* ── 얇은 명패 (본 앱 .plaque·.t-band 처방 — 종이 배경·잉크 테두리) ── */
+  header.plaque {
+    flex:none; display:flex; align-items:center; gap:10px;
+    background:var(--paper); color:var(--ink);
+    border-bottom:1.5px solid var(--ink);
+    padding:5px 6px 5px 14px;
+    padding-left:max(14px, env(safe-area-inset-left));
+  }
+  .pl-l { font-size:10.5px; font-weight:800; letter-spacing:.18em; color:var(--navy);
+          white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .pl-r { margin-left:auto; font-size:14px; font-weight:900; letter-spacing:-.3px;
+          color:var(--navy); white-space:nowrap; }
+  .gear {
+    flex:none; width:44px; height:44px; margin-right:max(0px, env(safe-area-inset-right));
+    display:inline-flex; align-items:center; justify-content:center;
+    background:var(--paper); color:var(--navy);
+    border:1.5px solid var(--paper-line); border-radius:10px;
+    font-family:inherit; font-size:17px; line-height:1; cursor:pointer;
+  }
+  .gear:active { background:var(--paper-dim); }
+
+  /* ── 필터 칩 (한 줄, 가로 스크롤 — 카테고리 | 이동 | 당김) ────────── */
+  /* 칩 줄은 세 축(카테고리|이동|당김)이 한 줄에 이어진다 — 오른쪽 가장자리를 흐려
+     "더 있다"를 알린다(조작 단계를 늘리지 않고 당김 축을 찾게 하는 유일한 장치). */
+  .chipbar { flex:none; position:relative; background:var(--paper); border-bottom:1.5px solid var(--paper-line); }
+  .chipbar::after {
+    content:""; position:absolute; top:0; bottom:0; right:0; width:26px; pointer-events:none;
+    background:linear-gradient(to right, rgba(250,247,240,0), var(--paper));
+  }
+  .chiprow {
+    display:flex; gap:6px; align-items:center; padding:7px 12px;
+    padding-left:max(12px, env(safe-area-inset-left));
+    padding-right:max(12px, env(safe-area-inset-right));
+    overflow-x:auto; overflow-y:hidden; scrollbar-width:none; -webkit-overflow-scrolling:touch;
+  }
+  .chiprow::-webkit-scrollbar { display:none; }
+  .chiprow .sep { flex:none; width:1.5px; height:26px; background:var(--paper-line); margin:0 3px; border-radius:1px; }
+  .chip {
+    flex:none; font-family:inherit; font-size:13px; font-weight:700; line-height:1;
+    height:44px; min-width:44px; padding:0 14px;
+    display:inline-flex; align-items:center; justify-content:center;
+    background:var(--paper); color:var(--ink);
+    border:1.5px solid var(--paper-line); border-radius:22px;
+    cursor:pointer; user-select:none; white-space:nowrap;
+    transition:background .12s, color .12s, border-color .12s;
+  }
+  .chip[aria-pressed="true"] { background:var(--red); border-color:var(--red); color:var(--paper); }
+
+  /* ── 지도 영역 ───────────────────────────────────────────────────── */
+  /* overflow:clip — hidden 이면 스크롤 컨테이너가 되어 시트 안 버튼을 누를 때 지도가 밀린다 */
+  #mapwrap { position:relative; flex:1 1 auto; min-height:0; background:var(--paper); overflow:clip; }
+  #map  { position:absolute; inset:0; width:100%; height:100%; display:none; }
+  #flat { position:absolute; inset:0; width:100%; height:100%; display:none; touch-action:manipulation; }
+  #pmk  { position:absolute; inset:0; display:none; pointer-events:none; }
+  #mapwrap.live #map { display:block; }
+  #mapwrap.paper #flat, #mapwrap.paper #pmk { display:block; }
+
+  /* 좌표에 '중심'이 오게 하는 0×0 감싸개.
+     상자 크기(46px, 라벨 폭…)를 anchor 로 쓰면 엔진마다 어긋난다 — 실측: 지점 명패가
+     네이버판에서 +32px 밀렸고, 우리 지도판과 다른 자리에 섰다. 그래서 크기가 0인 점에
+     붙이고 안쪽에서 스스로 가운데를 잡는다(두 엔진·종이 폴백이 모두 같은 자리). */
+  .zwrap { position:relative; width:0; height:0; }
+  .zwrap > .zhit { position:absolute; left:0; top:0; transform:translate(-50%,-50%); }
+  /* 지점 명패는 '네이비 사각형의 중심'이 지점 좌표다(사각 23px → 중심 11.5px) */
+  .zwrap > .branch { position:absolute; left:0; top:0; transform:translate(-50%,-11.5px); }
+  /* 현재 위치 — 정확도 원이 커지면 상자도 커진다(고정 46px 앵커로는 어긋난다) */
+  .zwrap > .gdot { position:absolute; left:0; top:0; transform:translate(-50%,-50%); pointer-events:none; }
+  #pmk .pm { position:absolute; }
+  #pmk .pm.c { transform:translate(-50%,-50%); }
+
+  /* 지도 위 라벨 */
+  .plate { display:inline-flex; align-items:center; padding:4px 8px;
+    background:var(--navy); color:var(--paper); border:1.5px solid var(--navy-deep);
+    border-radius:4px; font-size:11px; font-weight:800; line-height:1; white-space:nowrap;
+    box-shadow:var(--shadow-s); }
+  .bsq { display:block; width:19px; height:19px; background:var(--navy);
+    border:2px solid var(--paper); border-radius:2px; box-sizing:content-box;
+    box-shadow:0 0 0 1px var(--navy-deep), 0 1px 3px rgba(26,42,68,.35); }
+  .branch { width:110px; display:flex; flex-direction:column; align-items:center; pointer-events:none; }
+  .branch .plate { margin-top:5px; }
+  /* 묶음 라벨 — 글자 상자는 눈에 보이는 만큼, 손가락 상자는 44×44 */
+  .zhit { width:max-content; min-width:44px; height:44px; display:flex; align-items:center;
+          justify-content:center; cursor:pointer; pointer-events:auto; }
+  .zlab { font-size:12px; font-weight:800; line-height:1.2; text-align:center; white-space:nowrap;
+    text-shadow:0 0 3px var(--paper), 0 0 3px var(--paper), 0 0 3px var(--paper), 0 0 3px var(--paper); }
+  .zlab em { display:block; font-style:normal; font-size:10.5px; font-weight:700; color:var(--paper-ink-sub); }
+
+  /* ── 상태 줄 · 빈 상태 ───────────────────────────────────────────── */
+  .status {
+    position:absolute; left:10px; top:10px; z-index:6; max-width:58%; display:none;
+    background:rgba(250,247,240,.94); color:var(--wall-ink);
+    border:1.5px solid var(--paper-line); border-radius:9px; box-shadow:var(--shadow-s);
+    padding:7px 10px; font-size:11.5px; font-weight:700; line-height:1.3;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .status.on { display:block; }
+  .status b { color:var(--red); }
+  #empty {
+    position:absolute; left:50%; top:44%; transform:translate(-50%,-50%); z-index:7; display:none;
+    width:min(280px, 78%); text-align:center;
+    background:var(--paper); border:1.5px solid var(--ink); border-radius:12px;
+    box-shadow:var(--shadow); padding:16px 16px 14px;
+  }
+  #empty.on { display:block; }
+  #empty b { display:block; font-size:14.5px; letter-spacing:-.3px; }
+  #empty span { display:block; margin-top:6px; font-size:12px; color:var(--paper-ink-sub); }
+
+  .attrib {
+    position:absolute; right:8px; top:10px; z-index:5;
+    right:max(8px, env(safe-area-inset-right));
+    font-size:9.5px; line-height:1.35; text-align:right; color:var(--paper-ink-sub);
+    background:rgba(250,247,240,.82); border-radius:4px; padding:2px 5px; max-width:38%;
+  }
+
+  /* ── 보기·축척 (지도 좌하단 한 줄) ───────────────────────────────── */
+  .ctlbar {
+    position:absolute; z-index:5; display:flex; gap:10px; align-items:center;
+    left:10px; left:max(10px, env(safe-area-inset-left));
+    bottom:calc(10px + var(--prov) + var(--lgh));
+  }
+  .seg { display:flex; gap:5px; }
+  .btn {
+    flex:none; font-family:inherit; font-size:12.5px; font-weight:700; line-height:1;
+    height:44px; min-width:44px; padding:0 12px; cursor:pointer; white-space:nowrap;
+    display:inline-flex; align-items:center; justify-content:center;
+    background:var(--paper); color:var(--ink);
+    border:1.5px solid var(--paper-line); border-radius:10px; box-shadow:var(--shadow-s);
+  }
+  .btn[aria-pressed="true"] { background:var(--navy); border-color:var(--navy); color:var(--paper); }
+  .btn.solid { background:var(--navy); border-color:var(--navy); color:var(--paper); box-shadow:none; }
+
+  /* ── 범례 (동네 6묶음) ───────────────────────────────────────────── */
+  #legend {
+    position:absolute; left:0; right:0; bottom:var(--prov); z-index:6; display:none;
+    gap:6px; padding:7px 10px; overflow-x:auto; scrollbar-width:none;
+    background:rgba(250,247,240,.94); border-top:1.5px solid var(--paper-line);
+  }
+  #legend::-webkit-scrollbar { display:none; }
+  #mapwrap.haslegend #legend { display:flex; }
+  .lg {
+    flex:none; display:inline-flex; align-items:center; gap:6px;
+    font-family:inherit; font-size:12px; font-weight:700; line-height:1;
+    height:44px; padding:0 12px; cursor:pointer; white-space:nowrap;
+    background:var(--paper); border:1.5px solid var(--paper-line); border-radius:22px; color:var(--ink);
+  }
+  .lg i { width:12px; height:12px; border-radius:3px; display:inline-block; border-width:1.5px; border-style:solid; }
+  .lg em { font-style:normal; color:var(--paper-ink-sub); font-weight:700; }
+  .lg[aria-pressed="true"] { background:var(--paper-dim); border-color:var(--ink); }
+  #mapwrap.dimmed .lg:not([aria-pressed="true"]) { opacity:.55; }
+  .lg.nolab { border-style:dashed; }
+
+  /* ── 하단 시트 ───────────────────────────────────────────────────── */
+  .sheet {
+    position:absolute; left:0; right:0; bottom:0; z-index:20;
+    background:var(--paper); border-top:1.5px solid var(--ink);
+    border-radius:14px 14px 0 0; box-shadow:var(--shadow);
+    padding:10px 14px calc(16px + var(--prov)); transform:translateY(101%);
+    transition:transform .18s ease-out; max-height:76%; overflow-y:auto;
+    padding-left:max(14px, env(safe-area-inset-left));
+    padding-right:max(14px, env(safe-area-inset-right));
+  }
+  .sheet.on { transform:translateY(0); }
+  .sh-grab { width:36px; height:4px; border-radius:2px; background:var(--paper-line); margin:0 auto 8px; }
+  .sh-head { display:flex; align-items:flex-start; gap:8px; }
+  .sh-head h2 { margin:0; font-size:18px; line-height:1.25; letter-spacing:-.3px; flex:1 1 auto; padding-top:8px; }
+  .sh-x { flex:none; width:44px; height:44px; display:inline-flex; align-items:center; justify-content:center;
+          background:var(--paper); border:1.5px solid var(--paper-line); border-radius:10px;
+          font-family:inherit; font-size:12px; font-weight:700; color:var(--wall-ink); cursor:pointer; }
+  .sh-tags { display:flex; flex-wrap:wrap; gap:5px; margin:8px 0 0; }
+  .tag { font-size:11px; font-weight:700; line-height:1; padding:6px 9px; border-radius:11px;
+         background:var(--paper-dim); color:var(--wall-ink); border:1px solid var(--paper-line); }
+  .tag.red { background:var(--red); border-color:var(--red); color:var(--paper); }
+  .sh-one { margin:9px 0 0; font-size:13.5px; color:var(--wall-ink); }
+  .sh-facts { display:flex; flex-wrap:wrap; gap:10px; margin:9px 0 0; font-size:12.5px; color:var(--paper-ink-sub); }
+  .sh-acts { display:flex; gap:7px; margin:12px 0 0; }
+  .sh-acts a {
+    flex:1 1 0; min-height:44px; display:inline-flex; align-items:center; justify-content:center;
+    text-align:center; text-decoration:none; font-size:13px; font-weight:700; padding:8px;
+    border-radius:10px; border:1.5px solid var(--navy); color:var(--navy); background:var(--paper);
+  }
+  .sh-acts a.fill { background:var(--navy); color:var(--paper); }
+
+  /* ── 설정 시트 ───────────────────────────────────────────────────── */
+  #scrim { position:absolute; inset:0; z-index:24; display:none; background:rgba(30,28,20,.28); }
+  #scrim.on { display:block; }
+  #settings { z-index:25; max-height:88%; }
+  .st-h { display:flex; align-items:center; gap:8px; margin:0 0 4px; }
+  .st-h h2 { margin:0; font-size:16px; letter-spacing:-.3px; flex:1 1 auto; }
+  .st-row { padding:12px 0; border-top:1.5px solid var(--paper-line); }
+  .st-row:first-of-type { border-top:none; }
+  .st-lab { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:800; }
+  .st-lab .sp { margin-left:auto; }
+  .st-note { margin:6px 0 0; font-size:11.5px; color:var(--paper-ink-sub); line-height:1.5; }
+  .st-note code { background:var(--paper-dim); border:1px solid var(--paper-line); border-radius:4px;
+                  padding:0 4px; font-size:11px; font-family:ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .st-seg { display:flex; gap:6px; margin-top:9px; }
+  .st-seg .btn { flex:1 1 0; }
+  .sw { flex:none; width:64px; height:44px; padding:0; cursor:pointer; position:relative;
+        background:var(--paper-dim); border:1.5px solid var(--paper-line); border-radius:22px; }
+  .sw::after { content:""; position:absolute; top:5px; left:5px; width:30px; height:30px; border-radius:50%;
+        background:var(--paper); border:1.5px solid var(--paper-line); transition:transform .14s, background .14s; }
+  .sw[aria-pressed="true"] { background:var(--red); border-color:var(--red); }
+  .sw[aria-pressed="true"]::after { transform:translateX(20px); border-color:var(--paper); }
+  .st-key { display:flex; gap:6px; margin-top:9px; }
+  .st-key input { flex:1 1 auto; min-width:0; font-family:inherit; font-size:13px; height:44px;
+    padding:0 10px; background:var(--paper-dim); border:1.5px solid var(--paper-line);
+    border-radius:10px; color:var(--ink); }
+  .st-key input:focus { outline:none; border-color:var(--navy); }
+  details.st-fold > summary { list-style:none; cursor:pointer; font-size:13px; font-weight:800;
+    min-height:44px; display:flex; align-items:center; }
+  details.st-fold > summary::-webkit-details-marker { display:none; }
+  details.st-fold > summary::after { content:"▾"; margin-left:auto; color:var(--paper-ink-sub); }
+  details.st-fold[open] > summary::after { content:"▴"; }
+
+  /* ── 오류·안내 패널 ──────────────────────────────────────────────── */
+  /* 안내는 전면을 덮지 않는다 — 지도는 계속 보이고, 출처 표기도 가리지 않는다 */
+  #fail { position:absolute; left:0; right:0; bottom:0; z-index:30; display:none;
+          max-height:72%; overflow-y:auto; padding:0 10px 10px; }
+  #fail.on { display:block; }
+  .failbox { max-width:520px; margin:0 auto; background:var(--paper);
+             border:1.5px solid var(--ink); border-radius:12px 12px 0 0;
+             padding:14px 14px calc(14px + var(--prov)); box-shadow:var(--shadow); }
+  .failbox h3 { margin:0 0 8px; font-size:15px; }
+  .failbox ol { margin:8px 0 0; padding-left:18px; font-size:12.5px; color:var(--wall-ink); line-height:1.6; }
+  .failbox code { background:var(--paper-dim); border:1px solid var(--paper-line); border-radius:4px;
+                  padding:0 4px; font-size:11.5px; font-family:ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .failbox .row { display:flex; gap:6px; margin-top:11px; }
+  .failbox .row input { flex:1 1 auto; min-width:0; font-family:inherit; font-size:13px; height:44px;
+    padding:0 10px; background:var(--paper-dim); border:1.5px solid var(--paper-line); border-radius:10px; color:var(--ink); }
+  .note { font-size:11.5px; color:var(--paper-ink-sub); margin-top:9px; line-height:1.5; }
+
+  /* MapLibre 마커 최소 처방 — CSS 가 늦게 와도 마커가 원점에 쌓이지 않게 인라인으로 못박는다 */
+  .maplibregl-marker { position:absolute; top:0; left:0; will-change:transform; }
+  .maplibregl-canvas-container.maplibregl-interactive { cursor:default; }
+
+  @media (min-width:760px) { body { font-size:14.5px; } .pl-r { font-size:15px; } }
+  @media (prefers-reduced-motion:reduce) { .sheet { transition:none; } .chip { transition:none; } }
+</style>
+<script>
+"use strict";
+/* ── 백엔드 상수 ─────────────────────────────────────────────────────
+   이 한 줄이 쌍둥이 파일의 유일한 차이다. "naver" | "ours"            */
+var BACKEND = "ours";
+/* ──────────────────────────────────────────────────────────────────── */
+
+var LS_KEY = "nl_ncp_key", LS_OFF = "off", LS_GEO = "nl_map_geo";
+var DEFAULT_KEY = "uu5vs9jn56";
+var OTHER_PAGE = (BACKEND === "naver") ? "app-ours.html" : "app-naver.html";
+
+/* 바탕지도 로더 상태 — 본 스크립트보다 먼저 시작해 첫 타일까지의 시간을 줄인다 */
+window.__base = { kind:null, err:null, done:false, cb:null };
+function __baseDone(kind, err){
+  if (window.__base.done) return;
+  window.__base.done = true; window.__base.kind = kind; window.__base.err = err || null;
+  if (window.__base.cb) window.__base.cb();
+}
+function lsGet(k){ try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v){ try { localStorage.setItem(k, v); } catch (e) {} }
+
+(function bootBase(){
+  if (BACKEND === "naver") {
+    var stored = lsGet(LS_KEY);
+    var key = (stored === null) ? DEFAULT_KEY : ((stored === LS_OFF || stored === "") ? null : stored);
+    window.__ncpKey = key; window.__ncpDefault = (stored === null);
+    /* 네이버 SDK 가 전역으로 부른다 — 주입 이전에 정의돼 있어야 한다 */
+    window.navermap_authFailure = function(){
+      /* 인증 실패는 스크립트 로드 뒤(지도를 이미 만든 뒤)에도 온다 — 그때 네이버 SDK 는
+         window.naver 를 걷어 가므로 우리 어댑터가 죽는다. 종이 바탕으로 물러나게 알린다. */
+      window.__authFailed = true;
+      __baseDone(null, "auth");
+      if (window.__onAuthFail) { try { window.__onAuthFail(); } catch (e) {} }
+    };
+    if (!key) { __baseDone(null, "nokey"); return; }
+    var s = document.createElement("script");
+    s.src = "https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=" + encodeURIComponent(key);
+    s.async = true;
+    s.onload = function(){
+      if (window.naver && window.naver.maps) __baseDone("naver");
+      else if (!window.__authFailed) __baseDone(null, "load");
+    };
+    s.onerror = function(){ __baseDone(null, "network"); };
+    document.head.appendChild(s);
+  } else {
+    var need = 3, got = 0, bad = false;
+    function one(){ if (bad) return; if (++got === need) __baseDone("ours"); }
+    function fail(){ if (bad) return; bad = true; __baseDone(null, "network"); }
+    var l = document.createElement("link");
+    l.rel = "stylesheet"; l.href = "assets/maplibre-gl.css";
+    l.onload = one; l.onerror = fail;
+    document.head.appendChild(l);
+    ["assets/maplibre-gl.js", "assets/pmtiles.js"].forEach(function(src){
+      var s = document.createElement("script");
+      s.src = src; s.async = false;                  /* 삽입 순서대로 실행 */
+      s.onload = one; s.onerror = fail;
+      document.head.appendChild(s);
+    });
+  }
+})();
+</script>
+</head>
+<body>
+<div id="app">
+  <header class="plaque">
+    <span class="pl-l">IBK기업은행 논산지점</span>
+    <span class="pl-r">점심 지도</span>
+    <button class="gear" id="gear" type="button" aria-label="설정" aria-haspopup="dialog">⚙</button>
+  </header>
+
+  <!-- 칩은 데이터와 무관하게 파싱 시점에 만든다(로딩 중 레이아웃 무변동) -->
+  <div class="chipbar">
+    <div class="chiprow" id="chipRow" role="group" aria-label="필터"></div>
+  </div>
+
+  <div id="mapwrap">
+    <div id="map"></div>
+    <svg id="flat" xmlns="http://www.w3.org/2000/svg" aria-label="논산 식당 지도(바탕지도 없음)"></svg>
+    <div id="pmk"></div>
+
+    <div class="status" id="status" aria-live="polite"></div>
+    <div class="attrib" id="attrib">경계 © 국토교통부 국토지리정보원</div>
+
+    <div class="ctlbar" id="ctlbar">
+      <div class="seg" id="viewSeg" role="group" aria-label="보기">
+        <button class="btn" type="button" data-view="place" aria-pressed="true">식당</button>
+        <button class="btn" type="button" data-view="zone" aria-pressed="false">동네</button>
+      </div>
+      <div class="seg" id="scaleSeg" role="group" aria-label="축척">
+        <button class="btn" type="button" data-scale="near" aria-pressed="true">지점 근처</button>
+        <button class="btn" type="button" data-scale="all" aria-pressed="false">논산 전역</button>
+      </div>
+    </div>
+
+    <div id="legend" role="group" aria-label="동네 6묶음 범례"></div>
+
+    <div id="empty" role="status">
+      <b>이 조건에 맞는 곳이 없습니다</b>
+      <span>칩을 하나 풀어보세요</span>
+    </div>
+
+    <div class="sheet" id="sheet" role="dialog" aria-modal="false" aria-label="식당 정보"></div>
+
+    <div id="scrim"></div>
+    <div class="sheet" id="settings" role="dialog" aria-modal="true" aria-label="설정"></div>
+
+    <div id="fail" role="alert"><div class="failbox" id="failbox"></div></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ═══════════════════════════════════════════════════════════════════════
+   논산런치 · 점심 지도 — 본체
+   바탕지도만 다르고 화면 사양은 두 쌍둥이 파일이 같다.
+   구조: 상수 → 마커 그림 → 상태 → 어댑터(naver·ours·paper) → 렌더 → UI → QA 훅
+   ═══════════════════════════════════════════════════════════════════════ */
+
+var BRANCH = { la:36.1993678, lo:127.0891137, name:"IBK 논산지점" };
+var CATS  = ["전체","한식","중식","양식","일식","분식","카페"];
+var MOVES = ["도보","차량","원정"];
+/* src/constants.py MOODS 와 글자 그대로 같아야 한다(띄어쓰기 포함) */
+var PULLS = ["뜨끈한 국물","매콤하게","시원하게","든든한 한 끼","속 편하게","모시는 날","빨리 한 끼"];
+var LETTER = { "한식":"한","중식":"중","양식":"양","일식":"일","분식":"분","카페":"카","기타":"기" };
+var KLAT = Math.cos(36.2 * Math.PI / 180);
+var C = { ink:"#29261F", navy:"#26395B", navyDeep:"#1A2A44", red:"#C23B2E",
+          paper:"#FAF7F0", paperDim:"#F1ECE0", paperLine:"#D9D2C4", paperInkSub:"#6B6558",
+          wall:"#E9E6DF", wallInk:"#33383F", water:"#E4E9EA" };
+var FONT = '-apple-system, BlinkMacSystemFont, Apple SD Gothic Neo, sans-serif';
+
+/* 축척 2단 — 두 파일이 같은 화면이 되도록 줌을 우리가 계산해 정수로 고정한다.
+   (fitBounds 는 엔진마다 결과가 달라 '같은 버튼, 다른 화면'이 된다) */
+/* 네이버(구글 계열)는 256px 타일 기준 정수 줌이다. MapLibre 는 512px 타일 기준이라
+   같은 배율이 되려면 **1 을 뺀다**(그러지 않으면 같은 버튼이 두 배로 확대된다 — 실측).
+   naver 의 fitBounds 도 이 두 값을 고르므로(실측 10.46→10) 두 파일이 같은 화면이 된다. */
+var NEAR_ZOOM = 14, ALL_ZOOM = 10;
+var ZOOM_OFFSET = (BACKEND === "ours") ? -1 : 0;
+var MK_BOX = 46;                       /* 모든 마커의 손가락 상자 — 44×44 기준을 넘긴다 */
+/* 동네 색면 투명도 — 네이버판만 바탕 도로가 비치게 내린다(색은 그대로, 투명도만) */
+var ZONE_FILL = (BACKEND === "naver") ? 0.76 : 1.0;
+var ZONE_FILL_DIM = (BACKEND === "naver") ? 0.24 : 0.30;
+
+var S = { cat:"전체", move:null, pull:null, view:"place", scale:"near", zone:null };
+var PLACES = [], DONG = null, ZLABELS = [], ZMAP = {};
+var dataLoaded = false, mapReady = false, firstRender = false, A = null;
+var geoOn = false, geoWatch = null, geoPos = null;
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+  return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]; }); }
+function naverPlaceUrl(pid){ return "https://m.place.naver.com/restaurant/" + encodeURIComponent(pid) + "/home"; }
+
+/* 승인색에서 파생한 연한 틴트(명도 L) — 새 색을 만드는 게 아니라 같은 색상의 밝기만 올린다 */
+function tint(hex, L){
+  var r = parseInt(hex.slice(1,3),16)/255, g = parseInt(hex.slice(3,5),16)/255, b = parseInt(hex.slice(5,7),16)/255;
+  var mx = Math.max(r,g,b), mn = Math.min(r,g,b), h = 0, s = 0, l = (mx+mn)/2, d = mx-mn;
+  if (d) {
+    s = l > .5 ? d/(2-mx-mn) : d/(mx+mn);
+    if (mx === r) h = (g-b)/d + (g < b ? 6 : 0);
+    else if (mx === g) h = (b-r)/d + 2;
+    else h = (r-g)/d + 4;
+    h /= 6;
+  }
+  l = L;
+  var q = l < .5 ? l*(1+s) : l+s-l*s, p = 2*l-q;
+  function ch(t){ t = (t+1)%1; if (t < 1/6) return p+(q-p)*6*t; if (t < .5) return q;
+                  if (t < 2/3) return p+(q-p)*(2/3-t)*6; return p; }
+  function hx(v){ var n = Math.round(v*255).toString(16); return n.length < 2 ? "0"+n : n; }
+  return "#" + hx(ch(h+1/3)) + hx(ch(h)) + hx(ch(h-1/3));
+}
+
+/* ═══ 1. 마커 그림 ═══════════════════════════════════════════════════
+   네이버 기본 지도는 자체 POI(색아이콘·색글씨)가 잔뜩 뜬다 — 우리 마커가 묻히지 않도록
+   도장과 점 둘 다에 종이색 halo 를 두른다(도장 2.5px · 점 1.5px).                */
+var HALO = C.paper;
+function stampOuter(p){ return p.b ? 19.6 : (p.m === "차량" ? 17.9 : (p.m === "원정" ? 16.6 : 16.3)); }
+function haloR(p){ return stampOuter(p) + 1.3; }
+function stampInner(p){
+  var L = LETTER[p.c] || "기", ring;
+  if (p.m === "차량") {
+    ring = '<circle r="15.4" fill="none" stroke="#C23B2E" stroke-width="1.1"/>' +
+           '<circle r="17.4" fill="none" stroke="#C23B2E" stroke-width="1"/>';
+  } else if (p.m === "원정") {
+    ring = '<circle r="15.8" fill="none" stroke="#C23B2E" stroke-width="1.4" stroke-dasharray="2.6 2.6" stroke-linecap="round"/>';
+  } else {
+    ring = '<circle r="15.6" fill="none" stroke="#C23B2E" stroke-width="1.3"/>';
+  }
+  var badge = p.b ? '<circle r="19.6" fill="none" stroke="#C23B2E" stroke-width="1" opacity=".55"/>' : "";
+  return '<g transform="rotate(-6)">' +
+    '<circle r="' + haloR(p).toFixed(1) + '" fill="none" stroke="' + HALO + '" stroke-width="2.5" opacity=".95"/>' +
+    badge + ring +
+    '<circle r="13" fill="#C23B2E"/>' +
+    '<circle r="10.4" fill="none" stroke="#FAF7F0" stroke-width=".9" opacity=".8"/>' +
+    '<text x="0" y="0" text-anchor="middle" dominant-baseline="central" fill="#FAF7F0"' +
+    ' font-family="' + FONT + '" font-size="13.5" font-weight="800">' + L + '</text></g>';
+}
+function svgBox(inner){
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="' + MK_BOX + '" height="' + MK_BOX +
+    '" viewBox="' + (-MK_BOX/2) + ' ' + (-MK_BOX/2) + ' ' + MK_BOX + ' ' + MK_BOX +
+    '" style="display:block;overflow:visible">' + inner + '</svg>';
+}
+/* 점 3종 — 전부 종이색 halo 로 바탕에서 떼어 놓는다 */
+function dotInner(kind){
+  if (kind === "O")   /* 강추 밀도 점 */
+    return '<circle r="6.9" fill="none" stroke="' + HALO + '" stroke-width="1.5" opacity=".95"/>' +
+           '<circle r="6" fill="#C23B2E" opacity=".88"/>';
+  if (kind === "o")   /* 밀도 점 */
+    return '<circle r="5.35" fill="none" stroke="' + HALO + '" stroke-width="1.5" opacity=".95"/>' +
+           '<circle r="4.5" fill="#29261F" opacity=".62"/>';
+  if (kind === "d")   /* 필터 비해당 */
+    return '<circle r="4.35" fill="none" stroke="' + HALO + '" stroke-width="1.2" opacity=".9"/>' +
+           '<circle r="3.5" fill="#29261F" opacity=".18"/>';
+  /* "z" — 동네 모드의 후퇴한 점 */
+  return '<circle r="3.9" fill="none" stroke="' + HALO + '" stroke-width="1.2" opacity=".8"/>' +
+         '<circle r="3" fill="#29261F" opacity=".16"/>';
+}
+/* 마커 시각 반경(그래픽 대비 표본의 둘레 반경) */
+function visR(kind, p){
+  if (kind === "S") return haloR(p);
+  if (kind === "O") return 6.9;
+  if (kind === "o") return 5.35;
+  if (kind === "d") return 4.35;
+  return 3.9;
+}
+function markerHTML(kind, p){ return svgBox(kind === "S" ? stampInner(p) : dotInner(kind)); }
+function branchHTML(){
+  return '<div class="zwrap"><div class="branch"><span class="bsq"></span>' +
+    (S.scale === "all" ? "" : '<span class="plate" id="branchPlate">' + esc(BRANCH.name) + '</span>') +
+    '</div></div>';
+}
+function zhitHTML(z, dim){ return '<div class="zwrap"><div class="zhit">' + zlabHTML(z, dim) + '</div></div>'; }
+function zlabHTML(z, dim){
+  return '<div class="zlab" style="color:' + z.color + ';opacity:' + (dim ? .4 : 1) + '">' +
+    esc(z.name) + '<em>' + z.count + '곳</em></div>';
+}
+
+/* ═══ 2. 필터 ════════════════════════════════════════════════════════ */
+function moodsOf(p){
+  var v = p.k;
+  if (!v) return [];
+  return v.map(function(x){ return typeof x === "number" ? PULLS[x] : String(x); });
+}
+function matches(p){
+  if (S.cat !== "전체" && p.c !== S.cat) return false;
+  if (S.move && p.m !== S.move) return false;
+  if (S.pull && moodsOf(p).indexOf(S.pull) < 0) return false;
+  return true;
+}
+function isFiltered(){ return S.cat !== "전체" || !!S.move || !!S.pull; }
+/* 곳마다 한 글자 — 서명·개수·마커 그림이 전부 이 한 함수에서 나온다 */
+function kindOf(p){
+  if (S.view === "zone") return S.scale === "all" ? "-" : "z";
+  if (!isFiltered()) return p.b ? "O" : "o";
+  return matches(p) ? "S" : "d";
+}
+function tally(){
+  var r = { stamp:0, dim:0, dot:0, badgeDot:0, zoneDot:0, branch:1, total:PLACES.length };
+  for (var i = 0; i < PLACES.length; i++) {
+    var k = kindOf(PLACES[i]);
+    if (k === "S") r.stamp++;
+    else if (k === "d") r.dim++;
+    else if (k === "o") r.dot++;
+    else if (k === "O") { r.dot++; r.badgeDot++; }
+    else if (k === "z") r.zoneDot++;
+  }
+  return r;
+}
+
+/* ═══ 3. 축척·투영 공통 ══════════════════════════════════════════════ */
+var ALLBOX = null;
+function allBox(){
+  if (ALLBOX) return ALLBOX;
+  var s = 90, n = -90, w = 180, e = -180;
+  function ext(lat, lng){ if (lat<s) s=lat; if (lat>n) n=lat; if (lng<w) w=lng; if (lng>e) e=lng; }
+  ext(BRANCH.la, BRANCH.lo);
+  PLACES.forEach(function(p){ ext(p.la, p.lo); });
+  if (DONG) DONG.features.forEach(function(f){
+    (function walk(c){ if (typeof c[0] === "number"){ ext(c[1], c[0]); return; }
+      for (var i=0;i<c.length;i++) walk(c[i]); })(f.geometry.coordinates);
+  });
+  ALLBOX = { s:s, n:n, w:w, e:e };
+  return ALLBOX;
+}
+function nearBox(){
+  var dLat = 1.2/111.32, dLng = 1.2/(111.32*KLAT);
+  return { s:BRANCH.la-dLat, n:BRANCH.la+dLat, w:BRANCH.lo-dLng, e:BRANCH.lo+dLng };
+}
+function viewFor(scale){
+  if (scale === "all") {
+    var b = dataLoaded ? allBox() : { s:36.063, n:36.341, w:126.983, e:127.334 };
+    return { la:(b.s+b.n)/2, lo:(b.w+b.e)/2, z:ALL_ZOOM + ZOOM_OFFSET };
+  }
+  return { la:BRANCH.la, lo:BRANCH.lo, z:NEAR_ZOOM + ZOOM_OFFSET };
+}
+/* 화면의 실제 축척(m/px) — 현재 위치 정확도 원을 그릴 때 쓴다 */
+function currentMpp(){
+  if (A && A.mpp) { var v = A.mpp(); if (v) return v; }
+  return mppAt(BRANCH.la, NEAR_ZOOM);
+}
+function mppAt(lat, z){ return 156543.03392 * Math.cos(lat * Math.PI/180) / Math.pow(2, z); }
+
+/* ═══ 4. 어댑터 ══════════════════════════════════════════════════════
+   세 가지 바탕 — naver(네이버 타일) · ours(MapLibre+자체 타일) · paper(둘 다 실패했을 때).
+   위쪽 코드는 어댑터의 project / marker / polys 만 쓴다.                        */
+
+/* ── 4-a. 네이버 ─────────────────────────────────────────────────── */
+function NaverAdapter(){
+  var map = null, self = this;
+  this.kind = "naver";
+  this.create = function(){
+    var v = viewFor(S.scale);
+    map = new naver.maps.Map("map", {
+      center: new naver.maps.LatLng(v.la, v.lo), zoom: v.z, minZoom: 9, maxZoom: 19,
+      zoomControl:false, scaleControl:false, mapTypeControl:false,
+      /* 로고 컨트롤은 상시 노출이라 끌 수 없다(약관 제7조 ⑩). 저작권 표기도 켠 채로 둔다. */
+      mapDataControl:true,
+      mapDataControlOptions:{ position: naver.maps.Position.BOTTOM_RIGHT }
+    });
+    self.map = map;
+  };
+  function alive(){ return !!(window.naver && window.naver.maps && map); }
+  this.setView = function(v){ if (!alive()) return; map.setCenter(new naver.maps.LatLng(v.la, v.lo)); map.setZoom(v.z, false); };
+  this.zoom = function(){ return alive() ? map.getZoom() : NEAR_ZOOM; };
+  this.mpp = function(){ return alive() ? mppAt(map.getCenter().lat(), map.getZoom()) : null; };
+  this.center = function(){ if (!alive()) return { la:BRANCH.la, lo:BRANCH.lo };
+    var c = map.getCenter(); return { la:c.lat(), lo:c.lng() }; };
+  this.project = function(lat, lng){
+    if (!alive()) return [0, 0];
+    var o = map.getProjection().fromCoordToOffset(new naver.maps.LatLng(lat, lng));
+    return [o.x, o.y];
+  };
+  this.unproject = function(x, y){
+    if (!alive()) return [0, 0];
+    var c = map.getProjection().fromOffsetToCoord(new naver.maps.Point(x, y));
+    return [c.lat(), c.lng()];
+  };
+  this.marker = function(html, lat, lng, z, raw){
+    if (!alive()) return null;
+    function icon(h){
+      return raw ? { content:h, anchor:new naver.maps.Point(0, 0) }
+                 : { content:h, size:new naver.maps.Size(MK_BOX, MK_BOX),
+                     anchor:new naver.maps.Point(MK_BOX/2, MK_BOX/2) };
+    }
+    var m = new naver.maps.Marker({
+      position: new naver.maps.LatLng(lat, lng), map: map, zIndex: z || 10, icon: icon(html)
+    });
+    return {
+      raw: m,
+      html: function(h){ m.setIcon(icon(h)); },
+      pos: function(la, lo){ m.setPosition(new naver.maps.LatLng(la, lo)); },
+      show: function(v){ m.setVisible(!!v); },
+      shown: function(){ return m.getVisible(); },
+      z: function(v){ m.setZIndex(v); },
+      el: function(){ return m.getElement ? m.getElement() : null; },
+      click: function(fn){ naver.maps.Event.addListener(m, "click", fn); },
+      fire: function(){ naver.maps.Event.trigger(m, "click"); },   /* 진짜 클릭 경로 */
+      destroy: function(){ m.setMap(null); }
+    };
+  };
+  this.polys = function(gj){
+    if (!alive()) return;
+    map.data.addGeoJson(gj);
+    map.data.setStyle(polyStyleNaver);
+    naver.maps.Event.addListener(map.data, "click", function(e){
+      if (S.view !== "zone") return;
+      var z = e.feature.getProperty("zone");
+      selectZone(S.zone === z ? null : z);
+    });
+  };
+  this.restyle = function(){ if (!alive()) return; try { map.data.setStyle(polyStyleNaver); } catch (e) {} };
+  this.onIdle = function(fn){ naver.maps.Event.addListener(map, "idle", fn); };
+  this.onMove = function(fn){ naver.maps.Event.addListener(map, "zoom_changed", fn); };
+  this.resize = function(){ try { map.autoResize(); } catch (e) {} };
+  this.painted = function(){
+    /* 타일은 256px — 45~90px 짜리 네이버 로고를 타일로 세면 시각이 앞당겨진다 */
+    var imgs = document.querySelectorAll("#map img");
+    for (var i = 0; i < imgs.length; i++) if (imgs[i].complete && imgs[i].naturalWidth >= 128) return true;
+    return false;
+  };
+  this.providerRects = function(){
+    if (!alive()) return attribProviderRects("boundary-attribution");
+    var out = [];
+    [["naver-logo", "#map a[href*='naver'] img, #map img[src*='logo']"],
+     ["naver-copyright", ".map_copyright"]].forEach(function(pair){
+      var e = document.querySelector(pair[1]); if (!e) return;
+      var r = e.getBoundingClientRect(); if (!r.width || !r.height) return;
+      out.push({ id:pair[0], kind:"provider", x:+r.left.toFixed(1), y:+r.top.toFixed(1),
+                 w:+r.width.toFixed(1), h:+r.height.toFixed(1), sel:pair[1] });
+    });
+    /* 네이버 컨트롤이 아예 없다(인증 실패로 지도가 서지 못한 경우) — 그때 화면에 보이는
+       공급자 표기는 우리 출처 칸이다. 로고가 '있는데 우리가 덮은' 경우는 위에서 그대로 잡힌다. */
+    if (!out.length) return attribProviderRects("boundary-attribution");
+    return out;
+  };
+}
+function polyStyleNaver(feature){
+  var z = feature.getProperty("zone"), meta = ZMAP[z] || { color:C.paperInkSub };
+  if (S.view !== "zone")
+    return { fillColor:C.paper, fillOpacity:0, strokeColor:C.paperLine, strokeWeight:0.8, strokeOpacity:1, clickable:false };
+  var dim = S.zone && S.zone !== z;
+  return { fillColor: tint(meta.color, .94), fillOpacity: dim ? ZONE_FILL_DIM : ZONE_FILL,
+           strokeColor: meta.color, strokeWeight: zoneStroke(), strokeOpacity: dim ? .3 : 1, clickable:true };
+}
+
+/* ── 4-b. 우리 지도 (MapLibre + 자체 호스팅 pmtiles) ───────────────── */
+function OursAdapter(){
+  var map = null, self = this;
+  var tilesSeen = 0, polysBound = false, dead = false;
+  this.kind = "ours";
+  /* 바탕지도가 끝내 안 그려지면 종이 바탕으로 물러난다(네이버판의 인증 실패와 같은 자리) */
+  function baseFail(why){
+    if (dead) return; dead = true;
+    if (window.__onBaseFail) { try { window.__onBaseFail(why); } catch (e) {} }
+  }
+  this.create = function(){
+    var pmUrl = new URL("assets/nonsan.pmtiles", location.href).href;
+    var protocol = new pmtiles.Protocol();
+    maplibregl.addProtocol("pmtiles", protocol.tile);
+    protocol.add(new pmtiles.PMTiles(new pmtiles.FetchSource(pmUrl)));
+    var v = viewFor(S.scale);
+    map = new maplibregl.Map({
+      container:"map", style: buildStyle(pmUrl),
+      center:[v.lo, v.la], zoom:v.z, minZoom:8, maxZoom:17,
+      maxBounds:[[126.80, 35.90],[127.52, 36.52]],
+      attributionControl:false, fadeDuration:0, dragRotate:false, pitchWithRotate:false, hash:false
+    });
+    map.touchZoomRotate.disableRotation();
+    /* 벡터타일이 실제로 한 장이라도 도착했는가 — tilesPainted() 의 근거.
+       map.loaded() 는 타일이 0장이어도 참이라(실측 571ms, 바탕 백지) 그것만으로는 못 쓴다. */
+    map.on("data", function(e){
+      if (e && e.dataType === "source" && e.sourceId === "base" && e.tile) tilesSeen++;
+    });
+    map.on("error", function(e){
+      var m = (e && e.error && (e.error.message || e.error)) || "";
+      console.error("[map]", m);
+      /* pmtiles 는 Range(206) 를 요구한다 — 못 받으면 바탕지도가 통째로 안 온다 */
+      if (/Byte Serving|content-length|pmtiles|Failed to fetch|NetworkError/i.test(String(m))) baseFail("basemap");
+    });
+    /* 어떤 오류도 안 났는데 10초까지 타일이 한 장도 없으면 그것도 실패다(흰 화면 금지) */
+    setTimeout(function(){ if (tilesSeen === 0) baseFail("basemap"); }, 10000);
+    self.map = map;
+  };
+  this.ready = function(fn){ if (map.loaded()) fn(); else map.once("load", fn); };
+  this.setView = function(v){ map.jumpTo({ center:[v.lo, v.la], zoom:v.z }); };
+  this.zoom = function(){ return map.getZoom(); };
+  /* MapLibre 줌은 512px 타일 기준 — 미터/픽셀은 +1 한 값으로 계산해야 맞는다 */
+  this.mpp = function(){ return mppAt(map.getCenter().lat, map.getZoom() + 1); };
+  this.center = function(){ var c = map.getCenter(); return { la:c.lat, lo:c.lng }; };
+  this.project = function(lat, lng){ var p = map.project([lng, lat]); return [p.x, p.y]; };
+  this.unproject = function(x, y){ var c = map.unproject([x, y]); return [c.lat, c.lng]; };
+  this.marker = function(html, lat, lng, z, raw){
+    var el = document.createElement("div");
+    el.innerHTML = html;
+    el.style.zIndex = String(z || 10);
+    if (raw) { el.style.width = "0"; el.style.height = "0"; }   /* 0×0 → 좌표가 곧 중심 */
+    var m = new maplibregl.Marker({ element: el, anchor:"center" }).setLngLat([lng, lat]).addTo(map);
+    return {
+      raw: m,
+      html: function(h){ el.innerHTML = h; },
+      pos: function(la, lo){ m.setLngLat([lo, la]); },
+      show: function(v){ el.style.display = v ? "" : "none"; },
+      shown: function(){ return el.style.display !== "none"; },
+      z: function(v){ el.style.zIndex = String(v); },
+      el: function(){ return el.firstElementChild || el; },
+      click: function(fn){ el.addEventListener("click", fn); },
+      fire: function(){ el.dispatchEvent(new MouseEvent("click", { bubbles:true })); },
+      destroy: function(){ m.remove(); }
+    };
+  };
+  this.polys = function(gj){
+    var fc = { type:"FeatureCollection", features: gj.features.map(function(f){
+      var z = f.properties.zone, meta = ZMAP[z] || { color:C.paperInkSub };
+      return { type:"Feature", geometry:f.geometry,
+               properties:{ zone:z, color:meta.color, tint:tint(meta.color, .94) } };
+    }) };
+    var src = map.getSource("dong");
+    if (!src) {                      /* 스타일이 아직 안 올라왔다 — load 뒤에 다시 붙인다 */
+      map.once("load", function(){ try { self.polys(gj); } catch (e) {} });
+      return;
+    }
+    src.setData(fc);
+    if (polysBound) { self.restyle(); return; }
+    polysBound = true;
+    map.on("click", function(e){
+      if (S.view !== "zone") return;
+      var f = map.queryRenderedFeatures(e.point, { layers:["dong-fill"] })[0];
+      if (!f) { closeSheet(); return; }
+      var z = f.properties.zone;
+      selectZone(S.zone === z ? null : z);
+    });
+    self.restyle();
+  };
+  this.restyle = function(){
+    if (!map || !map.getLayer("dong-fill")) return;
+    var zoneMode = S.view === "zone";
+    map.setLayoutProperty("dong-fill", "visibility", zoneMode ? "visible" : "none");
+    map.setLayoutProperty("dong-line-zone", "visibility", zoneMode ? "visible" : "none");
+    map.setLayoutProperty("dong-line-plain", "visibility", zoneMode ? "none" : "visible");
+    if (!zoneMode) return;
+    var op = S.zone ? ["case", ["==", ["get","zone"], S.zone], ZONE_FILL, ZONE_FILL_DIM] : ZONE_FILL;
+    var lo = S.zone ? ["case", ["==", ["get","zone"], S.zone], 1, 0.3] : 0.95;
+    map.setPaintProperty("dong-fill", "fill-opacity", op);
+    map.setPaintProperty("dong-line-zone", "line-opacity", lo);
+    map.setPaintProperty("dong-line-zone", "line-width", zoneStroke());
+  };
+  this.onIdle = function(fn){ map.on("idle", fn); };
+  this.onMove = function(fn){ map.on("zoomend", fn); map.on("moveend", fn); };
+  this.resize = function(){ try { map.resize(); } catch (e) {} };
+  /* HOOKS.md 계약 = '바탕지도 타일이 실제로 픽셀로 그려졌는가'. 타일 도착 + 렌더 완료 둘 다 본다. */
+  this.painted = function(){ try { return !!(map.loaded() && tilesSeen > 0); } catch (e) { return false; } };
+  /* 우리 지도의 공급자 표기는 OpenStreetMap 저작자 표시다(ODbL) — 가리면 라이선스 위반이다.
+     네이버판의 로고·저작권 컨트롤과 같은 자리에 서는 항목이라 provider 로 신고한다. */
+  this.attribIsProvider = true;
+  this.providerRects = function(){ return attribProviderRects("osm-attribution"); };
+}
+/* 바탕지도 공급자 표기를 우리 출처 표기 칸이 겸할 때 — 가려지면 라이선스 위반이라 provider 로 낸다 */
+function attribProviderRects(id){
+  var e = $("attrib"); if (!e) return [];
+  var r = e.getBoundingClientRect(); if (!r.width || !r.height) return [];
+  return [{ id:id, kind:"provider", x:+r.left.toFixed(1), y:+r.top.toFixed(1),
+            w:+r.width.toFixed(1), h:+r.height.toFixed(1), sel:"#attrib" }];
+}
+/* 스타일 JSON 은 직접 쓴다(외부 스타일 URL 금지) — 저채도 종이 지도 */
+function buildStyle(pmUrl){
+  var rw = function(stops){
+    var e = ["interpolate", ["exponential", 1.35], ["zoom"]];
+    stops.forEach(function(s){ e.push(s[0], s[1]); });
+    return e;
+  };
+  return {
+    version:8, name:"논산런치 종이지도",
+    sources:{
+      base:{ type:"vector", url:"pmtiles://" + pmUrl, attribution:"© OpenStreetMap contributors" },
+      dong:{ type:"geojson", data:{ type:"FeatureCollection", features:[] } }
+    },
+    layers:[
+      { id:"bg", type:"background", paint:{ "background-color":C.paper } },
+      { id:"earth", type:"fill", source:"base", "source-layer":"earth", paint:{ "fill-color":C.paper } },
+      { id:"landuse-green", type:"fill", source:"base", "source-layer":"landuse",
+        filter:["match",["get","kind"],["park","wood","forest","garden","grass","meadow","cemetery","golf_course","pitch","wetland","scrub"],true,false],
+        paint:{ "fill-color":C.paperDim, "fill-opacity":0.95 } },
+      { id:"landuse-farm", type:"fill", source:"base", "source-layer":"landuse",
+        filter:["match",["get","kind"],["farmland","allotments","orchard","vineyard"],true,false],
+        paint:{ "fill-color":C.paperDim, "fill-opacity":0.5 } },
+      { id:"landuse-built", type:"fill", source:"base", "source-layer":"landuse",
+        filter:["match",["get","kind"],["school","university","hospital","industrial","military","commercial","residential","pedestrian","railway","platform","aerodrome"],true,false],
+        paint:{ "fill-color":C.wall, "fill-opacity":0.45 } },
+      { id:"water-fill", type:"fill", source:"base", "source-layer":"water",
+        filter:["==",["geometry-type"],"Polygon"], paint:{ "fill-color":C.water } },
+      { id:"water-line", type:"line", source:"base", "source-layer":"water",
+        filter:["==",["geometry-type"],"LineString"], layout:{ "line-cap":"round","line-join":"round" },
+        paint:{ "line-color":C.water, "line-width":rw([[8,0.6],[11,1.6],[13,3.2],[15,7],[17,13]]) } },
+      { id:"buildings", type:"fill", source:"base", "source-layer":"buildings", minzoom:14,
+        filter:["==",["get","kind"],"building"],
+        paint:{ "fill-color":C.paperDim, "fill-opacity":["interpolate",["linear"],["zoom"],14,0.35,16,0.75] } },
+      { id:"road-rail", type:"line", source:"base", "source-layer":"roads",
+        filter:["==",["get","kind"],"rail"], minzoom:11,
+        paint:{ "line-color":C.paperInkSub, "line-opacity":0.22,
+                "line-width":rw([[11,0.6],[14,1.0],[16,1.6]]), "line-dasharray":[3,3] } },
+      { id:"road-path", type:"line", source:"base", "source-layer":"roads",
+        filter:["==",["get","kind"],"path"], minzoom:14, layout:{ "line-cap":"round" },
+        paint:{ "line-color":C.paperLine, "line-opacity":0.85,
+                "line-width":rw([[14,0.6],[16,1.2],[17,1.8]]), "line-dasharray":[2,2] } },
+      { id:"road-other", type:"line", source:"base", "source-layer":"roads",
+        filter:["match",["get","kind"],["highway","major_road","minor_road","path","rail"],false,true],
+        minzoom:12, layout:{ "line-cap":"round","line-join":"round" },
+        paint:{ "line-color":C.paperLine, "line-width":rw([[12,0.5],[14,1.0],[16,2.2]]) } },
+      { id:"road-minor", type:"line", source:"base", "source-layer":"roads",
+        filter:["==",["get","kind"],"minor_road"], minzoom:12, layout:{ "line-cap":"round","line-join":"round" },
+        paint:{ "line-color":C.paperLine, "line-width":rw([[12,0.5],[14,1.3],[16,3.4],[17,5.5]]) } },
+      { id:"road-major", type:"line", source:"base", "source-layer":"roads",
+        filter:["==",["get","kind"],"major_road"], layout:{ "line-cap":"round","line-join":"round" },
+        paint:{ "line-color":C.paperInkSub, "line-opacity":0.30,
+                "line-width":rw([[9,0.5],[12,1.1],[14,2.4],[16,5.4],[17,8]]) } },
+      { id:"road-highway", type:"line", source:"base", "source-layer":"roads",
+        filter:["==",["get","kind"],"highway"], layout:{ "line-cap":"round","line-join":"round" },
+        paint:{ "line-color":C.paperInkSub, "line-opacity":0.46,
+                "line-width":rw([[8,0.7],[11,1.6],[14,3.4],[16,7],[17,10]]) } },
+      { id:"admin", type:"line", source:"base", "source-layer":"boundaries",
+        paint:{ "line-color":C.paperLine, "line-opacity":0.9,
+                "line-width":rw([[8,0.5],[12,0.9],[15,1.2]]), "line-dasharray":[4,3] } },
+      { id:"dong-fill", type:"fill", source:"dong", layout:{ visibility:"none" },
+        paint:{ "fill-color":["get","tint"], "fill-opacity":ZONE_FILL } },
+      { id:"dong-line-zone", type:"line", source:"dong", layout:{ visibility:"none", "line-join":"round" },
+        paint:{ "line-color":["get","color"], "line-width":1.2, "line-opacity":0.95 } },
+      { id:"dong-line-plain", type:"line", source:"dong", layout:{ "line-join":"round" },
+        paint:{ "line-color":C.paperLine, "line-width":0.8, "line-opacity":0.95 } }
+    ]
+  };
+}
+
+/* ── 4-c. 종이 바탕 (바탕지도가 없을 때의 정직한 화면) ──────────────── */
+function PaperAdapter(){
+  var self = this, P = null, W = 0, H = 0;
+  this.kind = "paper";
+  this.create = function(){ self.layout(); };
+  this.layout = function(){
+    var wrap = $("mapwrap");
+    W = wrap.clientWidth; H = wrap.clientHeight;
+    var box = S.scale === "all" ? (dataLoaded ? allBox() : nearBox()) : nearBox();
+    var x0 = box.w*KLAT, x1 = box.e*KLAT, y0 = -box.n, y1 = -box.s, pad = 28;
+    var k = Math.min((W-2*pad)/(x1-x0), (H-2*pad)/(y1-y0));
+    var ox = (W-(x1-x0)*k)/2 - x0*k, oy = (H-(y1-y0)*k)/2 - y0*k;
+    P = function(lat, lng){ return [ lng*KLAT*k+ox, -lat*k+oy ]; };
+    P.inv = function(x, y){ return [ (oy-y)/k, (x-ox)/(KLAT*k) ]; };
+    P.k = k;
+  };
+  this.setView = function(){ self.layout(); self.drawPolys(); repositionPaper(); };
+  this.zoom = function(){ return S.scale === "all" ? ALL_ZOOM : NEAR_ZOOM; };
+  this.mpp = function(){ if (!P) self.layout(); return 111320 / P.k; };
+  this.center = function(){ var v = viewFor(S.scale); return { la:v.la, lo:v.lo }; };
+  this.project = function(lat, lng){ if (!P) self.layout(); return P(lat, lng); };
+  this.unproject = function(x, y){ if (!P) self.layout(); return P.inv(x, y); };
+  this.marker = function(html, lat, lng, z, raw){
+    var el = document.createElement("div");
+    el.className = "pm" + (raw ? "" : " c");     /* c = 상자의 중심을 좌표에 맞춘다 */
+    el.style.zIndex = String(z || 10);
+    el.innerHTML = html;
+    el.__ll = [lat, lng];
+    $("pmk").appendChild(el);
+    var h = {
+      raw: el,
+      html: function(s){ el.innerHTML = s; },
+      pos: function(la, lo){ el.__ll = [la, lo]; h.place(); },
+      place: function(){ var q = self.project(el.__ll[0], el.__ll[1]);
+                         el.style.left = q[0] + "px"; el.style.top = q[1] + "px"; },
+      show: function(v){ el.style.display = v ? "" : "none"; },
+      shown: function(){ return el.style.display !== "none"; },
+      z: function(v){ el.style.zIndex = String(v); },
+      el: function(){ return el.firstElementChild || el; },
+      click: function(fn){ el.addEventListener("click", fn); },
+      fire: function(){ el.dispatchEvent(new MouseEvent("click", { bubbles:true })); },
+      destroy: function(){ el.remove(); }
+    };
+    h.place();
+    PAPER_MARKERS.push(h);
+    return h;
+  };
+  this.polys = function(){ self.drawPolys(); };
+  this.restyle = function(){ self.drawPolys(); };
+  this.drawPolys = function(){
+    if (!DONG) return;
+    var svg = $("flat");
+    if (!P) self.layout();
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    var out = ['<rect x="0" y="0" width="' + W + '" height="' + H + '" fill="' + C.paper + '"/>'];
+    var zoneMode = S.view === "zone";
+    DONG.features.forEach(function(f){
+      var z = f.properties.zone, meta = ZMAP[z] || { color:C.paperInkSub }, d = featurePath(f, P);
+      if (zoneMode) {
+        var dim = S.zone && S.zone !== z;
+        out.push('<path d="' + d + '" fill="' + tint(meta.color,.94) + '" fill-opacity="' + (dim ? 0.3 : 1) +
+          '" stroke="' + meta.color + '" stroke-width="' + zoneStroke() + '" stroke-opacity="' + (dim ? .3 : 1) +
+          '" stroke-linejoin="round" data-zone="' + z + '" style="cursor:pointer"/>');
+      } else {
+        out.push('<path d="' + d + '" fill="none" stroke="' + C.paperLine + '" stroke-width="0.8" stroke-linejoin="round"/>');
+      }
+    });
+    svg.innerHTML = out.join("");
+  };
+  this.onIdle = function(){};
+  this.onMove = function(){};
+  this.resize = function(){ self.layout(); self.drawPolys(); repositionPaper(); };
+  this.painted = function(){ return false; };   /* 바탕지도 타일은 없다 — 정직하게 false */
+  this.attribIsProvider = true;                 /* 이 화면의 바탕은 경계 데이터 하나뿐이다 */
+  this.providerRects = function(){ return attribProviderRects("boundary-attribution"); };
+}
+var PAPER_MARKERS = [];
+function repositionPaper(){ PAPER_MARKERS.forEach(function(h){ if (h.place) h.place(); }); }
+function ringPath(ring, P){
+  var d = "", i, q;
+  for (i = 0; i < ring.length; i++) { q = P(ring[i][1], ring[i][0]);
+    d += (i ? "L" : "M") + q[0].toFixed(1) + " " + q[1].toFixed(1); }
+  return d + "Z";
+}
+function featurePath(f, P){
+  var g = f.geometry, d = "", polys = g.type === "Polygon" ? [g.coordinates] : g.coordinates;
+  polys.forEach(function(poly){ poly.forEach(function(ring){ d += ringPath(ring, P); }); });
+  return d;
+}
+function zoneStroke(){ return S.scale === "all" ? 1.8 : 1.2; }
+
+/* ═══ 5. 마커 관리 ═══════════════════════════════════════════════════ */
+var MK = [], mkBranch = null, mkZones = [], mkGeo = null;
+var ZKIND = { "S":50, "O":30, "o":10, "d":2, "z":4 };
+
+function buildMarkers(){
+  PLACES.forEach(function(p, i){
+    var k = kindOf(p);
+    var h = A.marker(markerHTML(k, p), p.la, p.lo, ZKIND[k] || 10);
+    if (!h) return;
+    h.__kind = k; h.__i = i;
+    h.click(function(){ if (S.view !== "zone") openSheet(p); });
+    MK.push(h);
+  });
+  mkBranch = A.marker(branchHTML(), BRANCH.la, BRANCH.lo, 90, true);
+  if (mkBranch) mkBranch.__scale = S.scale;
+  ZLABELS.forEach(function(z){
+    var h = A.marker(zhitHTML(z, false), z.la, z.lo, 60, true);
+    if (!h) return;
+    h.__z = z;
+    h.click(function(){ selectZone(S.zone === z.z ? null : z.z); });
+    h.show(false);
+    mkZones.push(h);
+  });
+}
+function applyMarkers(){
+  for (var i = 0; i < MK.length; i++) {
+    var h = MK[i], p = PLACES[h.__i], k = kindOf(p);
+    if (k === "-") { if (h.shown()) h.show(false); h.__kind = k; continue; }
+    if (h.__kind !== k) { h.html(markerHTML(k, p)); h.z(ZKIND[k] || 10); h.__kind = k; }
+    if (!h.shown()) h.show(true);
+  }
+  if (mkBranch && mkBranch.__scale !== S.scale) { mkBranch.html(branchHTML()); mkBranch.__scale = S.scale; }
+}
+
+/* ── 묶음 라벨 자리 찾기 — 라벨은 자기 폴리곤 밖으로 나가지 못한다 ──── */
+var ZPOLYS = null, ZANCHORS = null;
+function buildZonePolys(){
+  ZPOLYS = {};
+  DONG.features.forEach(function(f){
+    var z = f.properties.zone, g = f.geometry;
+    var polys = g.type === "MultiPolygon" ? g.coordinates : [g.coordinates];
+    if (!ZPOLYS[z]) ZPOLYS[z] = [];
+    Array.prototype.push.apply(ZPOLYS[z], polys);
+  });
+}
+function ringHas(ring, x, y){
+  var inside = false;
+  for (var i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    var xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
+    if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) inside = !inside;
+  }
+  return inside;
+}
+function polyHas(poly, x, y){
+  if (!ringHas(poly[0], x, y)) return false;
+  for (var h = 1; h < poly.length; h++) if (ringHas(poly[h], x, y)) return false;
+  return true;
+}
+function inZone(z, lng, lat){
+  if (!ZPOLYS) buildZonePolys();
+  var polys = ZPOLYS[z]; if (!polys) return false;
+  for (var k = 0; k < polys.length; k++) if (polyHas(polys[k], lng, lat)) return true;
+  return false;
+}
+function ringArea(r){
+  var a = 0;
+  for (var i = 0; i < r.length - 1; i++) a += r[i][0]*r[i+1][1] - r[i+1][0]*r[i][1];
+  return a / 2;
+}
+function polyPole(poly){
+  var ring = poly[0], minx = 1e9, miny = 1e9, maxx = -1e9, maxy = -1e9, i;
+  for (i = 0; i < ring.length; i++) {
+    var p = ring[i];
+    if (p[0] < minx) minx = p[0];
+    if (p[0] > maxx) maxx = p[0];
+    if (p[1] < miny) miny = p[1];
+    if (p[1] > maxy) maxy = p[1];
+  }
+  var N = 22, best = null, bd = -1;
+  for (var a = 1; a < N; a++) for (var b = 1; b < N; b++) {
+    var x = minx + (maxx-minx)*a/N, y = miny + (maxy-miny)*b/N;
+    if (!polyHas(poly, x, y)) continue;
+    var d = 1e9;
+    for (i = 0; i < ring.length; i++) {
+      var dx = ring[i][0]-x, dy = ring[i][1]-y, dd = dx*dx + dy*dy;
+      if (dd < d) d = dd;
+    }
+    if (d > bd) { bd = d; best = [x, y]; }
+  }
+  return best;
+}
+function buildZoneAnchors(){
+  if (!ZPOLYS) buildZonePolys();
+  ZANCHORS = {};
+  ZLABELS.forEach(function(z){
+    var list = (ZPOLYS[z.z] || []).map(function(poly){
+      return { poly:poly, area:Math.abs(ringArea(poly[0])) };
+    }).sort(function(a, b){ return b.area - a.area; });
+    var arr = [[z.lo, z.la]];
+    list.forEach(function(it){ var p = polyPole(it.poly); if (p) arr.push(p); });
+    ZANCHORS[z.z] = arr;
+  });
+}
+var ZOFF = [[0,0],[0,-24],[0,24],[-46,0],[46,0],[0,-46],[0,46],[-46,-30],[46,-30],[-46,30],[46,30],
+            [-80,0],[80,0],[0,-70],[0,70],[-80,-40],[80,-40],[-80,42],[80,42],
+            [-118,0],[118,0],[-118,-52],[118,-52],[-118,54],[118,54],[0,-100],[0,100]];
+var ZHIDDEN = [];
+function applyZoneLabels(){
+  if (!mkZones.length) return;
+  if (S.view !== "zone") { mkZones.forEach(function(h){ h.show(false); }); ZHIDDEN = []; return; }
+  if (!ZANCHORS) buildZoneAnchors();
+  var wrap = $("mapwrap"), W = wrap.clientWidth, H = wrap.clientHeight;
+  var P;
+  try { P = function(la, lo){ return A.project(la, lo); }; P.inv = function(x, y){ return A.unproject(x, y); };
+        P(BRANCH.la, BRANCH.lo); } catch (e) { return; }
+  var bq = P(BRANCH.la, BRANCH.lo);
+  var placed = (S.scale === "all") ? [[bq[0], bq[1], 27, 27]] : [[bq[0], bq[1] + 11, 92, 52]];
+  /* 화면에 이미 서 있는 우리 UI(보기·축척 버튼, 출처 표기, 상태 줄)도 자리를 차지한다 —
+     이걸 안 넣으면 묶음 라벨이 버튼 위에 앉는다(실측: 남부 라벨 × 식당 버튼 39×8.5px). */
+  var wr = wrap.getBoundingClientRect();
+  ["ctlbar","attrib","status"].forEach(function(id){
+    var el = $(id);
+    if (!el || !visible(el)) return;
+    if (id === "status" && !el.classList.contains("on")) return;
+    var r = el.getBoundingClientRect();
+    placed.push([r.left - wr.left + r.width/2, r.top - wr.top + r.height/2, r.width + 10, r.height + 10]);
+  });
+  var lgh = $("legend").offsetHeight || 0;
+  var provPx = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--prov")) || 0;
+  var view = [8, 8, W - 8, H - lgh - provPx - 8];
+  var out = [], hidden = [];
+  var order = ZLABELS.slice().sort(function(a, b){
+    if (S.zone) { if (a.z === S.zone) return -1; if (b.z === S.zone) return 1; }
+    return (b.count || 0) - (a.count || 0);
+  });
+  order.forEach(function(z){
+    var w = Math.max(46, z.name.length * 11) + 4, h = 34;
+    var anchors = ZANCHORS[z.z] || [[z.lo, z.la]], pick = null;
+    for (var pass = 0; pass < 2 && !pick; pass++) {
+      for (var ai = 0; ai < anchors.length && !pick; ai++) {
+        var q = P(anchors[ai][1], anchors[ai][0]);
+        for (var k = 0; k < ZOFF.length; k++) {
+          var bx = q[0] + ZOFF[k][0], by = q[1] + ZOFF[k][1];
+          var ll = P.inv(bx, by);
+          if (!inZone(z.z, ll[1], ll[0])) continue;                 /* 남의 땅이면 후보 탈락 */
+          if (pass === 0 && (bx - w/2 < view[0] || bx + w/2 > view[2] ||
+                             by - h/2 < view[1] || by + h/2 > view[3])) continue;
+          var hit = false;
+          for (var j = 0; j < placed.length; j++)
+            if (Math.abs(placed[j][0] - bx) < (placed[j][2] + w)/2 &&
+                Math.abs(placed[j][1] - by) < (placed[j][3] + h)/2) { hit = true; break; }
+          if (hit) continue;
+          pick = [bx, by]; break;
+        }
+      }
+    }
+    if (pick) { placed.push([pick[0], pick[1], w, h]); out.push({ z:z, at:P.inv(pick[0], pick[1]) }); }
+    else hidden.push(z.z);
+  });
+  ZHIDDEN = hidden;
+  var pos = {};
+  out.forEach(function(it){ pos[it.z.z] = it.at; });
+  mkZones.forEach(function(h){
+    var at = pos[h.__z.z];
+    if (!at) { h.show(false); return; }
+    h.pos(at[0], at[1]);
+    h.html(zhitHTML(h.__z, !!(S.zone && S.zone !== h.__z.z)));
+    h.show(true);
+  });
+  var n = $("legend").children;
+  for (var i = 0; i < n.length; i++) n[i].classList.toggle("nolab", hidden.indexOf(ZLABELS[i].z) >= 0);
+}
+
+/* ═══ 6. 렌더 ════════════════════════════════════════════════════════ */
+var renderPending = false;
+function render(){
+  if (!dataLoaded || !A) return;
+  var wrap = $("mapwrap");
+  wrap.classList.toggle("haslegend", S.view === "zone");
+  wrap.style.setProperty("--lgh", (S.view === "zone" ? ($("legend").offsetHeight || 58) + 8 : 0) + "px");
+  if (S.view === "zone") closeSheet();
+  syncChips(); syncLegend(); syncStatus();
+  applyMarkers();
+  if (A.restyle) A.restyle();
+  if (A.drawPolys) A.drawPolys();
+  applyZoneLabels();
+  if (A.kind === "paper") repositionPaper();
+  firstRender = true;
+}
+function syncStatus(){
+  var t = tally(), el = $("status"), em = $("empty");
+  var filtered = isFiltered(), zeroed = (S.view === "place" && filtered && t.stamp === 0);
+  if (S.view === "zone") {
+    el.classList.remove("on"); em.classList.remove("on"); return;
+  }
+  if (!filtered) { el.classList.remove("on"); em.classList.remove("on"); return; }
+  var parts = [];
+  if (S.cat !== "전체") parts.push(S.cat);
+  if (S.move) parts.push(S.move);
+  if (S.pull) parts.push(S.pull);
+  el.innerHTML = esc(parts.join(" · ")) + " — <b>" + t.stamp + "곳</b>";
+  el.classList.add("on");
+  em.classList.toggle("on", zeroed);
+}
+
+/* ═══ 7. 칩·범례·시트 ════════════════════════════════════════════════ */
+function chipEl(axis, v){
+  var b = document.createElement("button");
+  b.type = "button"; b.className = "chip"; b.textContent = v;
+  b.dataset.axis = axis; b.dataset.v = v;
+  b.setAttribute("aria-pressed", "false");
+  b.addEventListener("click", function(){ tapChip(axis, v); });
+  return b;
+}
+function tapChip(axis, v){
+  if (axis === "cat") S.cat = v;                                   /* '전체'가 이 축의 해제다 */
+  else if (axis === "move") S.move = (S.move === v) ? null : v;    /* 같은 칩 재탭 = 해제 */
+  else S.pull = (S.pull === v) ? null : v;
+  S.zone = null;
+  render();
+  writeUrl();
+}
+function buildChips(){
+  var row = $("chipRow");
+  row.innerHTML = "";
+  CATS.forEach(function(v, i){
+    if (i === 1) row.appendChild(sepEl());
+    row.appendChild(chipEl("cat", v));
+  });
+  row.appendChild(sepEl());
+  MOVES.forEach(function(v){ row.appendChild(chipEl("move", v)); });
+  row.appendChild(sepEl());
+  PULLS.forEach(function(v){ row.appendChild(chipEl("pull", v)); });
+}
+function sepEl(){ var s = document.createElement("span"); s.className = "sep"; s.setAttribute("aria-hidden","true"); return s; }
+function syncChips(){
+  var n = $("chipRow").querySelectorAll(".chip");
+  for (var i = 0; i < n.length; i++) {
+    var a = n[i].dataset.axis, v = n[i].dataset.v;
+    var on = (a === "cat") ? (S.cat === v) : (a === "move" ? (S.move === v) : (S.pull === v));
+    n[i].setAttribute("aria-pressed", String(on));
+  }
+}
+/* 고른 칩이 스크롤 밖에 있으면 보이게 끌어온다(누르는 횟수는 그대로) */
+function scrollToSelected(){
+  var row = $("chipRow"), sel = row.querySelector('.chip[aria-pressed="true"][data-axis="cat"]');
+  var first = row.querySelector('.chip[aria-pressed="true"]');
+  var target = (S.cat !== "전체" ? sel : null) || first;
+  if (!target) { row.scrollLeft = 0; return; }
+  var l = target.offsetLeft - 12;
+  if (l < row.scrollLeft || l > row.scrollLeft + row.clientWidth - 60) row.scrollLeft = Math.max(0, l);
+}
+function buildLegend(){
+  var el = $("legend"); el.innerHTML = "";
+  ZLABELS.forEach(function(z){
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "lg";
+    b.setAttribute("aria-pressed", String(S.zone === z.z));
+    b.innerHTML = '<i style="background:' + tint(z.color,.94) + ';border-color:' + z.color + '"></i>' +
+                  esc(z.name) + ' <em>' + z.count + '</em>';
+    b.addEventListener("click", function(){ selectZone(S.zone === z.z ? null : z.z); });
+    el.appendChild(b);
+  });
+}
+function syncLegend(){
+  var n = $("legend").children;
+  for (var i = 0; i < n.length; i++) n[i].setAttribute("aria-pressed", String(ZLABELS[i].z === S.zone));
+  $("mapwrap").classList.toggle("dimmed", !!S.zone);
+}
+function selectZone(z){ S.zone = z; render(); writeUrl(); }
+
+function openSheet(p){
+  var tags = '<span class="tag">' + esc(p.c) + '</span><span class="tag">' + esc(p.m) + '</span>' +
+    (p.b ? '<span class="tag red">강추</span>' : "") +
+    moodsOf(p).map(function(m){ return '<span class="tag">' + esc(m) + '</span>'; }).join("");
+  var facts = [];
+  if (p.p) facts.push('<span>' + esc(p.p) + '</span>');
+  if (p.s) facts.push('<span>' + esc(p.s) + '</span>');
+  if (p.d) facts.push('<span>' + esc(p.d) + '</span>');
+  var acts = "";
+  if (p.t) acts += '<a href="tel:' + esc(String(p.t).replace(/[^0-9+]/g, "")) + '">전화 ' + esc(p.t) + '</a>';
+  if (p.u) acts += '<a class="fill" href="' + esc(naverPlaceUrl(p.u)) + '" target="_blank" rel="noopener noreferrer">네이버 지도에서 열기</a>';
+  $("sheet").innerHTML =
+    '<div class="sh-grab"></div>' +
+    '<div class="sh-head"><h2>' + esc(p.n) + '</h2><button class="sh-x" type="button" id="shX">닫기</button></div>' +
+    '<div class="sh-tags">' + tags + '</div>' +
+    (p.o ? '<p class="sh-one">' + esc(p.o) + '</p>' : "") +
+    (facts.length ? '<div class="sh-facts">' + facts.join("") + '</div>' : "") +
+    (acts ? '<div class="sh-acts">' + acts + '</div>' : "");
+  $("sheet").classList.add("on");
+  var x = $("shX"); if (x) x.addEventListener("click", closeSheet);
+}
+function closeSheet(){ $("sheet").classList.remove("on"); }
+
+/* ═══ 8. 설정 시트 ═══════════════════════════════════════════════════ */
+function openSettings(){
+  var stored = lsGet(LS_KEY);
+  var keyVal = (stored === null) ? DEFAULT_KEY : (stored === LS_OFF ? "" : stored);
+  var mine = (BACKEND === "naver");
+  $("settings").innerHTML =
+    '<div class="sh-grab"></div>' +
+    '<div class="st-h"><h2>설정</h2><button class="sh-x" type="button" id="stX">닫기</button></div>' +
+
+    '<div class="st-row"><div class="st-lab">바탕지도</div>' +
+      '<div class="st-seg">' +
+        '<button class="btn" type="button" id="bmNaver" aria-pressed="' + (mine ? "true" : "false") + '">네이버 지도</button>' +
+        '<button class="btn" type="button" id="bmOurs" aria-pressed="' + (mine ? "false" : "true") + '">우리 지도</button>' +
+      '</div>' +
+      '<p class="st-note">지금 보고 있는 화면 그대로(고른 칩·보기·축척) 넘어갑니다. ' +
+      '<b>우리 지도</b>는 외부 호출 없이 우리가 만든 종이톤 벡터타일로 그립니다.</p></div>' +
+
+    '<div class="st-row"><div class="st-lab">현재 위치 표시' +
+      '<button class="sw sp" type="button" id="geoSw" aria-pressed="' + (geoOn ? "true" : "false") +
+      '" aria-label="현재 위치 표시"></button></div>' +
+      '<p class="st-note">기본은 꺼짐입니다. 켤 때만 위치 권한을 묻습니다. ' +
+      '<b>HTTPS</b>(또는 <code>localhost</code>)에서만 동작합니다.' +
+      '<span id="geoMsg"></span></p></div>' +
+
+    (mine ?
+    '<div class="st-row"><details class="st-fold"><summary>NCP 키</summary>' +
+      '<div class="st-key"><input id="keyIn" type="text" inputmode="latin" autocomplete="off" spellcheck="false" ' +
+        'placeholder="NCP Maps 키 (ncpKeyId)" aria-label="NCP Maps 키" value="' + esc(keyVal) + '">' +
+        '<button class="btn solid" type="button" id="keyApply">적용</button></div>' +
+      '<div class="st-key"><button class="btn" type="button" id="keyClear" style="flex:1 1 auto">지우기 (바탕지도 없이 보기)</button></div>' +
+      '<p class="st-note">' + (stored === null ? "기본 키를 쓰는 중입니다." : (stored === LS_OFF ? "키를 지운 상태입니다." : "직접 넣은 키를 쓰는 중입니다.")) +
+      ' 이 키는 등록된 주소(<code>localhost</code>·<code>vanyale-dev.github.io</code>)에서만 동작합니다.</p>' +
+      '</details></div>' : "") +
+
+    '<div class="st-row"><div class="st-lab">출처 · 라이선스</div>' +
+      '<p class="st-note">' +
+      '· 동네 경계 © 국토교통부 국토지리정보원<br>' +
+      '· 가게 정보 · 딥링크 © NAVER Corp.<br>' +
+      (mine ? '· 바탕지도 © NAVER Corp. (Maps Web Dynamic Map)'
+            : '· 바탕지도 © OpenStreetMap contributors (ODbL) · 엔진 MapLibre GL JS (BSD-3)') +
+      '<br>· 논산런치 — IBK기업은행 논산지점 점심 발권기</p></div>';
+
+  $("settings").classList.add("on");
+  $("scrim").classList.add("on");
+  $("stX").addEventListener("click", closeSettings);
+  $("bmNaver").addEventListener("click", function(){ if (!mine) gotoOther(); });
+  $("bmOurs").addEventListener("click", function(){ if (mine) gotoOther(); });
+  $("geoSw").addEventListener("click", function(){ toggleGeo(!geoOn); });
+  if (mine) {
+    $("keyApply").addEventListener("click", function(){
+      var v = $("keyIn").value.trim();
+      if (!v) { $("keyIn").focus(); return; }
+      lsSet(LS_KEY, v); location.href = urlWithState(location.pathname);
+    });
+    $("keyClear").addEventListener("click", function(){
+      lsSet(LS_KEY, LS_OFF); location.href = urlWithState(location.pathname);
+    });
+  }
+  updateGeoMsg();
+}
+function closeSettings(){ $("settings").classList.remove("on"); $("scrim").classList.remove("on"); }
+function gotoOther(){ location.href = urlWithState(OTHER_PAGE); }
+
+/* ═══ 9. URL 상태 (바탕지도를 바꿔도 같은 화면이 이어지게) ═══════════ */
+function urlWithState(base){
+  var q = [];
+  if (S.cat !== "전체") q.push("c=" + encodeURIComponent(S.cat));
+  if (S.move) q.push("m=" + encodeURIComponent(S.move));
+  if (S.pull) q.push("p=" + encodeURIComponent(S.pull));
+  if (S.view !== "place") q.push("v=" + S.view);
+  if (S.scale !== "near") q.push("s=" + S.scale);
+  if (S.zone) q.push("z=" + encodeURIComponent(S.zone));
+  return base + (q.length ? "?" + q.join("&") : "");
+}
+function readUrl(){
+  var q = {};
+  location.search.replace(/^\?/, "").split("&").forEach(function(kv){
+    if (!kv) return;
+    var i = kv.indexOf("="), k = i < 0 ? kv : kv.slice(0, i);
+    q[k] = i < 0 ? "" : decodeURIComponent(kv.slice(i + 1).replace(/\+/g, " "));
+  });
+  if (q.c && CATS.indexOf(q.c) >= 0) S.cat = q.c;
+  if (q.m && MOVES.indexOf(q.m) >= 0) S.move = q.m;
+  if (q.p && PULLS.indexOf(q.p) >= 0) S.pull = q.p;
+  if (q.v === "zone" || q.v === "place") S.view = q.v;
+  if (q.s === "near" || q.s === "all") S.scale = q.s;
+  if (q.z && /^zone[1-6]$/.test(q.z)) S.zone = q.z;
+  syncSegs();
+}
+function writeUrl(){
+  try { history.replaceState(null, "", urlWithState(location.pathname)); } catch (e) {}
+}
+
+/* ═══ 10. 현재 위치 (기본 꺼짐 · 첫 진입에서 절대 묻지 않는다) ═══════ */
+function geoHTML(accPx){
+  var r = Math.max(10, Math.min(120, accPx || 0));
+  var box = Math.max(46, Math.ceil(r * 2) + 8);
+  return '<div class="zwrap"><div class="gdot">' +
+    '<svg xmlns="http://www.w3.org/2000/svg" width="' + box + '" height="' + box +
+    '" viewBox="' + (-box/2) + ' ' + (-box/2) + ' ' + box + ' ' + box + '" style="display:block">' +
+    '<circle r="' + r.toFixed(1) + '" fill="#26395B" fill-opacity=".10" stroke="#26395B" stroke-opacity=".38" stroke-width="1.2"/>' +
+    '<circle r="7.4" fill="none" stroke="#FAF7F0" stroke-width="2.4"/>' +
+    '<circle r="6" fill="#29261F"/></svg></div></div>';
+}
+function updateGeoMsg(){
+  var el = $("geoMsg"); if (!el) return;
+  var secure = (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1");
+  if (!secure) el.innerHTML = "<br><b>지금 주소는 HTTPS가 아니라 위치를 쓸 수 없습니다.</b>";
+  else if (geoOn && !geoPos) el.innerHTML = "<br>위치를 찾는 중…";
+  else if (geoOn && geoPos) el.innerHTML = "<br>표시 중 (정확도 약 " + Math.round(geoPos.acc) + "m)";
+  else el.innerHTML = "";
+}
+function toggleGeo(on){
+  geoOn = !!on;
+  lsSet(LS_GEO, geoOn ? "1" : "0");
+  var sw = $("geoSw"); if (sw) sw.setAttribute("aria-pressed", String(geoOn));
+  if (!geoOn) {
+    if (geoWatch != null && navigator.geolocation) navigator.geolocation.clearWatch(geoWatch);
+    geoWatch = null; geoPos = null;
+    if (mkGeo) { mkGeo.destroy(); mkGeo = null; }
+    updateGeoMsg();
+    return;
+  }
+  startGeo();
+}
+function startGeo(){
+  if (!navigator.geolocation) { geoFail("이 브라우저는 위치 기능을 제공하지 않습니다."); return; }
+  updateGeoMsg();
+  geoWatch = navigator.geolocation.watchPosition(function(pos){
+    geoPos = { la:pos.coords.latitude, lo:pos.coords.longitude, acc:pos.coords.accuracy || 0 };
+    drawGeo();
+    updateGeoMsg();
+  }, function(err){
+    geoFail(err && err.code === 1 ? "위치 권한이 거부되었습니다. 지도는 그대로 씁니다."
+                                  : "위치를 가져오지 못했습니다. 지도는 그대로 씁니다.");
+  }, { enableHighAccuracy:true, timeout:12000, maximumAge:30000 });
+}
+function geoFail(msg){
+  geoOn = false; lsSet(LS_GEO, "0");
+  var sw = $("geoSw"); if (sw) sw.setAttribute("aria-pressed", "false");
+  var el = $("geoMsg"); if (el) el.innerHTML = "<br><b>" + esc(msg) + "</b>";
+}
+function drawGeo(){
+  if (!geoPos || !A) return;
+  var px = geoPos.acc / currentMpp();
+  var html = geoHTML(px);
+  if (!mkGeo) { mkGeo = A.marker(html, geoPos.la, geoPos.lo, 80, true); }
+  else { mkGeo.html(html); mkGeo.pos(geoPos.la, geoPos.lo); }
+}
+
+/* ═══ 11. 컨트롤 배선 ════════════════════════════════════════════════ */
+function syncSegs(){
+  var n = $("viewSeg").querySelectorAll(".btn"), i;
+  for (i = 0; i < n.length; i++) n[i].setAttribute("aria-pressed", String(n[i].dataset.view === S.view));
+  n = $("scaleSeg").querySelectorAll(".btn");
+  for (i = 0; i < n.length; i++) n[i].setAttribute("aria-pressed", String(n[i].dataset.scale === S.scale));
+}
+function setView(v){
+  if (v !== "place" && v !== "zone") return S.view;
+  if (S.view !== v) { S.view = v; S.zone = null; closeSheet(); }
+  syncSegs(); render(); writeUrl();
+  return S.view;
+}
+function setScale(v){
+  if (v !== "near" && v !== "all") return S.scale;
+  S.scale = v;
+  syncSegs();
+  if (A && A.setView) A.setView(viewFor(v));
+  render();
+  if (geoPos) drawGeo();
+  writeUrl();
+  return S.scale;
+}
+function wireControls(){
+  $("gear").addEventListener("click", openSettings);
+  $("scrim").addEventListener("click", closeSettings);
+  $("viewSeg").addEventListener("click", function(e){
+    var b = e.target.closest("[data-view]"); if (b) setView(b.dataset.view);
+  });
+  $("scaleSeg").addEventListener("click", function(e){
+    var b = e.target.closest("[data-scale]"); if (b) setScale(b.dataset.scale);
+  });
+  $("flat").addEventListener("click", function(e){
+    var z = e.target.closest ? e.target.closest("[data-zone]") : null;
+    if (z && S.view === "zone") { var zz = z.getAttribute("data-zone"); selectZone(S.zone === zz ? null : zz); return; }
+    closeSheet();
+  });
+  $("mapwrap").addEventListener("scroll", function(){
+    var w = $("mapwrap"); if (w.scrollTop || w.scrollLeft) { w.scrollTop = 0; w.scrollLeft = 0; }
+  });
+  var t = null;
+  window.addEventListener("resize", function(){
+    if (t) clearTimeout(t);
+    t = setTimeout(function(){ if (A) { A.resize(); render(); } }, 120);
+  });
+}
+
+/* ═══ 12. 오류 안내 ══════════════════════════════════════════════════ */
+function showFail(kind, extra){
+  var head, why;
+  if (kind === "network") {
+    head = "바탕지도를 불러오지 못했습니다";
+    why = "<li>네트워크가 끊겼거나 차단되어 바탕지도 파일을 받지 못했습니다. " +
+          "<b>아래 화면은 종이 바탕 위에 그린 우리 지도</b>이며 그대로 쓸 수 있습니다.</li>";
+  } else if (kind === "nokey") {
+    head = "바탕지도 없이 보는 중";
+    why = "<li>설정(⚙) &gt; NCP 키에서 키를 넣으면 네이버 지도 타일이 표시됩니다. " +
+          "지금 화면은 종이 바탕 위에 그린 우리 오버레이입니다.</li>";
+  } else if (kind === "basemap") {
+    head = "바탕지도를 불러오지 못했습니다";
+    why = "<li>우리 지도의 벡터타일(<code>.pmtiles</code>)은 <b>구간 요청(HTTP Range, 206)</b>을 받는 " +
+          "서버에서만 읽을 수 있습니다. 지금 서버가 그것을 못 하거나 파일을 못 받았습니다.</li>" +
+          "<li><b>아래 화면은 종이 바탕 위에 그린 우리 지도</b>이며 필터·도장·동네 색면은 그대로 동작합니다.</li>" +
+          "<li>설정(⚙) &gt; 바탕지도에서 <b>네이버 지도</b>로 넘어갈 수 있습니다.</li>";
+  } else if (kind === "init") {
+    head = "지도를 만드는 중 오류가 났습니다";
+    why = "<li>" + esc(extra || "알 수 없는 오류") + "</li>";
+  } else {
+    head = "네이버 지도 인증에 실패했습니다";
+    why =
+      "<li><b>키 파라미터 이름</b> — 이 페이지는 <code>ncpKeyId</code>로 보냅니다. " +
+        "(낡은 안내의 <code>ncpClientId</code>는 지금 규격이 아닙니다.)</li>" +
+      "<li><b>웹 서비스 URL 미등록</b> — NCP 콘솔 &gt; Maps &gt; Application 의 <b>Web 서비스 URL</b>에 " +
+        "이 페이지의 <b>호스트만</b> 등록해야 합니다(포트·경로 제외).<br>" +
+        "현재 호스트: <code>" + esc(location.protocol + "//" + location.hostname) + "</code></li>" +
+      "<li>키를 방금 발급·수정했다면 반영에 몇 분 걸릴 수 있습니다.</li>";
+  }
+  $("failbox").innerHTML =
+    "<h3>" + esc(head) + "</h3>" +
+    '<div style="font-size:12.5px;color:#33383F">확인할 것:</div><ol>' + why + "</ol>" +
+    '<div class="row"><button class="btn solid" type="button" id="failGo" style="flex:1 1 auto">이대로 지도 보기</button></div>' +
+    '<p class="note">바탕지도가 없어도 도장 마커·동네 색면·필터는 그대로 동작합니다. ' +
+    '네이버 타일을 키 없이 직접 가져오는 것은 약관 위반이므로 하지 않습니다.</p>';
+  $("fail").classList.add("on");
+  $("failGo").addEventListener("click", function(){ $("fail").classList.remove("on"); });
+}
+function fatal(msg){
+  $("failbox").innerHTML = '<h3>데이터를 불러오지 못했습니다</h3><p class="note">' + esc(msg) +
+    "<br>네트워크가 끊겼을 수 있습니다. 연결을 확인하고 새로고침 해주세요.<br>" +
+    "(<code>file://</code> 로 직접 열면 <code>data/</code> 를 읽지 못합니다 — 로컬 서버로 여세요.)</p>";
+  $("fail").classList.add("on");
+}
+
+/* ═══ 13. 시작 ═══════════════════════════════════════════════════════ */
+function pickAdapter(){
+  var b = window.__base;
+  if (b.kind === "naver") return new NaverAdapter();
+  if (b.kind === "ours")  return new OursAdapter();
+  return new PaperAdapter();
+}
+function mountMap(){
+  if (mapReady) return;
+  var b = window.__base;
+  var wrap = $("mapwrap");
+  A = pickAdapter();
+  try {
+    A.create();
+  } catch (err) {
+    A = new PaperAdapter(); A.create();
+    wrap.classList.remove("live"); wrap.classList.add("paper");
+    mapReady = true; showFail("init", err && err.message ? err.message : String(err));
+    afterMapReady();
+    return;
+  }
+  if (A.kind === "paper") {
+    wrap.classList.add("paper");
+    document.documentElement.style.setProperty("--prov", "0px");
+    if (b.err && b.err !== "nokey") showFail(b.err);
+    else if (b.err === "nokey") showFail("nokey");
+  } else {
+    wrap.classList.add("live");
+    /* 네이버 로고·저작권(우하단, 실측 45×10 / 88×19)은 약관상 가릴 수 없다 — 아래를 비운다 */
+    document.documentElement.style.setProperty("--prov", A.kind === "naver" ? "26px" : "0px");
+  }
+  mapReady = true;
+  if (A.ready) A.ready(afterMapReady); else afterMapReady();
+}
+/* 바탕지도가 도중에 죽었을 때(인증 실패 등) 종이 바탕으로 물러난다 — 흰 화면 금지 */
+function fallbackToPaper(reason){
+  if (A && A.kind === "paper") return;
+  try { MK.forEach(function(h){ h.destroy(); }); } catch (e) {}
+  try { if (mkBranch) mkBranch.destroy(); } catch (e) {}
+  try { mkZones.forEach(function(h){ h.destroy(); }); } catch (e) {}
+  try { if (mkGeo) mkGeo.destroy(); } catch (e) {}
+  MK = []; mkZones = []; mkBranch = null; mkGeo = null; PAPER_MARKERS = [];
+  dataAttached = false; firstRender = false;
+  var wrap = $("mapwrap");
+  wrap.classList.remove("live"); wrap.classList.add("paper");
+  document.documentElement.style.setProperty("--prov", "0px");
+  $("map").innerHTML = "";
+  A = new PaperAdapter(); A.create();
+  mapReady = true;
+  attachData();
+  showFail(reason || "auth");
+}
+
+function afterMapReady(){
+  if (!dataLoaded) return;                      /* 데이터가 오면 그때 이어 붙인다 */
+  attachData();
+}
+var dataAttached = false;
+function attachData(){
+  if (dataAttached || !mapReady || !dataLoaded) return;
+  dataAttached = true;
+  try { A.polys(DONG); } catch (e) { console.error("[polys]", e); }
+  buildMarkers();
+  buildLegend();
+  if (A.onIdle) A.onIdle(function(){ if (S.view === "zone") applyZoneLabels(); });
+  if (A.onMove) A.onMove(function(){ if (geoPos) drawGeo(); });
+  render();
+  scrollToSelected();
+  if (geoOn) startGeo();
+  setTimeout(function(){ if (A && A.resize) { A.resize(); render(); } }, 60);
+}
+
+function start(){
+  $("attrib").innerHTML = (BACKEND === "ours")
+    ? "바탕 © OpenStreetMap contributors<br>경계 © 국토지리정보원"
+    : "경계 © 국토교통부 국토지리정보원";
+  readUrl();
+  buildChips();
+  wireControls();
+  syncChips();
+  geoOn = (lsGet(LS_GEO) === "1");
+  window.__onAuthFail = function(){ fallbackToPaper("auth"); };
+  window.__onBaseFail = function(why){ fallbackToPaper(why || "basemap"); };
+
+  /* 바탕지도 — 본 스크립트보다 먼저 시작해 있다. 준비되면(또는 실패하면) 즉시 지도를 만든다.
+     데이터를 기다리지 않는다 = 첫 타일이 그만큼 빨리 온다. */
+  if (window.__base.done) mountMap();
+  else window.__base.cb = mountMap;
+  setTimeout(function(){ if (!mapReady) { __baseDone(null, "timeout"); } }, 12000);
+
+  Promise.all([
+    fetch("./data/places.json").then(function(r){ if (!r.ok) throw new Error("places.json " + r.status); return r.json(); }),
+    fetch("./data/dong.geojson").then(function(r){ if (!r.ok) throw new Error("dong.geojson " + r.status); return r.json(); }),
+    fetch("./data/zone_labels.json").then(function(r){ if (!r.ok) throw new Error("zone_labels.json " + r.status); return r.json(); })
+  ]).then(function(res){
+    PLACES = res[0]; DONG = res[1]; ZLABELS = res[2];
+    ZLABELS.forEach(function(z){ ZMAP[z.z] = z; });
+    dataLoaded = true;
+    if (mapReady) attachData();
+  }).catch(function(err){
+    fatal(err && err.message ? err.message : String(err));
+  });
+
+  /* 서비스워커 — 오프라인에서 흰 화면 대신 이 화면이 그대로 뜨게 한다.
+     등록은 가볍지만(2KB) 미리 담기(precache)는 첫 타일 뒤로 미뤄 대역폭을 뺏지 않는다. */
+  if ("serviceWorker" in navigator && location.protocol !== "file:") {
+    navigator.serviceWorker.register("./sw.js").then(function(){
+      var sent = false, t0 = Date.now();
+      function ask(){
+        if (sent) return;
+        var painted = false;
+        try { painted = !!(A && A.painted && A.painted()); } catch (e) {}
+        if (!painted && Date.now() - t0 < 4000) { setTimeout(ask, 400); return; }
+        sent = true;
+        var urls = [location.pathname, "./data/places.json", "./data/dong.geojson", "./data/zone_labels.json"];
+        if (BACKEND === "ours") urls.push("./assets/maplibre-gl.js", "./assets/maplibre-gl.css", "./assets/pmtiles.js");
+        var sw = navigator.serviceWorker.controller;
+        if (sw) sw.postMessage({ type:"precache", urls:urls });
+      }
+      setTimeout(ask, 400);
+    }).catch(function(){});
+  }
+
+  /* 본 앱(발권기) 오프라인 폴백 되돌리기 — 아래 설명 참조. 첫 화면을 방해하지 않게 뒤로 미룬다. */
+  setTimeout(healHostCache, 3000);
+}
+
+/* 본 앱 오프라인 폴백 보호.
+   발권기의 서비스워커(site/sw.js)는 스코프가 `/nonsanlunch/` 라 이 지도 페이지의
+   **첫 진입까지** 가로채고, 받은 HTML 을 자기 오프라인 폴백 자리인 `./index.html`
+   (= /nonsanlunch/index.html) 에 덮어쓴다. 그대로 두면 직원이 오프라인에서 발권기를
+   열었을 때 발권기 대신 이 지도가 뜬다 — 북극성(발권)을 직접 깎는 사고다.
+   지도는 본 앱 파일을 한 글자도 고칠 수 없으므로, 오염을 **런타임에 감지해 그 자리만**
+   원래 발권기 문서로 되돌린다. 오염이 없으면(캐시 없음 · 정상 문서) 아무 일도 하지 않는다.
+   주의: 캐시 이름은 본 앱 sw.js 의 상수를 베낀 것이라, 본 앱이 버전을 올리면 이 보호는
+   조용히 무효가 된다(README 「배포」절에 적어 둔다). */
+function healHostCache(){
+  try {
+    if (!window.caches || !caches.has) return;
+    var NAME = "nslunch-v2";            /* site/sw.js 의 CACHE 상수 */
+    var KEY  = "../index.html";         /* 이 페이지 기준 → /nonsanlunch/index.html */
+    caches.has(NAME).then(function(has){
+      if (!has) return;                 /* 발권기를 쓴 적 없는 기기 — 손대지 않는다 */
+      return caches.open(NAME).then(function(c){
+        return c.match(KEY, { ignoreSearch:true }).then(function(hit){
+          if (!hit || !hit.url || hit.url.indexOf("/map/") < 0) return;   /* 오염 아님 */
+          return fetch(KEY, { cache:"no-cache" }).then(function(res){
+            if (res && res.ok) return c.put(KEY, res.clone());
+          });
+        });
+      });
+    }).catch(function(){});
+  } catch (e) {}
+}
+
+/* ═══ 14. QA 훅 — window.__qa v1 (계약서 qa/HOOKS.md) ════════════════
+   읽기 전용이 원칙이고, 상태를 바꾸는 것은 사용자가 손으로 누르는 것과 같은 경로다.
+   관문 밖에서는 아무 부작용이 없다.                                          */
+function rectOf(el){
+  var r = el.getBoundingClientRect();
+  return { x:+r.left.toFixed(1), y:+r.top.toFixed(1), w:+r.width.toFixed(1), h:+r.height.toFixed(1) };
+}
+function visible(el){
+  if (!el) return false;
+  var r = el.getBoundingClientRect();
+  if (!r.width || !r.height) return false;
+  var s = getComputedStyle(el);
+  return s.visibility !== "hidden" && s.display !== "none" && s.opacity !== "0";
+}
+function markerEl(i){ var h = MK[i]; return h ? h.el() : null; }
+/* 마커 핸들의 '보이는 알맹이' — 좌표 정확도를 위해 감싸개(.zwrap)는 0×0 이라 그대로 재면 안 된다 */
+function innerEl(h, sel){
+  var el = h && h.el ? h.el() : null;
+  if (!el) return null;
+  var q = el.querySelector ? el.querySelector(sel) : null;
+  return q || el;
+}
+/* 마커 중심의 화면 좌표 — 어댑터 투영을 그대로 쓴다(뷰포트 밖도 계산된다) */
+function markerCenter(i){
+  var p = PLACES[i];
+  try { var q = A.project(p.la, p.lo); return q; } catch (e) { return null; }
+}
+window.__qa = {
+  version: 1,
+  /* 실제로 무엇이 그리고 있는지(naver/ours/paper)를 리포트에 남긴다 — 폴백을 숨기지 않는다 */
+  get caps(){ return { pull:true, empty:true, signature:"per-place",
+                       basemap:BACKEND, adapter:(A ? A.kind : null) }; },
+  places: function(){ return PLACES; },
+  ready: function(){ return !!(dataLoaded && mapReady && dataAttached && firstRender); },
+  tilesPainted: function(){ try { return !!(A && A.painted && A.painted()); } catch (e) { return false; } },
+  settle: function(){
+    return new Promise(function(r){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ r(true); }); }); });
+  },
+
+  getFilters: function(){ return { cat:S.cat, move:S.move, pull:S.pull }; },
+  setFilters: function(f){
+    var un = [];
+    function axis(name, cur, want){
+      if (want === undefined) return;
+      if (want === cur) return;                                  /* 이미 그 상태 */
+      if (want === null) {                                       /* 해제 = 눌린 칩을 다시 누른다 */
+        if (name === "cat") { if (!clickChip("cat", "전체")) un.push("cat:null"); return; }
+        if (cur === null) return;
+        if (!clickChip(name, cur)) un.push(name + ":null");
+        return;
+      }
+      if (!clickChip(name, want)) un.push(name + ":" + want);
+    }
+    axis("cat",  S.cat,  ("cat"  in f) ? f.cat  : undefined);
+    axis("move", S.move, ("move" in f) ? f.move : undefined);
+    axis("pull", S.pull, ("pull" in f) ? f.pull : undefined);
+    return { ok: un.length === 0, unsupported: un };
+  },
+  reset: function(){
+    if (S.cat !== "전체") clickChip("cat", "전체");
+    if (S.move) clickChip("move", S.move);
+    if (S.pull) clickChip("pull", S.pull);
+    if (S.view !== "place") setView("place");
+    if (S.scale !== "near") setScale("near");
+    if (S.zone) selectZone(null);
+    closeSheet(); closeSettings();
+    $("fail").classList.remove("on");
+    return true;
+  },
+
+  getView: function(){ return S.view; },
+  setView: function(v){ return setView(v); },
+  getScale: function(){ return S.scale; },
+  setScale: function(v){ return setScale(v); },
+
+  counts: function(){ return tally(); },
+  emptyState: function(){
+    var el = $("empty");
+    return { shown: el.classList.contains("on"), text: (el.textContent || "").replace(/\s+/g, " ").trim() };
+  },
+  signature: function(){
+    return S.view + "|" + S.scale + "|" + (S.zone || "-") + "|" +
+           PLACES.map(function(p){ return kindOf(p); }).join("");
+  },
+
+  /* 누를 수 있는 것 전부 — 보이는 크기가 아니라 '손가락이 닿는 상자'를 잰다 */
+  targets: function(){
+    var out = [];
+    Array.prototype.forEach.call($("chipRow").querySelectorAll(".chip"), function(c){
+      if (!visible(c)) return;
+      out.push({ id:"chip:" + c.textContent.trim(), kind:"chip", ...rectOf(c) });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("#viewSeg .btn, #scaleSeg .btn"), function(b){
+      if (!visible(b)) return;
+      out.push({ id:"btn:" + b.textContent.trim(), kind:"button", ...rectOf(b) });
+    });
+    var g = $("gear"); if (visible(g)) out.push({ id:"btn:설정", kind:"button", ...rectOf(g) });
+    Array.prototype.forEach.call($("legend").querySelectorAll(".lg"), function(b){
+      if (!visible(b)) return;
+      out.push({ id:"legend:" + (b.textContent || "").trim(), kind:"legend", ...rectOf(b) });
+    });
+    for (var i = 0; i < MK.length; i++) {
+      var h = MK[i]; if (!h.shown()) continue;
+      var el = h.el(); if (!visible(el)) continue;
+      out.push({ id:"marker#" + h.__i, kind:"marker", ...rectOf(el) });
+    }
+    mkZones.forEach(function(h){
+      if (!h.shown()) return;
+      var el = innerEl(h, ".zhit"); if (!visible(el)) return;
+      out.push({ id:"zone:" + h.__z.name, kind:"legend", ...rectOf(el) });
+    });
+    if ($("sheet").classList.contains("on")) {
+      Array.prototype.forEach.call($("sheet").querySelectorAll("button, a"), function(b){
+        if (!visible(b)) return;
+        out.push({ id:"sheet:" + (b.textContent || "").trim().slice(0, 12), kind:"sheet-button", ...rectOf(b) });
+      });
+    }
+    return out;
+  },
+
+  /* 겹침 감사용 사각형 — '눈에 보이는 만큼'을 잰다(손가락 상자가 아니다) */
+  rects: function(){
+    var out = [];
+    var bp = mkBranch ? innerEl(mkBranch, ".plate") : null;
+    if (bp && bp === mkBranch.el()) bp = null;               /* 명패 텍스트가 없는 축척 */
+    if (bp && visible(bp)) out.push({ id:"label:지점명패", kind:"label", ...rectOf(bp) });
+    mkZones.forEach(function(h){
+      if (!h.shown()) return;
+      var lab = innerEl(h, ".zlab");
+      if (!lab || !visible(lab)) return;
+      out.push({ id:"zonelabel:" + h.__z.name, kind:"zonelabel", ...rectOf(lab) });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("#viewSeg .btn, #scaleSeg .btn"), function(b){
+      if (visible(b)) out.push({ id:"control:" + b.textContent.trim(), kind:"control", ...rectOf(b) });
+    });
+    Array.prototype.forEach.call($("legend").querySelectorAll(".lg"), function(b){
+      if (visible(b)) out.push({ id:"legend:" + (b.textContent || "").trim(), kind:"legend", ...rectOf(b) });
+    });
+    var at = $("attrib");
+    if (visible(at) && !(A && A.attribIsProvider)) out.push({ id:"attrib", kind:"attrib", ...rectOf(at) });
+    var sh = $("sheet"); if (sh.classList.contains("on")) out.push({ id:"sheet", kind:"sheet", ...rectOf(sh) });
+    if (A && A.providerRects) Array.prototype.push.apply(out, A.providerRects());
+    return out;
+  },
+  sheetOpen: function(){ return $("sheet").classList.contains("on"); },
+  tapMarker: function(i){
+    var h = null, n = 0;
+    for (var j = 0; j < MK.length; j++) {
+      if (!MK[j].shown()) continue;
+      if (n === i) { h = MK[j]; break; }
+      n++;
+    }
+    if (!h) return false;
+    if (h.fire) { h.fire(); return true; }        /* 좌표 클릭이 아니라 마커의 실제 클릭 경로 */
+    openSheet(PLACES[h.__i]);
+    return true;
+  },
+
+  /* 대비 표본 — 마커의 '아래 배경'을 뜰 둘레 반경까지 알려 준다.
+     표본은 **바탕지도 위에 온전히 보이는 마커만**이다. 위에 덮인 마커(더 큰 마커·지점 명패·
+     묶음 라벨·우리 UI 판때기 밑)는 눈에 보이지 않을 뿐 아니라, 그 자리를 재면
+     '배경'이 아니라 우리 UI 색(예: 명패의 네이비)을 배경으로 세게 된다. */
+  graphicSamples: function(){
+    var wrap = $("mapwrap").getBoundingClientRect();
+    var occ = [];                                   /* 마커보다 위에 그려지는 것들 */
+    function addOcc(el){ if (visible(el)) occ.push(el.getBoundingClientRect()); }
+    if (mkBranch) addOcc(innerEl(mkBranch, ".branch"));
+    mkZones.forEach(function(h){ if (h.shown()) addOcc(innerEl(h, ".zhit")); });
+    ["status","attrib","ctlbar","legend","sheet","empty","fail"].forEach(function(id){
+      var el = $(id);
+      if (!el) return;
+      if ((id === "sheet" || id === "empty" || id === "fail") && !el.classList.contains("on")) return;
+      if (id === "legend" && S.view !== "zone") return;
+      if (id === "status" && !el.classList.contains("on")) return;
+      addOcc(el);
+    });
+    if (A && A.providerRects) A.providerRects().forEach(function(r){
+      occ.push({ left:r.x, top:r.y, right:r.x + r.w, bottom:r.y + r.h });
+    });
+    function hitOcc(cx, cy, r){
+      for (var i = 0; i < occ.length; i++) {
+        var o = occ[i];
+        if (cx + r > o.left && cx - r < o.right && cy + r > o.top && cy - r < o.bottom) return true;
+      }
+      return false;
+    }
+    var vis = [];
+    for (var i = 0; i < MK.length; i++) {
+      var h = MK[i]; if (!h.shown()) continue;
+      var k = h.__kind, p = PLACES[h.__i], q = markerCenter(h.__i);
+      if (!q) continue;
+      var cx = wrap.left + q[0], cy = wrap.top + q[1], r = visR(k, p);
+      if (cx - r < 8 || cy - r < 8 || cx + r > wrap.right - 8 || cy + r > wrap.bottom - 8) continue;
+      if (hitOcc(cx, cy, r + 9)) continue;          /* 관문이 훑는 둘레(+9)까지 우리 UI 가 덮은 자리 */
+      vis.push({ i:h.__i, k:k, cx:cx, cy:cy, r:r, z:ZKIND[k] || 10, ord:i,
+                 fill: (k === "S" || k === "O") ? C.red : C.ink });
+    }
+    /* 위에 그려진 마커가 중심을 덮었으면 그 마커는 화면에 없다 */
+    var out = [];
+    for (var a = 0; a < vis.length; a++) {
+      var m = vis[a], hidden = false;
+      for (var b = 0; b < vis.length; b++) {
+        if (a === b) continue;
+        var o = vis[b];
+        var above = (o.z > m.z) || (o.z === m.z && o.ord > m.ord);
+        if (!above) continue;
+        var dx = o.cx - m.cx, dy = o.cy - m.cy;
+        /* 관문은 이 마커의 둘레를 sampleR · +4 · +9 세 반경으로 훑어 '아래 배경'을 정한다.
+           그 고리 안에 위 마커의 몸이 들어와 있으면 재는 것은 바탕이 아니라 그 마커의
+           인주색이다(실측: 도장 무리 속 옅은 점이 2.85:1 로 찍혔다). 그런 자리의 점은
+           눈으로도 도장에 묻혀 안 보인다 — 표본에서 뺀다. */
+        if (Math.sqrt(dx*dx + dy*dy) < o.r + m.r + 9) { hidden = true; break; }
+      }
+      if (hidden) continue;
+      out.push({ id:(m.k === "S" ? "stamp#" : m.k === "O" ? "badgedot#" : m.k === "d" ? "dimdot#" : m.k === "z" ? "zonedot#" : "dot#") + m.i,
+                 kind:"marker", fill:m.fill, cx:+m.cx.toFixed(1), cy:+m.cy.toFixed(1),
+                 sampleR:+m.r.toFixed(1) });
+    }
+    return out;
+  },
+  textSamples: function(){
+    var out = [];
+    function add(el, id){
+      if (!visible(el)) return;
+      var r = el.getBoundingClientRect();
+      out.push({ id:id, color:getComputedStyle(el).color,
+                 box:{ x:+r.left.toFixed(1), y:+r.top.toFixed(1), w:+r.width.toFixed(1), h:+r.height.toFixed(1) },
+                 /* 글자가 없는 자리 — 테두리 안쪽 여백(안티에일리어싱이 섞이지 않게) */
+                 padBox:{ x:+(r.left + 4).toFixed(1), y:+(r.top + r.height/2 - 4).toFixed(1), w:6, h:8 } });
+    }
+    Array.prototype.forEach.call($("chipRow").querySelectorAll(".chip"), function(c){
+      add(c, "chip:" + c.textContent.trim());
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("#viewSeg .btn, #scaleSeg .btn"), function(b){
+      add(b, "btn:" + b.textContent.trim());
+    });
+    return out;
+  }
+};
+function clickChip(axis, v){
+  var sel = '.chip[data-axis="' + axis + '"][data-v="' + (window.CSS && CSS.escape ? CSS.escape(v) : v) + '"]';
+  var c = $("chipRow").querySelector(sel);
+  if (!c) {
+    var all = $("chipRow").querySelectorAll('.chip[data-axis="' + axis + '"]');
+    for (var i = 0; i < all.length; i++) if (all[i].dataset.v === v) { c = all[i]; break; }
+  }
+  if (!c) return false;
+  c.click();
+  return true;
+}
+
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
+else start();
+</script>
+</body>
+</html>
