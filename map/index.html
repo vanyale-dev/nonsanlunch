@@ -4,10 +4,15 @@
 
   2026-08-28 개편 — 사장 지시 "전부 빼라". 상단 명패·설정 시트·필터 칩·상태 줄·
   하단 버튼 4개·동네 보기(폴리곤·범례·묶음 라벨)를 **DOM 에서 제거**했다.
-  남은 것: 네이버 바탕지도 · 지점 명패 · 마커 167 · 하단 시트 · 현재 위치 버튼 하나.
+  남은 것: 네이버 바탕지도 · 지점 마커 · 마커 167 · 하단 시트 · 현재 위치 버튼 하나.
+
+  2026-08-28(2차) 사장 지시 — 지점 마커와 현재 위치 마커를 **사장이 직접 그린 그림**으로 바꿨다.
+  img/branch.png(지점, 34px 정사각·가운데 앵커) · img/me.png(내 위치, 높이 44px·아래 꼭짓점 앵커).
+  base64 가 아니라 **파일 참조**다 — 그림만 갈아끼우면 되고 HTML 이 무거워지지 않는다.
+  지점 명패("지점 이름" 글자)는 제거했다. 그림만 남는다. 기본 점은 회색 대신 브랜드 파랑이다.
 
   ── 마커 규칙 (선택하게 하지 않는다 — 항상 전부 보인다) ─────────────────
-  기본 = 회색 점(93곳). 특별 선정 = 그 칩에 쓰이는 아이콘(74곳).
+  기본 = 파랑 점(93곳). 특별 선정 = 그 칩에 쓰이는 아이콘(74곳).
   겹치는 곳은 하나만 그린다. 우선순위(데이터 pk 필드에 이미 반영):
   논슐랭 > 블루리본 > 백년가게 > 식객허영만 > 또간집 > 새로오픈 > 인기체인.
   아이콘 출처는 본 앱(src/build_webapp.py)의 칩 그대로다 —
@@ -44,6 +49,9 @@
     --ink:#29261F; --navy:#26395B; --navy-deep:#1A2A44; --red:#C23B2E;
     --paper:#FAF7F0; --paper-dim:#F1ECE0; --paper-line:#D9D2C4; --paper-ink-sub:#6B6558;
     --wall:#E9E6DF; --wall-ink:#33383F; --wall-sub:#77706A;
+    /* 점 파랑 — 사장이 그린 img/branch.png 에서 실제로 뽑은 주 색(면적 최대 7,653px).
+       새로 고른 색이 아니다. 그림과 점이 같은 파랑을 쓴다. */
+    --pin-blue:#1C73F2;
     --shadow:0 1px 2px rgba(30,28,20,.10), 0 8px 22px rgba(30,28,20,.09);
     --shadow-s:0 1px 2px rgba(30,28,20,.14);
     --prov:0px;         /* 바탕지도 공급자 표기(네이버 로고·저작권)를 위해 비우는 아래 여백 */
@@ -70,33 +78,40 @@
 
   /* 좌표에 '중심'이 오게 하는 0×0 감싸개 — 상자 크기를 anchor 로 쓰면 엔진마다 어긋난다 */
   .zwrap { position:relative; width:0; height:0; }
-  /* 지점 명패는 '네이비 사각형의 중심'이 지점 좌표다(사각 23px → 중심 11.5px) */
-  .zwrap > .branch { position:absolute; left:0; top:0; transform:translate(-50%,-11.5px); }
-  /* 현재 위치 — 정확도 원이 커지면 상자도 커진다(고정 앵커로는 어긋난다) */
-  .zwrap > .gdot { position:absolute; left:0; top:0; transform:translate(-50%,-50%); pointer-events:none; }
+  /* 지점 마커는 그림의 '한가운데'가 지점 좌표다(34×34 정사각) */
+  .zwrap > .branch { position:absolute; left:0; top:0; transform:translate(-50%,-50%); }
+  /* 현재 위치 — 정확도 원은 중심 앵커(원이 커지면 상자도 커진다),
+     핀은 물방울이라 **아래 꼭짓점**이 좌표다(가운데에 두면 실제 위치보다 아래로 밀린다). */
+  .zwrap > .gacc { position:absolute; left:0; top:0; transform:translate(-50%,-50%);
+                   pointer-events:none; z-index:1; }
+  .zwrap > .gpin { position:absolute; left:0; top:0; transform:translate(-50%,-100%);
+                   pointer-events:none; z-index:2; line-height:0; }
+  .zwrap > .gpin img { display:block; width:29px; height:44px; }
+  /* 그림을 못 받았을 때만 — 옛 잉크 점으로 물러난다(중심 앵커로 되돌린다) */
+  .zwrap > .gpin.nofile { transform:translate(-50%,-50%); }
   #pmk .pm { position:absolute; }
   #pmk .pm.c { transform:translate(-50%,-50%); }
 
-  /* 지점 명패 */
-  .plate { display:inline-flex; align-items:center; padding:4px 8px;
-    background:var(--navy); color:var(--paper); border:1.5px solid var(--navy-deep);
-    border-radius:4px; font-size:11px; font-weight:800; line-height:1; white-space:nowrap;
-    box-shadow:var(--shadow-s); }
+  /* 지점 마커 — 사장이 직접 그린 그림. 글자 라벨은 없다(2026-08-28 지시 "라벨도 빼줘") */
+  .branch { width:34px; height:34px; display:flex; align-items:center; justify-content:center;
+    pointer-events:none; }
+  .branch img { display:block; width:34px; height:34px; }
+  /* 그림을 못 받았을 때만 쓰는 폴백 도형 — 깨진 아이콘 대신 옛 네이비 사각이 선다 */
   .bsq { display:block; width:19px; height:19px; background:var(--navy);
     border:2px solid var(--paper); border-radius:2px; box-sizing:content-box;
     box-shadow:0 0 0 1px var(--navy-deep), 0 1px 3px rgba(26,42,68,.35); }
-  .branch { width:110px; display:flex; flex-direction:column; align-items:center; pointer-events:none; }
-  .branch .plate { margin-top:5px; }
 
   /* ── 식당 마커 ───────────────────────────────────────────────────────
      상자는 46×46(손가락 44 기준을 넘긴다), 보이는 알맹이는 그 안에서 작다.
      네이버 기본 지도는 자체 POI(색아이콘·색글씨)가 잔뜩 뜨므로 둘 다 종이색 halo 로
-     바탕에서 떼어 놓는다(회색 점 1.6px · 선정 아이콘 1.5px).                      */
+     바탕에서 떼어 놓는다(점 2.2px · 선정 아이콘 1.5px).
+     점이 파랑이 된 뒤로 이 halo 가 더 중요해졌다 — 네이버 자체 파란 POI(지하철·국도 방패)와
+     섞이지 않게, 두꺼운 종이색 테두리로 '찍은 점'처럼 떼어 놓는다.                */
   .mk { width:46px; height:46px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
-  .mk .gd {                                   /* 기본 회색 점 — 93곳 */
-    width:9px; height:9px; border-radius:50%; background:var(--paper-ink-sub);
-    box-shadow:0 0 0 1.6px var(--paper); }
-  .mk .ic {                                   /* 특별 선정 — 74곳. 회색 점보다 확실히 크다 */
+  .mk .gd {                                   /* 기본 점 — 93곳. 9px 회색 → 11px 브랜드 파랑 */
+    width:11px; height:11px; border-radius:50%; background:var(--pin-blue);
+    box-shadow:0 0 0 2.2px var(--paper); }
+  .mk .ic {                                   /* 특별 선정 — 74곳. 점(15.4px)보다 확실히 크다 */
     width:24px; height:24px; border-radius:50%;
     background-color:var(--paper); border:1.5px solid var(--ink);
     display:flex; align-items:center; justify-content:center;
@@ -233,10 +248,11 @@ function __baseDone(kind, err){
          현재 위치(캐릭터 교체 지점) → 오류 안내 → 시작 → QA 훅
    ═══════════════════════════════════════════════════════════════════════ */
 
-var BRANCH = { la:36.1993678, lo:127.0891137, name:"IBK 논산지점" };
+var BRANCH = { la:36.1993678, lo:127.0891137 };   /* 이름 라벨은 제거됐다(2026-08-28) */
 /* src/constants.py MOODS 와 글자 그대로 같아야 한다(띄어쓰기 포함) — 시트의 당김 표시에만 쓴다 */
 var PULLS = ["뜨끈한 국물","매콤하게","시원하게","든든한 한 끼","속 편하게","모시는 날","빨리 한 끼"];
-var C = { ink:"#29261F", paper:"#FAF7F0", paperLine:"#D9D2C4", paperInkSub:"#6B6558" };
+var C = { ink:"#29261F", paper:"#FAF7F0", paperLine:"#D9D2C4", paperInkSub:"#6B6558",
+          pinBlue:"#1C73F2" };
 var KLAT = Math.cos(36.2 * Math.PI / 180);
 
 /* 축척 전환이 없어졌다 — 초기 뷰는 지점 근처 고정이고 그 뒤는 손으로 줌·팬 한다.
@@ -254,8 +270,8 @@ function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(
 function naverPlaceUrl(pid){ return "https://m.place.naver.com/restaurant/" + encodeURIComponent(pid) + "/home"; }
 
 /* ═══ 1. 마커 그림 ═══════════════════════════════════════════════════
-   167곳을 기본 회색 점으로 깔고, 특별 선정에 해당하는 곳만 그 칩의 아이콘으로 바꾼다.
-   고르게 하지 않는다 — 항상 전부 보인다(이모지 74 + 회색 93).
+   167곳을 기본 파랑 점으로 깔고, 특별 선정에 해당하는 곳만 그 칩의 아이콘으로 바꾼다.
+   고르게 하지 않는다 — 항상 전부 보인다(이모지 74 + 파랑 점 93).
    아이콘은 본 앱(src/build_webapp.py)의 칩과 같은 것이다:
      논슐랭·블루리본·백년가게 = 칩이 쓰는 PNG 원본(.straw·.ribbon·.cert)을 그대로 심었다.
      인기체인🔥·식객허영만🍚·또간집📺·새로오픈🆕 = 칩과 같은 이모지 문자.        */
@@ -279,12 +295,22 @@ function markerHTML(p){
     '" role="img" aria-label="' + esc(m.name) + '">' + (m.emoji || "") + "</span></div>";
 }
 /* 마커 시각 반경(그래픽 대비 표본의 둘레 반경) — 보이는 알맹이의 바깥 테두리까지 */
-function visR(p){ return pickOf(p) ? 13.5 : 6.1; }   /* 아이콘 24/2+1.5halo · 점 9/2+1.6halo */
+function visR(p){ return pickOf(p) ? 13.5 : 7.7; }   /* 아이콘 24/2+1.5halo · 점 11/2+2.2halo */
 /* 대비 판정에 신고하는 '이 마커를 정의하는 색' */
-function visFill(p){ return pickOf(p) ? C.ink : C.paperInkSub; }
+function visFill(p){ return pickOf(p) ? C.ink : C.pinBlue; }
+/* 지점 마커 — 사장이 직접 그린 그림 하나. 34px 정사각, 그림의 한가운데가 지점 좌표다.
+   그림을 못 받으면(오프라인 첫 진입·파일 유실) onerror 가 옛 네이비 사각으로 물러난다. */
+var BRANCH_IMG_OK = true;
 function branchHTML(){
-  return '<div class="zwrap"><div class="branch"><span class="bsq"></span>' +
-    '<span class="plate" id="branchPlate">' + esc(BRANCH.name) + '</span></div></div>';
+  if (!BRANCH_IMG_OK) return '<div class="zwrap"><div class="branch"><span class="bsq"></span></div></div>';
+  return '<div class="zwrap"><div class="branch">' +
+    '<img src="img/branch.png" width="34" height="34" alt="지점 위치" ' +
+    'onerror="branchImgFail(this)"></div></div>';
+}
+function branchImgFail(img){
+  BRANCH_IMG_OK = false;
+  var box = img.parentNode; if (!box) return;
+  box.innerHTML = '<span class="bsq"></span>';
 }
 
 /* ═══ 2. 축척·투영 공통 ══════════════════════════════════════════════ */
@@ -484,10 +510,12 @@ function closeSheet(){ $("sheet").classList.remove("on"); }
 /* ═══ 6. 현재 위치 ═══════════════════════════════════════════════════
    ┌──────────────────────────────────────────────────────────────────┐
    │ ★ 논산런치 캐릭터 교체 지점 — 그림은 이 두 함수에만 있다.        │
-   │   geoBtnIcon() : 우하단 원형 버튼 안의 아이콘                    │
-   │   geoHTML()    : 지도 위 '현재 내 자리' 마커(점 + 정확도 원)     │
-   │ 캐릭터 PNG 가 준비되면 두 함수의 SVG 를 <img src="data:…"> 로    │
-   │ 바꾸면 끝난다. 바깥 코드는 이 두 함수의 반환값만 쓴다.           │
+   │   geoBtnIcon() : 우하단 원형 버튼 안의 아이콘 — **조작**이라     │
+   │                  2026-08-28 지시에서 제외됐다(그대로 둔다).      │
+   │   geoHTML()    : 지도 위 '현재 내 자리' 마커 — **표시**.         │
+   │                  사장이 그린 img/me.png 핀 + 정확도 원.          │
+   │ 그림은 base64 가 아니라 파일 참조다(img/me.png). 그림만 바꾸고   │
+   │ 싶으면 파일을 갈아끼우면 되고, 이 함수는 손댈 필요가 없다.       │
    └──────────────────────────────────────────────────────────────────┘
    기본 꺼짐이고 버튼을 누를 때만 권한을 묻는다(첫 진입에서 절대 묻지 않는다).
    거부·실패해도 지도는 그대로 쓴다.                                          */
@@ -499,15 +527,37 @@ function geoBtnIcon(on){
     '<path d="M0 -10.2V-7.2M0 7.2v3M-10.2 0h3M7.2 0h3" stroke="' + c + '" stroke-width="1.8" stroke-linecap="round"/>' +
     "</svg>";
 }
+/* 정확도 원은 남긴다(GPS 오차를 알려주는 정보다). 다만 주인공은 핀이므로 옅게 낮췄다:
+   fill .10 → .06 · stroke .38 → .20 · 굵기 1.2 → 1. 핀은 z-index 로 원 위에 온다. */
+var GEO_IMG_OK = true;
 function geoHTML(accPx){
   var r = Math.max(10, Math.min(120, accPx || 0));
   var box = Math.max(46, Math.ceil(r * 2) + 8);
-  return '<div class="zwrap"><div class="gdot">' +
+  var acc = '<div class="gacc">' +
     '<svg xmlns="http://www.w3.org/2000/svg" width="' + box + '" height="' + box +
-    '" viewBox="' + (-box/2) + ' ' + (-box/2) + ' ' + box + ' ' + box + '" style="display:block">' +
-    '<circle r="' + r.toFixed(1) + '" fill="#26395B" fill-opacity=".10" stroke="#26395B" stroke-opacity=".38" stroke-width="1.2"/>' +
+    '" viewBox="' + (-box/2) + ' ' + (-box/2) + ' ' + box + ' ' + box + '" style="display:block" aria-hidden="true">' +
+    '<circle r="' + r.toFixed(1) + '" fill="#26395B" fill-opacity=".06" stroke="#26395B" stroke-opacity=".20" stroke-width="1"/>' +
+    '</svg></div>';
+  /* 핀(물방울) — 아래 꼭짓점이 좌표다. 87×132 원본을 29×44 로 쓴다(DPR3 에서 1:1). */
+  var pin = GEO_IMG_OK
+    ? '<div class="gpin"><img src="img/me.png" width="29" height="44" alt="내 위치" ' +
+      'onerror="geoImgFail(this)"></div>'
+    : '<div class="gpin nofile">' + geoDotSVG() + '</div>';
+  return '<div class="zwrap">' + acc + pin + '</div>';
+}
+/* 그림을 못 받았을 때의 폴백 — 옛 잉크 점. 한 번 실패하면 다시 부르지 않는다
+   (watchPosition 은 계속 다시 그리므로, 플래그가 없으면 매 갱신마다 404 를 낸다). */
+function geoDotSVG(){
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="-10 -10 20 20" ' +
+    'style="display:block" aria-hidden="true">' +
     '<circle r="7.4" fill="none" stroke="#FAF7F0" stroke-width="2.4"/>' +
-    '<circle r="6" fill="#29261F"/></svg></div></div>';
+    '<circle r="6" fill="#29261F"/></svg>';
+}
+function geoImgFail(img){
+  GEO_IMG_OK = false;
+  var box = img.parentNode; if (!box) return;
+  box.className = "gpin nofile";
+  box.innerHTML = geoDotSVG();
 }
 /* ── 캐릭터 교체 지점 끝 ─────────────────────────────────────────── */
 
@@ -684,7 +734,8 @@ function start(){
         try { painted = !!(A && A.painted && A.painted()); } catch (e) {}
         if (!painted && Date.now() - t0 < 4000) { setTimeout(ask, 400); return; }
         sent = true;
-        var urls = [location.pathname, "./data/places.json"];
+        /* 마커 그림 두 장도 담는다 — 오프라인에서 지점·내 위치가 깨진 아이콘이 되지 않게 */
+        var urls = [location.pathname, "./data/places.json", "./img/branch.png", "./img/me.png"];
         var sw = navigator.serviceWorker.controller;
         if (sw) sw.postMessage({ type:"precache", urls:urls });
       }
@@ -819,9 +870,11 @@ window.__qa = {
   /* 겹침 감사용 사각형 — '눈에 보이는 만큼'을 잰다(손가락 상자가 아니다) */
   rects: function(){
     var out = [];
-    var bp = mkBranch ? innerEl(mkBranch, ".plate") : null;
-    if (bp && visible(bp) && bp.classList && bp.classList.contains("plate"))
-      out.push({ id:"label:지점명패", kind:"label", ...rectOf(bp) });
+    /* 지점 명패(글자)는 제거됐다 — 이제 신고할 것은 그림 마커 자체다.
+       kind 는 "label" 이 아니라 "marker" 다(라벨 가림 판정이 아니라 UI 겹침 판정 대상). */
+    var bimg = mkBranch ? innerEl(mkBranch, ".branch") : null;
+    if (bimg && visible(bimg) && bimg.classList && bimg.classList.contains("branch"))
+      out.push({ id:"marker:지점", kind:"marker", ...rectOf(bimg) });
     var g = $("geoBtn");
     if (visible(g)) out.push({ id:"control:현재 위치", kind:"control", ...rectOf(g) });
     var sh = $("sheet"); if (sh.classList.contains("on")) out.push({ id:"sheet", kind:"sheet", ...rectOf(sh) });
@@ -856,7 +909,7 @@ window.__qa = {
       var el = $(id);
       if (el && el.classList.contains("on")) addOcc(el);
     });
-    if (mkGeo) addOcc(innerEl(mkGeo, ".gdot"));
+    if (mkGeo) { addOcc(innerEl(mkGeo, ".gacc")); addOcc(innerEl(mkGeo, ".gpin")); }
     if (A && A.providerRects) A.providerRects().forEach(function(r){
       occ.push({ left:r.x, top:r.y, right:r.x + r.w, bottom:r.y + r.h });
     });
@@ -896,10 +949,10 @@ window.__qa = {
     }
     return out;
   },
-  /* 화면에 남은 글자는 지점 명패와 시트뿐이다 — 칩·버튼 글자는 사라졌다.
-     칩이 없다고 빈 목록을 돌려주면 T5 의 글자 축이 조용히 무동작이 된다 —
-     남은 글자를 정직하게 신고한다. padBox 는 **테두리·안쪽 여백**만 고른다
-     (글자 위를 재면 안티에일리어싱이 배경으로 섞인다). */
+  /* 2026-08-28(2차)로 지점 명패까지 사라져 **화면에 상시 떠 있는 글자는 없다**.
+     남은 글자는 시트를 열었을 때뿐이라 닫힌 상태에서는 빈 목록이 정답이다
+     (T5 의 그래픽 축은 마커 표본으로 계속 돈다). padBox 는 **테두리·안쪽 여백**만
+     고른다 — 글자 위를 재면 안티에일리어싱이 배경으로 섞인다. */
   textSamples: function(){
     var out = [];
     function add(el, id, pad){
@@ -914,9 +967,6 @@ window.__qa = {
     function leftStrip(r){ return { x:+(r.left+3).toFixed(1), y:+(r.top+r.height/2-3).toFixed(1), w:4, h:6 }; }
     /* 위 여백 띠 — padding-top 안(글자는 그 아래) */
     function topStrip(r){ return { x:+(r.left+r.width/2-2).toFixed(1), y:+(r.top+2).toFixed(1), w:4, h:4 }; }
-
-    var bp = mkBranch ? innerEl(mkBranch, ".plate") : null;
-    if (bp && bp.classList && bp.classList.contains("plate")) add(bp, "label:지점명패", leftStrip);
 
     var sh = $("sheet");
     if (sh.classList.contains("on")) {

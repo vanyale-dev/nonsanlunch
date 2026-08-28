@@ -7,15 +7,16 @@
    2. 같은 출처는 네트워크 우선 + 실패 시 캐시(오래된 데이터를 조용히 굳히지 않는다).
    3. 미리 담기(precache)는 페이지가 "첫 타일 그린 뒤"에 보내는 메시지로만 한다 —
       첫 화면의 대역폭을 뺏지 않기 위해서다. 지금 페이지가 보내는 목록은
-      [location.pathname, "./data/places.json"] 둘뿐이고, 그게 배포 파일 전부다.
-      data/dong.geojson·zone_labels.json 은 파일로는 남아 있으나 페이지가 부르지
-      않으므로 담지 않는다(2026-08-28 동네 보기 제거).
+      [location.pathname, "./data/places.json", "./img/branch.png", "./img/me.png"] 넷이고,
+      그게 배포 파일 전부다. data/dong.geojson·zone_labels.json 은 파일로는 남아 있으나
+      페이지가 부르지 않으므로 담지 않는다(2026-08-28 동네 보기 제거).
+      마커 그림 두 장이 붙어 캐시 이름을 nl-map-v2 → v3 로 올렸다(2026-08-28).
    4. **낡은 캐시 청소는 우리 것(`nl-map-*`)만 한다.** CacheStorage 는 스코프가 아니라
       출처(origin) 단위라, 같은 출처에 사는 발권기 본 앱의 캐시(`nslunch-*`)가 여기서 다 보인다.
       "내 이름이 아니면 지운다"로 쓰면 지도를 한 번 여는 것만으로 발권기의 오프라인 폴백이
       통째로 지워진다(2026-08-27 실URL 실측으로 확인 — 지도 진입 뒤 `nslunch-v2` 소멸).
 */
-var V = "nl-map-v2";
+var V = "nl-map-v3";
 var MINE = "nl-map-";      /* 이 접두사가 붙은 캐시만 우리 것이다 */
 
 self.addEventListener("install", function(e){ self.skipWaiting(); });
