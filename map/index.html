@@ -20,10 +20,19 @@
   ⑤ 새로오픈 그림 교체 — 마커는 img/fresh.png, 시트 배지는 본 앱과 바이트 동일한 --img-fresh.
      만료(fo+90일)는 여는 순간 다시 판정한다.
 
+  2026-08-29(4차) 사장 지시 — **카페 마커**. 점심 뒤 이어지는 카페 동선을 위해
+  카페 22곳(places.json 의 `c === "카페"`)을 전부 커피잔 그림(img/cafe.png)으로 그린다.
+  **카페가 특별 선정을 이긴다** — 마커 종류를 고르는 mkKind() 가 선정보다 먼저 카페를 본다.
+  대가: 해피어처럼 카페이면서 논슐랭인 곳은 지도에서 딸기 대신 커피잔이 된다.
+  그래도 이렇게 하는 이유 — 선정이 이기면 카페 9곳만 커피잔이라 "카페가 어디 있나"가
+  지도에서 안 보인다. 시트 배지에는 선정이 그대로 남으므로 정보는 잃지 않는다.
+  세부 갈래(`ck`: dessert·brunch·view·coffee)는 이번에 마커를 가르지 않는다 — 22곳 전부 같은 커피잔이다.
+
   ── 마커 규칙 (선택하게 하지 않는다 — 항상 전부 보인다) ─────────────────
-  기본 = 파랑 점. 특별 선정 = 그 칩에 쓰이는 아이콘.
-  겹치는 곳은 하나만 그린다. 우선순위(pickOf 가 **여는 순간** 배지 필드에서 다시 고른다):
-  논슐랭 > 블루리본 > 백년가게 > 식객허영만 > 또간집 > 새로오픈 > 인기체인.
+  기본 = 파랑 점. 카페 = 커피잔. 그 밖의 특별 선정 = 그 칩에 쓰이는 아이콘.
+  겹치는 곳은 하나만 그린다. 우선순위(mkKind 가 **여는 순간** 카테고리·배지 필드에서 다시 고른다):
+  **카페** > 논슐랭 > 블루리본 > 백년가게 > 식객허영만 > 또간집 > 새로오픈 > 인기체인.
+  실측 내역: 선정 61 · 카페 22 · 파랑 점 84 = 167.
   아이콘 출처는 본 앱(src/build_webapp.py)의 칩 그대로다 —
   논슐랭·블루리본·백년가게는 PNG(data/strawberry.png·blueribbon.png·century.png)를
   그대로 심었고(:root 변수로 한 번만 싣고 마커·배지가 같이 쓴다),
@@ -136,7 +145,7 @@
   .mk .gd {                                   /* 기본 점 — 93곳. 9px 회색 → 11px 브랜드 파랑 */
     width:11px; height:11px; border-radius:50%; background:var(--pin-blue);
     box-shadow:0 0 0 2.2px var(--paper); }
-  .mk .ic {                                   /* 특별 선정 — 74곳. 점(15.4px)보다 확실히 크다 */
+  .mk .ic {                                   /* 카페 22 + 그 밖의 특별 선정 61 = 83곳. 점(15.4px)보다 확실히 크다 */
     width:24px; height:24px; border-radius:50%;
     background-color:var(--paper); border:1.5px solid var(--ink);
     display:flex; align-items:center; justify-content:center;
@@ -151,6 +160,13 @@
      자리수의 선택자로 못박는다. */
   .mk .ic.ic-fresh { background-size:14px auto; }
   .ic-fresh { background-image:url("img/fresh.png"); }
+  /* 카페 — 사장이 준 그림(img/cafe.png · 60×60). fresh.png 와 **같은 성질**의 그림이라
+     같은 처방을 쓴다: 여백 없이 꽉 찬 원반이어서 `.mk .ic.img` 의 15px 로 깔면 24px 원반
+     안에서 종이 여백이 사라진다(잉크 테두리에 닿는다). 14px 이면 원반 지름·종이 여백이
+     새로오픈과 정확히 같다 — DPR3 재현 시트에서 fresh14 · cafe14 · cafe15 를 나란히 놓고 골랐다.
+     비율 유지가 필요하므로 auto 를 쓰고, 15px 정사각을 이기게 같은 자리수의 선택자로 못박는다. */
+  .mk .ic.ic-cafe { background-size:14px auto; }
+  .ic-cafe { background-image:url("img/cafe.png"); }
   .ic-nc   { background-image:var(--img-straw); }     /* 논슐랭 = 본 앱 칩의 딸기 원본 */
   .ic-blue { background-image:var(--img-ribbon); }    /* 블루리본 #2C4A85 */
   .ic-cert { background-image:var(--img-cert); }      /* 백년가게 #70522A */
@@ -333,14 +349,16 @@ function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(
 function naverPlaceUrl(pid){ return "https://m.place.naver.com/restaurant/" + encodeURIComponent(pid) + "/home"; }
 
 /* ═══ 1. 마커 그림 ═══════════════════════════════════════════════════
-   167곳을 기본 파랑 점으로 깔고, 특별 선정에 해당하는 곳만 그 칩의 아이콘으로 바꾼다.
-   고르게 하지 않는다 — 항상 전부 보인다(이모지 74 + 파랑 점 93).
+   167곳을 기본 파랑 점으로 깔고, 카페와 특별 선정에 해당하는 곳만 아이콘으로 바꾼다.
+   고르게 하지 않는다 — 항상 전부 보인다(선정 61 + 카페 22 + 파랑 점 84 = 167).
    아이콘은 본 앱(src/build_webapp.py)의 칩과 같은 것이다:
      논슐랭·블루리본·백년가게 = 칩이 쓰는 PNG 원본(.straw·.ribbon·.cert)을 그대로 심었다.
      인기체인🔥·식객허영만🍚·또간집📺 = 칩과 같은 이모지 문자.
      새로오픈 = 사장이 그린 그림 (2026-08-28 3차 지시). 마커는 img/fresh.png,
-     시트 배지는 --img-fresh(=본 앱 data/fresh_icon.png 와 바이트 동일).           */
+     시트 배지는 --img-fresh(=본 앱 data/fresh_icon.png 와 바이트 동일).
+     카페 = 사장이 준 그림 img/cafe.png (2026-08-29 4차 지시) — **선정을 이긴다**.  */
 var PICK = {
+  cafe:    { name:"카페",       img:true },      /* 2026-08-29 — 선정보다 먼저 걸린다 */
   nc:      { name:"논슐랭",     img:true },
   blue:    { name:"블루리본",   img:true },
   cert:    { name:"백년가게",   img:true },
@@ -349,7 +367,7 @@ var PICK = {
   fresh:   { name:"새로오픈",   img:true },
   chain:   { name:"인기체인",   emoji:"🔥" }
 };
-var PICKCH = { nc:"N", blue:"B", cert:"C", sikgaek:"S", ttogan:"T", fresh:"F", chain:"H" };
+var PICKCH = { cafe:"K", nc:"N", blue:"B", cert:"C", sikgaek:"S", ttogan:"T", fresh:"F", chain:"H" };
 
 /* ── 새로오픈 만료 ────────────────────────────────────────────────────
    본 앱(src/build_webapp.py 984행 근처)과 **같은 규칙**이다: 탐지일(fo) + 90일까지만
@@ -389,17 +407,25 @@ function pickOf(p, today){
   if (p.ch) return "chain";
   return null;
 }
+/* 마커에 실제로 그려지는 종류. **카페가 선정을 이긴다**(2026-08-29 4차 지시).
+   pickOf() 는 그대로 '특별 선정 판정'으로 남는다 — 시트 배지·새로오픈 만료 감사(pickAt)는
+   선정 사실을 봐야 하므로 그쪽은 건드리지 않는다. 갈라 둔 이유가 이것이다.
+   세부 갈래(p.ck)는 보지 않는다 — 카페 22곳은 전부 같은 커피잔이다.               */
+function mkKind(p, today){
+  if (p && p.c === "카페") return "cafe";
+  return pickOf(p, today);
+}
 function markerHTML(p){
-  var k = pickOf(p);
+  var k = mkKind(p);
   if (!k) return '<div class="mk"><span class="gd" role="img" aria-label="식당"></span></div>';
   var m = PICK[k];
   return '<div class="mk"><span class="ic' + (m.img ? " img ic-" + k : "") +
     '" role="img" aria-label="' + esc(m.name) + '">' + (m.emoji || "") + "</span></div>";
 }
 /* 마커 시각 반경(그래픽 대비 표본의 둘레 반경) — 보이는 알맹이의 바깥 테두리까지 */
-function visR(p){ return pickOf(p) ? 13.5 : 7.7; }   /* 아이콘 24/2+1.5halo · 점 11/2+2.2halo */
+function visR(p){ return mkKind(p) ? 13.5 : 7.7; }   /* 아이콘 24/2+1.5halo · 점 11/2+2.2halo */
 /* 대비 판정에 신고하는 '이 마커를 정의하는 색' */
-function visFill(p){ return pickOf(p) ? C.ink : C.pinBlue; }
+function visFill(p){ return mkKind(p) ? C.ink : C.pinBlue; }
 /* 지점 마커 — 사장이 직접 그린 그림 하나. 34px 정사각, 그림의 한가운데가 지점 좌표다.
    그림을 못 받으면(오프라인 첫 진입·파일 유실) onerror 가 옛 네이비 사각으로 물러난다. */
 var BRANCH_IMG_OK = true;
@@ -575,7 +601,7 @@ var MK = [], mkBranch = null, mkGeo = null;
 
 function buildMarkers(){
   PLACES.forEach(function(p, i){
-    var h = A.marker(markerHTML(p), p.la, p.lo, pickOf(p) ? 30 : 10);
+    var h = A.marker(markerHTML(p), p.la, p.lo, mkKind(p) ? 30 : 10);
     if (!h) return;
     h.__i = i;
     h.click(function(){ openSheet(p); });
@@ -963,9 +989,9 @@ function start(){
         try { painted = !!(A && A.painted && A.painted()); } catch (e) {}
         if (!painted && Date.now() - t0 < 4000) { setTimeout(ask, 400); return; }
         sent = true;
-        /* 마커 그림 두 장도 담는다 — 오프라인에서 지점·내 위치가 깨진 아이콘이 되지 않게 */
+        /* 마커 그림도 전부 담는다 — 오프라인에서 지점·내 위치·아이콘이 깨지지 않게 */
         var urls = [location.pathname, "./data/places.json", "./img/branch.png", "./img/me.png",
-                    "./img/fresh.png", "./img/sel.png"];
+                    "./img/fresh.png", "./img/sel.png", "./img/cafe.png"];
         var sw = navigator.serviceWorker.controller;
         if (sw) sw.postMessage({ type:"precache", urls:urls });
       }
@@ -1051,7 +1077,7 @@ function tally(){
   var r = { stamp:0, dim:0, dot:PLACES.length, badgeDot:0, zoneDot:0, branch:mkBranch ? 1 : 0,
             total:PLACES.length, gray:0, pick:0, bySlug:{} };
   PLACES.forEach(function(p){
-    var k = pickOf(p);
+    var k = mkKind(p);
     if (!k) { r.gray++; return; }
     r.pick++;
     r.bySlug[k] = (r.bySlug[k] || 0) + 1;
@@ -1090,7 +1116,7 @@ window.__qa = {
   emptyState: function(){ return { shown:false, text:"" }; },
   signature: function(){
     return "place|near|-|" + PLACES.map(function(p){
-      var k = pickOf(p); return k ? PICKCH[k] : "o";
+      var k = mkKind(p); return k ? PICKCH[k] : "o";
     }).join("");
   },
 
@@ -1198,7 +1224,7 @@ window.__qa = {
       var cx = wrap.left + q[0], cy = wrap.top + q[1], r = visR(p);
       if (cx - r < 8 || cy - r < 8 || cx + r > wrap.right - 8 || cy + r > wrap.bottom - 8) continue;
       if (hitOcc(cx, cy, r + 9)) continue;          /* 관문이 훑는 둘레(+9)까지 우리 UI 가 덮은 자리 */
-      vis.push({ i:h.__i, p:p, cx:cx, cy:cy, r:r, z:pickOf(p) ? 30 : 10, ord:i, fill:visFill(p) });
+      vis.push({ i:h.__i, p:p, cx:cx, cy:cy, r:r, z:mkKind(p) ? 30 : 10, ord:i, fill:visFill(p) });
     }
     /* 위에 그려진 마커가 둘레를 침범했으면 그 마커는 눈으로도 묻혀 안 보인다 — 표본에서 뺀다 */
     var out = [];
@@ -1213,7 +1239,8 @@ window.__qa = {
         if (Math.sqrt(dx*dx + dy*dy) < o.r + m.r + 9) { hidden = true; break; }
       }
       if (hidden) continue;
-      out.push({ id:(pickOf(m.p) ? "pick:" + m.p.pk + "#" : "dot#") + m.i,
+      var mk = mkKind(m.p);          /* id 는 그려진 종류로 — 카페는 pk 가 없을 수 있다 */
+      out.push({ id:(mk ? "pick:" + mk + "#" : "dot#") + m.i,
                  kind:"marker", fill:m.fill, cx:+m.cx.toFixed(1), cy:+m.cy.toFixed(1),
                  sampleR:+m.r.toFixed(1) });
     }
