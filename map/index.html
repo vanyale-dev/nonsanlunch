@@ -11,13 +11,24 @@
   base64 가 아니라 **파일 참조**다 — 그림만 갈아끼우면 되고 HTML 이 무거워지지 않는다.
   지점 명패("지점 이름" 글자)는 제거했다. 그림만 남는다. 기본 점은 회색 대신 브랜드 파랑이다.
 
+  2026-08-28(3차) 사장 지시 4건 — 하단 시트와 마커.
+  ① 시트에서 **칩 줄(카테고리·이동수단·강추·당김)을 DOM 에서 제거**했다.
+  ② 대신 **특별선정 배지만 이름 오른쪽**에 — 본 앱 홈화면 카드(card())의 마크업·CSS 그대로.
+  ③ **전화 버튼 삭제 → 길찾기 버튼**(네이버지도 앱 스킴 nmap:// → 실패 시 웹 길찾기 폴백).
+     [네이버 지도에서 열기]는 '장소 정보'라 성격이 달라 그대로 두고 둘을 나란히 세웠다.
+  ④ 마커를 탭하면 그 좌표에 **선택 핀(img/sel.png)** 이 선다(항상 최대 1개, 시트를 닫으면 사라진다).
+  ⑤ 새로오픈 그림 교체 — 마커는 img/fresh.png, 시트 배지는 본 앱과 바이트 동일한 --img-fresh.
+     만료(fo+90일)는 여는 순간 다시 판정한다.
+
   ── 마커 규칙 (선택하게 하지 않는다 — 항상 전부 보인다) ─────────────────
-  기본 = 파랑 점(93곳). 특별 선정 = 그 칩에 쓰이는 아이콘(74곳).
-  겹치는 곳은 하나만 그린다. 우선순위(데이터 pk 필드에 이미 반영):
+  기본 = 파랑 점. 특별 선정 = 그 칩에 쓰이는 아이콘.
+  겹치는 곳은 하나만 그린다. 우선순위(pickOf 가 **여는 순간** 배지 필드에서 다시 고른다):
   논슐랭 > 블루리본 > 백년가게 > 식객허영만 > 또간집 > 새로오픈 > 인기체인.
   아이콘 출처는 본 앱(src/build_webapp.py)의 칩 그대로다 —
   논슐랭·블루리본·백년가게는 PNG(data/strawberry.png·blueribbon.png·century.png)를
-  그대로 심었고, 인기체인🔥·식객🍚·또간집📺·새로오픈🆕는 본 앱과 같은 이모지 문자다.
+  그대로 심었고(:root 변수로 한 번만 싣고 마커·배지가 같이 쓴다),
+  인기체인🔥·식객🍚·또간집📺 는 본 앱과 같은 이모지 문자,
+  새로오픈은 사장이 그린 img/fresh.png 다.
 
   ── 쌍둥이 파일 ─────────────────────────────────────────────────────────
   app-ours.html(MapLibre 판)은 **이력으로 얼린다.** 바탕지도 전환 안이 폐기돼
@@ -54,6 +65,15 @@
     --pin-blue:#1C73F2;
     --shadow:0 1px 2px rgba(30,28,20,.10), 0 8px 22px rgba(30,28,20,.09);
     --shadow-s:0 1px 2px rgba(30,28,20,.14);
+    /* 특별 선정 그림 — 마커 원반과 시트 배지가 **같은 원본**을 쓴다.
+       본 앱(src/build_webapp.py)의 data/strawberry.png·blueribbon.png·century.png 와 바이트 동일.
+       두 곳에 두 번 싣지 않으려고 변수로 한 번만 둔다. */
+    --img-straw:url("data:image/png;base64,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");
+    --img-ribbon:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAMAAADVRocKAAAAwFBMVEUAAAAOOoorWKoZRZZvldT9/PYDPn4NOYcAAH8AVaoAAP8NOYgNOYoNOYgPOYoNOYkAf38NOYkgTZ5kjdA4ZLMAVVUiTqBIcryNrNtchMlRe8IAKn/H1elDbrmju+AWQ40UQo8AAKqxxeQXRZgAH38Af/8cTKIiUKCfueAVQpUFMn3m6/AYRJMAVX+Xs97d5e5+odgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAir0ieAAAAQHRSTlMA/f7+//8FLQIDAdKPTBOuAm3///8D//////8G////EUoD/2sIAv/F/8sz/74G////AAAAAAAAAAAAAAAAAAAA1E+A4AAABHdJREFUeNrtWWt3mzAMFTgx2DxMCHmsadpu7dq9t///6+Y32KY7w+ZLz6k+rIRkknWle4USgHd7M1ZiboQCUCKuypXd005fEKIvOrqmf+6+2NV13bQAbcMvdoW8uZYdoGWZst1OX7CW314LfiiyGStgpUKQQ5vNWnsgK7gX/cLmAzDRW8noiKoqfyjP0fRvlomap+HUwWXHRvfaLxpDsN0lpZs6KKrMOHXhsa+rIj7CTPcg5EdK6CZa4sr1nmtzY1S4jGM1Bk2qXjrs84kdVURNPojsJaISkAdGuWfqpkqBJFVg3r8TIa4KBJrM+DD+h+vp5jRMIqhyNEASAiDrf/iwkba/TnKID0Bpawqp/N1srH1Qd6woRbVRCa3TnvL4e27yr7zVWyZEKHdJW8MCe/795u729tNmb3NI4VpnNVQmMAj/v7bS7kSE65Rx1fIZrUtsGSYSOG+3YwQ3heVcIyoB0UPSkwD+uwmwFa8GHUBmUS1XvE5WINclGKYJbLdf9mMAlQWGZY1EAWdegP3dGOATD3AyAVBMmanu0WmAL26Aq5PB4j6i8C+IzpsQosVaXTtF5kfe3xr/v0WRdRepAcQWi8VkmkkenKZt9Idf30ypzBEiy4mwc5RCapDM4XZju9QQrY7RCqJAMlIxSAnanM9SKVQPGZ6xLmbuU/jppHDSWi3/vXFmM44aOLoKwslR5bC3cn21co3SJ9o4EPKTkuxTPvpPGDgfzUzOxgg8jcEZyoZlH6Nq0GZ2KGfzQ19XoQUat3aoiYD64LFIN5B+ymORqwhxnxyRf/wsgWUmhdp7MpVpHL2n0zp+lyJ+hDmrgaTsH42Z/D2af3pvUjeQp6a2o1m5FfuHVrm6eUrdZkk3Tn+zG4wrQgMdSV8C2ev4s+QlkDPoPtyfxjrcQ+o3ClKRjvlMBCS2kAZSIZKj01JLPmojSzvRo8kY8T0NOQx2XlWp/qWk9q4Cja/6WCH1FsH8tQB5wgI4eTxCnsa5GKW1kRybaHpixqYpoNQvdUKEmmZVjOQW4hy4bf2UUsRITk0P8qAobUIVMPiA1GCIN4KWgBFxEZJtHxCDpagF9hG6AFx8jHCa0PUuQhi7GPUpguf5UuKp5dWNGp3CTMfMdBaJbtKAxgIMAiGZ6Vo0FmCEvRtL5m6GU6X+ksRjX7eS0ClHHawjeCFCGopX34h5uJ476Fxqh3WEjr42hWIEb07o8CwBIwUvlAS7BpBA8KLI7COUXcb3LlmAUdR608uj98EpbXa9/kjEkmN8PGcVCnC29UFV9hyLUSk7BbGiQEGn2A5DRcHkrxVVGUPjY/614dcs7HXDEf4rDjRfhZAvJbNi6yN31cI3FLBVkxl9g5aHfYwgsxC6+l7UGj7Dj8EInfOtMBp+8DfFR+7rpYLHEWIFqEMReAgVUyntg+od/jHx8aUYAabG2UsAgcToxQSlGJZ3kf39lf/Xh6CIsgkeRq9pv81yPMI2LKtqtd9j+dd3AZE4EXdAYC3DgR5zrmF4S0b/69a7vdsbtb88VTbBasdyAQAAAABJRU5ErkJggg==");
+    --img-cert:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAMAAADVRocKAAAAwFBMVEVuVyCMb1Lk0LJWHBGljXNQKgn39/dWMxJ4Uy/t49S1n4k3DgAyCwCpcGrosVhqYWFNJgK0tLToqVRrSy5+X0CqkG//f39tTC3x4s2Gak7VxLPFs56ZmWbHm196XUGYf2bpwH7/qv8AAAD++fCLWivgqU/To0lbNhNNKARlPhlVVQBcNhNvRiDBrpl/AAD26NDluHA+PgDUtXHGnULCsJtcNxRYNBRbNxVvNwDrx4rx2bBtRB3l2stTNhXIt6RaNxVmR/4zAAAAQHRSTlMW+v0O85gCbvr59VcrC/sEzAMXp/5VAkKnvHpiBXOnSP8DAP7//v79/f0DQ/7+Av7/BP///9AutQT//v39EPqQvREKoAAABH5JREFUeNrtWumWsjgQDYtr27a9fcvsU3ySoIgyMyjSiu//VhPCFhFNAtI/5kz9aw/U7eRWkro3IOg40H8RwFs0Dk8CwGv3D3siAPrAdtk4tpcIqJp/G+AWEWyrCNURHLGDncZBXz7eHIEPJwe7PxqHi50TTXIdwIMd/vjRIj7wrjJHlwDDNgBDCQC3DYArAGActAEQc7CltfZBw1WO5C368vbmCIp1QBqE3Drw4Lg8OUSLV/9wsaqNsydijTi75VG0ktOlvsPOwVKMg0P5ldiLaIToGGB3zb0cbWoj4h5Zuzg4eqHceeCBERCNe3s0t+uC/x80Ehxrd+LaA2dBi4mY3Ot7e34R9p57wCS0fBbyJ5qfIMTcBMxrALgBxAQvK/UvODJ9WGLMEf3HxRDsDUcwpvlDtTM5hAEelin0SwCO4iEeXMt//dAP4cQTvakg2HOe4N7V/De6Ch92ZFxWqn2V4jHZ1fMralsQCrBepJlXEAqKdRwgr1Ff5AEKyvV2XqnlANZugKAZAB03Im/1lVrWqEbQjQkSdHY+RTDrhlDWqEm+XlkAUq2jDwOyyodg19RoTJbXC0imN02Ww+iiUu1psYUOBPmFza8PPXdUrdSC4mHv9vzIdNcUQbuo1IxirQdG+/bd6PfMc5rzAYxnj+JeGUn0y2gWn1VqVqM6OUr04hICZAFGtrGmQ8hqdO0aNxeAgsJZwGTIVWpWo28PQoKlJZQPD1pRqdkATLn8khothIdxXqk22wBXwgWgJgIN6LG806xGDydxgaqpzCd4XTOa0xp9hed7y9g/4TurVFajGvTvr5P7kKy3TULxWEGMygPQJ+l602mN6gadsQ6U/iMgtu0dvqq8pWIlPMLvCQHv0gQrexXP8LNl/SRPsLoZ0odv39TyqwF8+fJiT1/6L50B/ALv0+mv0BnAMzxG03n0TtnuBOAJJiOLyo4DUkGQB/D6ME63ingic9I02yrSvchUqCQkv8p+Kze77/ff7OiBcCgB1q/Su5EkAO3wYqsEsPTefQ8ceiibFg9gjSWPZNlDf6JZ5wCWdsdDn7YtuRApAazh5F5tSyL8D9YFwMGZ3Kfx8uBptuJMhULbxDN0l9axbH5ZY8TJS3PWN9oDcO172pxyCJpYHkgIkEGpNDdZ85v/MHJbC5CQehZ6SXCu8vOfRrilhKKeSKH2o1Lg2IUIXJGBYAwIBEJZO1extn2u0kwqkxvLWIPmzxyXUTb9LM6IeGsjxFGQmYPZ9BdmGkdECyth8bTLXK8oTckF+1MvzBDUBKC0c/bV9DnEvrBzfHWAEHopwetNXf4UISVCIyd1QyrxEJjE15Ppr3U1k9/nUUNLrTAF2fTb9lUERgQzBX0VgMLW3N9In0HsU1tzq2Jr5sYsm37bFiAkRKgZs9SBZ9ZylGT4WxDJMxGzlg1Zazk3x5kl/pcwUpucmeMolLxq7NLe5y8oVtKRXVCcxBcUXV+xdH5J9AnXXB1f1H3KVWOnl6WdX/d2fmH9CVfuXX800P1nD91/uAH/fzxTiX8BHAEAQ3WcH8wAAAAASUVORK5CYII=");
+    /* 새로오픈 — 본 앱 카드 배지와 **바이트 동일한 원본**(data/fresh_icon.png).
+       마커(img/fresh.png)는 24px 원반에 맞춰 따로 자른 같은 그림이다. */
+    --img-fresh:url("data:image/png;base64,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");
     --prov:0px;         /* 바탕지도 공급자 표기(네이버 로고·저작권)를 위해 비우는 아래 여백 */
   }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -89,6 +109,11 @@
   .zwrap > .gpin img { display:block; width:29px; height:44px; }
   /* 그림을 못 받았을 때만 — 옛 잉크 점으로 물러난다(중심 앵커로 되돌린다) */
   .zwrap > .gpin.nofile { transform:translate(-50%,-50%); }
+  /* 선택한 곳 핀 — 물방울이라 **아래 꼭짓점**이 그 식당 좌표다(120×156 원본을 40×52 로 쓴다).
+     지점 마커(z 90)보다도 위에 얹는다. 항상 최대 한 개다. */
+  .zwrap > .selpin { position:absolute; left:0; top:0; transform:translate(-50%,-100%);
+                     pointer-events:none; line-height:0; }
+  .zwrap > .selpin img { display:block; width:40px; height:52px; }
   #pmk .pm { position:absolute; }
   #pmk .pm.c { transform:translate(-50%,-50%); }
 
@@ -118,9 +143,17 @@
     font-size:14px; line-height:1; font-family:inherit;
     box-shadow:0 0 0 1.5px var(--paper), var(--shadow-s); }
   .mk .ic.img { background-repeat:no-repeat; background-position:50% 50%; background-size:15px 15px; }
-  .ic-nc   { background-image:url("data:image/png;base64,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"); }     /* 논슐랭 = 본 앱 칩의 딸기 원본 */
-  .ic-blue { background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAMAAADVRocKAAAAwFBMVEUAAAAOOoorWKoZRZZvldT9/PYDPn4NOYcAAH8AVaoAAP8NOYgNOYoNOYgPOYoNOYkAf38NOYkgTZ5kjdA4ZLMAVVUiTqBIcryNrNtchMlRe8IAKn/H1elDbrmju+AWQ40UQo8AAKqxxeQXRZgAH38Af/8cTKIiUKCfueAVQpUFMn3m6/AYRJMAVX+Xs97d5e5+odgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAir0ieAAAAQHRSTlMA/f7+//8FLQIDAdKPTBOuAm3///8D//////8G////EUoD/2sIAv/F/8sz/74G////AAAAAAAAAAAAAAAAAAAA1E+A4AAABHdJREFUeNrtWWt3mzAMFTgx2DxMCHmsadpu7dq9t///6+Y32KY7w+ZLz6k+rIRkknWle4USgHd7M1ZiboQCUCKuypXd005fEKIvOrqmf+6+2NV13bQAbcMvdoW8uZYdoGWZst1OX7CW314LfiiyGStgpUKQQ5vNWnsgK7gX/cLmAzDRW8noiKoqfyjP0fRvlomap+HUwWXHRvfaLxpDsN0lpZs6KKrMOHXhsa+rIj7CTPcg5EdK6CZa4sr1nmtzY1S4jGM1Bk2qXjrs84kdVURNPojsJaISkAdGuWfqpkqBJFVg3r8TIa4KBJrM+DD+h+vp5jRMIqhyNEASAiDrf/iwkba/TnKID0Bpawqp/N1srH1Qd6woRbVRCa3TnvL4e27yr7zVWyZEKHdJW8MCe/795u729tNmb3NI4VpnNVQmMAj/v7bS7kSE65Rx1fIZrUtsGSYSOG+3YwQ3heVcIyoB0UPSkwD+uwmwFa8GHUBmUS1XvE5WINclGKYJbLdf9mMAlQWGZY1EAWdegP3dGOATD3AyAVBMmanu0WmAL26Aq5PB4j6i8C+IzpsQosVaXTtF5kfe3xr/v0WRdRepAcQWi8VkmkkenKZt9Idf30ypzBEiy4mwc5RCapDM4XZju9QQrY7RCqJAMlIxSAnanM9SKVQPGZ6xLmbuU/jppHDSWi3/vXFmM44aOLoKwslR5bC3cn21co3SJ9o4EPKTkuxTPvpPGDgfzUzOxgg8jcEZyoZlH6Nq0GZ2KGfzQ19XoQUat3aoiYD64LFIN5B+ymORqwhxnxyRf/wsgWUmhdp7MpVpHL2n0zp+lyJ+hDmrgaTsH42Z/D2af3pvUjeQp6a2o1m5FfuHVrm6eUrdZkk3Tn+zG4wrQgMdSV8C2ev4s+QlkDPoPtyfxjrcQ+o3ClKRjvlMBCS2kAZSIZKj01JLPmojSzvRo8kY8T0NOQx2XlWp/qWk9q4Cja/6WCH1FsH8tQB5wgI4eTxCnsa5GKW1kRybaHpixqYpoNQvdUKEmmZVjOQW4hy4bf2UUsRITk0P8qAobUIVMPiA1GCIN4KWgBFxEZJtHxCDpagF9hG6AFx8jHCa0PUuQhi7GPUpguf5UuKp5dWNGp3CTMfMdBaJbtKAxgIMAiGZ6Vo0FmCEvRtL5m6GU6X+ksRjX7eS0ClHHawjeCFCGopX34h5uJ476Fxqh3WEjr42hWIEb07o8CwBIwUvlAS7BpBA8KLI7COUXcb3LlmAUdR608uj98EpbXa9/kjEkmN8PGcVCnC29UFV9hyLUSk7BbGiQEGn2A5DRcHkrxVVGUPjY/614dcs7HXDEf4rDjRfhZAvJbNi6yN31cI3FLBVkxl9g5aHfYwgsxC6+l7UGj7Dj8EInfOtMBp+8DfFR+7rpYLHEWIFqEMReAgVUyntg+od/jHx8aUYAabG2UsAgcToxQSlGJZ3kf39lf/Xh6CIsgkeRq9pv81yPMI2LKtqtd9j+dd3AZE4EXdAYC3DgR5zrmF4S0b/69a7vdsbtb88VTbBasdyAQAAAABJRU5ErkJggg=="); }    /* 블루리본 #2C4A85 */
-  .ic-cert { background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAMAAADVRocKAAAAwFBMVEVuVyCMb1Lk0LJWHBGljXNQKgn39/dWMxJ4Uy/t49S1n4k3DgAyCwCpcGrosVhqYWFNJgK0tLToqVRrSy5+X0CqkG//f39tTC3x4s2Gak7VxLPFs56ZmWbHm196XUGYf2bpwH7/qv8AAAD++fCLWivgqU/To0lbNhNNKARlPhlVVQBcNhNvRiDBrpl/AAD26NDluHA+PgDUtXHGnULCsJtcNxRYNBRbNxVvNwDrx4rx2bBtRB3l2stTNhXIt6RaNxVmR/4zAAAAQHRSTlMW+v0O85gCbvr59VcrC/sEzAMXp/5VAkKnvHpiBXOnSP8DAP7//v79/f0DQ/7+Av7/BP///9AutQT//v39EPqQvREKoAAABH5JREFUeNrtWumWsjgQDYtr27a9fcvsU3ySoIgyMyjSiu//VhPCFhFNAtI/5kz9aw/U7eRWkro3IOg40H8RwFs0Dk8CwGv3D3siAPrAdtk4tpcIqJp/G+AWEWyrCNURHLGDncZBXz7eHIEPJwe7PxqHi50TTXIdwIMd/vjRIj7wrjJHlwDDNgBDCQC3DYArAGActAEQc7CltfZBw1WO5C368vbmCIp1QBqE3Drw4Lg8OUSLV/9wsaqNsydijTi75VG0ktOlvsPOwVKMg0P5ldiLaIToGGB3zb0cbWoj4h5Zuzg4eqHceeCBERCNe3s0t+uC/x80Ehxrd+LaA2dBi4mY3Ot7e34R9p57wCS0fBbyJ5qfIMTcBMxrALgBxAQvK/UvODJ9WGLMEf3HxRDsDUcwpvlDtTM5hAEelin0SwCO4iEeXMt//dAP4cQTvakg2HOe4N7V/De6Ch92ZFxWqn2V4jHZ1fMralsQCrBepJlXEAqKdRwgr1Ff5AEKyvV2XqnlANZugKAZAB03Im/1lVrWqEbQjQkSdHY+RTDrhlDWqEm+XlkAUq2jDwOyyodg19RoTJbXC0imN02Ww+iiUu1psYUOBPmFza8PPXdUrdSC4mHv9vzIdNcUQbuo1IxirQdG+/bd6PfMc5rzAYxnj+JeGUn0y2gWn1VqVqM6OUr04hICZAFGtrGmQ8hqdO0aNxeAgsJZwGTIVWpWo28PQoKlJZQPD1pRqdkATLn8khothIdxXqk22wBXwgWgJgIN6LG806xGDydxgaqpzCd4XTOa0xp9hed7y9g/4TurVFajGvTvr5P7kKy3TULxWEGMygPQJ+l602mN6gadsQ6U/iMgtu0dvqq8pWIlPMLvCQHv0gQrexXP8LNl/SRPsLoZ0odv39TyqwF8+fJiT1/6L50B/ALv0+mv0BnAMzxG03n0TtnuBOAJJiOLyo4DUkGQB/D6ME63ingic9I02yrSvchUqCQkv8p+Kze77/ff7OiBcCgB1q/Su5EkAO3wYqsEsPTefQ8ceiibFg9gjSWPZNlDf6JZ5wCWdsdDn7YtuRApAazh5F5tSyL8D9YFwMGZ3Kfx8uBptuJMhULbxDN0l9axbH5ZY8TJS3PWN9oDcO172pxyCJpYHkgIkEGpNDdZ85v/MHJbC5CQehZ6SXCu8vOfRrilhKKeSKH2o1Lg2IUIXJGBYAwIBEJZO1extn2u0kwqkxvLWIPmzxyXUTb9LM6IeGsjxFGQmYPZ9BdmGkdECyth8bTLXK8oTckF+1MvzBDUBKC0c/bV9DnEvrBzfHWAEHopwetNXf4UISVCIyd1QyrxEJjE15Ppr3U1k9/nUUNLrTAF2fTb9lUERgQzBX0VgMLW3N9In0HsU1tzq2Jr5sYsm37bFiAkRKgZs9SBZ9ZylGT4WxDJMxGzlg1Zazk3x5kl/pcwUpucmeMolLxq7NLe5y8oVtKRXVCcxBcUXV+xdH5J9AnXXB1f1H3KVWOnl6WdX/d2fmH9CVfuXX800P1nD91/uAH/fzxTiX8BHAEAQ3WcH8wAAAAASUVORK5CYII="); }      /* 백년가게 #70522A */
+  /* 새로오픈 — 사장이 그린 그림(img/fresh.png · 60×58).
+     다른 아이콘은 여백이 있는 96px 캔버스라 15px 로 깔아도 알맹이가 작지만, 이 그림은
+     여백 없이 꽉 찬 원반이라 같은 15px 로 깔면 24px 원반 안에서 혼자 답답해 보인다.
+     14px(원반 지름 13.2px)이 딸기·🔥 와 눈으로 같은 무게였다 — 다섯 값을 나란히 렌더해 골랐다.
+     비율 유지가 필요하므로 auto 를 쓰고, `.mk .ic.img` 의 15px 정사각을 이기게 같은
+     자리수의 선택자로 못박는다. */
+  .mk .ic.ic-fresh { background-size:14px auto; }
+  .ic-fresh { background-image:url("img/fresh.png"); }
+  .ic-nc   { background-image:var(--img-straw); }     /* 논슐랭 = 본 앱 칩의 딸기 원본 */
+  .ic-blue { background-image:var(--img-ribbon); }    /* 블루리본 #2C4A85 */
+  .ic-cert { background-image:var(--img-cert); }      /* 백년가게 #70522A */
 
   /* ── 현재 위치 버튼 (지도 앱 표준 관용구 — 우하단 원형) ──────────────
      네이버 로고·저작권(우하단, 약관상 가릴 수 없다) 위에 앉는다: --prov 만큼 띄운다 */
@@ -147,19 +180,49 @@
   .sheet.on { transform:translateY(0); }
   .sh-grab { width:36px; height:4px; border-radius:2px; background:var(--paper-line); margin:0 auto 8px; }
   .sh-head { display:flex; align-items:flex-start; gap:8px; }
-  .sh-head h2 { margin:0; font-size:18px; line-height:1.25; letter-spacing:-.3px; flex:1 1 auto; padding-top:8px; }
+  /* 이름 + 특별선정 배지를 한 줄에 흘린다 — 본 앱 홈화면 카드의 .row1 과 같은 규칙
+     (display:flex · align-items:center · gap 6px · flex-wrap:wrap). 이름이 길면 배지가
+     아랫줄로 접힐 뿐 레이아웃은 깨지지 않는다. */
+  .sh-name { display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+             flex:1 1 auto; min-width:0; padding-top:8px; }
+  .sh-head h2 { margin:0; font-size:18px; line-height:1.25; letter-spacing:-.3px;
+                flex:0 1 auto; word-break:keep-all; }
   .sh-x { flex:none; width:44px; height:44px; display:inline-flex; align-items:center; justify-content:center;
           background:var(--paper); border:1.5px solid var(--paper-line); border-radius:10px;
           font-family:inherit; font-size:12px; font-weight:700; color:var(--wall-ink); cursor:pointer; }
-  .sh-tags { display:flex; flex-wrap:wrap; gap:5px; margin:8px 0 0; }
-  .tag { font-size:11px; font-weight:700; line-height:1; padding:6px 9px; border-radius:11px;
-         background:var(--paper-dim); color:var(--wall-ink); border:1px solid var(--paper-line); }
-  .tag.red { background:var(--red); border-color:var(--red); color:var(--paper); }
+  /* ── 특별선정 배지 ──────────────────────────────────────────────────
+     2026-08-28(3차) 사장 지시: 이름 아래 칩(카테고리·이동수단·강추·당김)은 **삭제**,
+     대신 특별선정 배지만 이름 오른쪽에 "원래 홈화면에서 쓰이던 대로" 붙인다.
+     아래 값은 전부 본 앱 src/build_webapp.py 의 CSS 를 글자 그대로 옮긴 것이다 —
+     고치려면 두 곳을 같이 고쳐야 눈으로 같아 보인다. */
+  /* line-height 1.55 는 본 앱 body 의 값이다 — 지도 body 는 1.45 라, 안 적으면 배지 높이가
+     본 앱 21.27px 대신 20.22px 로 1px 낮게 나온다(아이콘 눈높이도 -0.63 → -1.11 로 어긋난다). */
+  .tag { font-size:10.5px; font-weight:800; padding:1.5px 7px; border-radius:4px; line-height:1.55; }
+  .tag.blue { color:#2C4A85; border:1.2px solid #4A66A0; background:#EDF1F8;
+    display:inline-flex; align-items:center; gap:3px; }
+  .tag.chain { color:#9C4A21; border:1.2px solid #C0764A; background:#F8EFE7; }
+  .tag.heritage { color:#70522A; border:1.2px solid #A9854A; background:#F4EDDE; }
+  .tag.fresh { color:#175A4E; border:1.2px solid #1F6B5C; background:#E9F3F0; }
+  .tag.ttogan { color:#5E4A85; border:1.2px solid #8672AC; background:#F1EDF7; }
+  .tag.sikgaek { color:#9C446B; border:1.2px solid #B4527A; background:#F9EEF4; }
+  /* 논슐랭 딸기 — 본 앱은 심사 기준 시트를 여는 <button> 이지만 지도에는 그 시트가 없다.
+     누를 것이 없는 버튼을 두지 않으려고 <span> 으로 옮겼다(모양은 같다). */
+  .ncb { display:inline-flex; align-items:center; gap:1px; padding:2px 6px;
+    background:#FFFDF6; border:1px solid #DCB74A; border-radius:5px; line-height:1; }
+  .straw { display:inline-block; width:13px; height:13px; flex:none;
+    background:var(--img-straw) center / contain no-repeat; }
+  .ribbon { display:inline-block; width:13px; height:13px; flex:none; vertical-align:-2px;
+    background:var(--img-ribbon) center / contain no-repeat; }
+  .cert { display:inline-block; width:13px; height:13px; flex:none; vertical-align:-2px;
+    background:var(--img-cert) center / contain no-repeat; }
+  /* 새로오픈 아이콘 — 본 앱 .fresh-i 와 한 글자도 다르지 않다(눈높이 자동 일치) */
+  .fresh-i { display:inline-block; width:13px; height:13px; flex:none; vertical-align:-2px;
+    background:var(--img-fresh) center / contain no-repeat; }
   .sh-one { margin:9px 0 0; font-size:13.5px; color:var(--wall-ink); }
   .sh-facts { display:flex; flex-wrap:wrap; gap:10px; margin:9px 0 0; font-size:12.5px; color:var(--paper-ink-sub); }
-  .sh-acts { display:flex; gap:7px; margin:12px 0 0; }
+  .sh-acts { display:flex; flex-wrap:wrap; gap:7px; margin:12px 0 0; }
   .sh-acts a {
-    flex:1 1 0; min-height:44px; display:inline-flex; align-items:center; justify-content:center;
+    flex:1 1 42%; min-height:44px; display:inline-flex; align-items:center; justify-content:center;
     text-align:center; text-decoration:none; font-size:13px; font-weight:700; padding:8px;
     border-radius:10px; border:1.5px solid var(--navy); color:var(--navy); background:var(--paper);
   }
@@ -249,8 +312,8 @@ function __baseDone(kind, err){
    ═══════════════════════════════════════════════════════════════════════ */
 
 var BRANCH = { la:36.1993678, lo:127.0891137 };   /* 이름 라벨은 제거됐다(2026-08-28) */
-/* src/constants.py MOODS 와 글자 그대로 같아야 한다(띄어쓰기 포함) — 시트의 당김 표시에만 쓴다 */
-var PULLS = ["뜨끈한 국물","매콤하게","시원하게","든든한 한 끼","속 편하게","모시는 날","빨리 한 끼"];
+/* 당김(PULLS)·카테고리·이동수단 칩은 2026-08-28(3차) 지시로 시트에서 제거됐다 —
+   쓰는 곳이 없어져 상수도 같이 지웠다(데이터의 k 필드는 그대로 두되 화면에 안 쓴다). */
 var C = { ink:"#29261F", paper:"#FAF7F0", paperLine:"#D9D2C4", paperInkSub:"#6B6558",
           pinBlue:"#1C73F2" };
 var KLAT = Math.cos(36.2 * Math.PI / 180);
@@ -274,19 +337,58 @@ function naverPlaceUrl(pid){ return "https://m.place.naver.com/restaurant/" + en
    고르게 하지 않는다 — 항상 전부 보인다(이모지 74 + 파랑 점 93).
    아이콘은 본 앱(src/build_webapp.py)의 칩과 같은 것이다:
      논슐랭·블루리본·백년가게 = 칩이 쓰는 PNG 원본(.straw·.ribbon·.cert)을 그대로 심었다.
-     인기체인🔥·식객허영만🍚·또간집📺·새로오픈🆕 = 칩과 같은 이모지 문자.        */
+     인기체인🔥·식객허영만🍚·또간집📺 = 칩과 같은 이모지 문자.
+     새로오픈 = 사장이 그린 그림 (2026-08-28 3차 지시). 마커는 img/fresh.png,
+     시트 배지는 --img-fresh(=본 앱 data/fresh_icon.png 와 바이트 동일).           */
 var PICK = {
   nc:      { name:"논슐랭",     img:true },
   blue:    { name:"블루리본",   img:true },
   cert:    { name:"백년가게",   img:true },
   sikgaek: { name:"식객허영만", emoji:"🍚" },
   ttogan:  { name:"또간집",     emoji:"📺" },
-  fresh:   { name:"새로오픈",   emoji:"🆕" },
+  fresh:   { name:"새로오픈",   img:true },
   chain:   { name:"인기체인",   emoji:"🔥" }
 };
 var PICKCH = { nc:"N", blue:"B", cert:"C", sikgaek:"S", ttogan:"T", fresh:"F", chain:"H" };
 
-function pickOf(p){ return (p.pk && PICK[p.pk]) ? p.pk : null; }
+/* ── 새로오픈 만료 ────────────────────────────────────────────────────
+   본 앱(src/build_webapp.py 984행 근처)과 **같은 규칙**이다: 탐지일(fo) + 90일까지만
+   새로오픈이다. 데이터에 구워진 fr·pk 는 빌드 시점의 사진이라 믿지 않고, 페이지를
+   여는 순간 fo 로 다시 판정한다 — 지도를 오래 재발행하지 않아도 만료된 배지가 남지 않는다.
+   비교는 앱과 같이 "YYYY-MM-DD" 문자열 비교다.                                    */
+function ymd(d){
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") +
+         "-" + String(d.getDate()).padStart(2, "0");
+}
+function freshUntil(fo){
+  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(fo || ""));
+  if (!m) return "";
+  var d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+  if (isNaN(d.getTime())) return "";
+  d.setUTCDate(d.getUTCDate() + 90);
+  return d.toISOString().slice(0, 10);
+}
+var TODAY = ymd(new Date());
+function freshOn(p, today){
+  var u = freshUntil(p && p.fo);
+  return !!u && (today || TODAY) <= u;
+}
+/* 마커 종류는 데이터의 pk 를 그대로 쓰지 않고 배지 필드에서 **다시** 고른다.
+   우선순위는 proto/add_pk.py 와 글자 그대로 같다:
+     논슐랭 > 블루리본 > 백년가게 > 식객허영만 > 또간집 > 새로오픈 > 인기체인.
+   새로오픈이 만료됐으면 그 자리를 다음 순위 선정에 넘기고,
+   넘길 것이 없으면 파랑 점으로 강등한다(회색 점 자리 = 선정 없음).               */
+function pickOf(p, today){
+  if (!p) return null;
+  if (p.nc) return "nc";
+  if (p.bl) return "blue";
+  if (p.ct) return "cert";
+  if (p.sg) return "sikgaek";
+  if (p.tg) return "ttogan";
+  if (freshOn(p, today)) return "fresh";
+  if (p.ch) return "chain";
+  return null;
+}
 function markerHTML(p){
   var k = pickOf(p);
   if (!k) return '<div class="mk"><span class="gd" role="img" aria-label="식당"></span></div>';
@@ -380,6 +482,11 @@ function NaverAdapter(){
       destroy: function(){ m.setMap(null); }
     };
   };
+  /* 시트에 가린 곳을 위로 밀어 올릴 때만 쓴다(선택 핀). 픽셀 단위 이동이다. */
+  this.panBy = function(dx, dy){ if (!alive()) return; map.panBy(new naver.maps.Point(dx, dy)); };
+  /* 첫 화면(지점 근처)으로 되돌린다 — 선택이 지도를 움직이므로 되돌릴 길이 있어야 한다 */
+  this.home = function(){ if (!alive()) return; var v = initialView();
+    map.setZoom(v.z, false); map.setCenter(new naver.maps.LatLng(v.la, v.lo)); };
   this.onMove = function(fn){ naver.maps.Event.addListener(map, "zoom_changed", fn); };
   this.resize = function(){ try { map.autoResize(); } catch (e) {} };
   this.painted = function(){
@@ -454,6 +561,7 @@ function PaperAdapter(){
     return h;
   };
   this.onMove = function(){};
+  this.home = function(){};        /* 종이 바탕은 화면이 고정이라 되돌릴 것이 없다 */
   this.resize = function(){ self.layout(); self.paint(); repositionPaper(); };
   this.painted = function(){ return false; };   /* 바탕지도 타일은 없다 — 정직하게 false */
   this.providerRects = function(){ return []; };
@@ -478,34 +586,154 @@ function buildMarkers(){
   firstRender = true;
 }
 
-/* ═══ 5. 하단 시트 ═══════════════════════════════════════════════════ */
-function moodsOf(p){
-  var v = p.k;
-  if (!v) return [];
-  return v.map(function(x){ return typeof x === "number" ? PULLS[x] : String(x); });
+/* ═══ 5. 하단 시트 ═══════════════════════════════════════════════════
+   2026-08-28(3차) 사장 지시로 크게 바뀌었다.
+   ① 이름 아래 칩 줄(카테고리·이동수단·강추·당김)을 **DOM 에서 제거**했다(숨김 아님).
+   ② 대신 **특별선정 배지만** 이름 오른쪽에 — 본 앱 홈화면 카드(card())에서 쓰던 그대로.
+   ③ 전화 버튼을 없애고 **길찾기**(네이버지도 앱/웹 길찾기 연동)를 주 버튼으로 넣었다.
+   ④ 시트를 열면 그 좌표에 선택 핀(img/sel.png)이 서고, 닫거나 다른 곳을 고르면 사라진다.
+   한줄평·가격대·별점·거리는 종전 그대로다.                                        */
+
+/* 배지 — 본 앱 src/build_webapp.py 의 card() 마크업을 글자 그대로 옮겼다.
+   카테고리 칩(catChip)·회식용(.tag.line)은 배지가 아니므로 넣지 않는다.
+   순서도 card() 와 같다: 논슐랭 → 인기체인 → 블루리본 → 백년가게 → 새로오픈 → 또간집 → 식객.
+   새로오픈만 데이터의 fr 대신 freshOn(fo+90일) 로 다시 판정한다(마커와 같은 판정이다). */
+function strawImgs(n){ var h = ""; for (var i = 0; i < n; i++) h += '<i class="straw"></i>'; return h; }
+function badgesHTML(p){
+  var h = "";
+  if (p.nc) h += '<span class="ncb" role="img" aria-label="논슐랭 ' + p.nc + '딸기">' + strawImgs(p.nc) + '</span>';
+  if (p.ch) h += '<span class="tag chain">🔥 인기 체인</span>';
+  if (p.bl) h += '<span class="tag blue"><i class="ribbon"></i>블루리본' + (p.rb >= 2 ? " " + p.rb + "리본" : "") + '</span>';
+  if (p.ct) h += '<span class="tag heritage"><i class="cert"></i>' + esc(p.ct) + '</span>';
+  if (freshOn(p)) h += '<span class="tag fresh"><i class="fresh-i"></i> 새로오픈</span>';
+  if (p.tg) h += '<span class="tag ttogan">📺 또간집' + esc(p.tg === "1위" ? "1위" : "출연") + '</span>';
+  if (p.sg) h += '<span class="tag sikgaek">🍚 백반기행 ' + esc(p.sg) + '</span>';
+  return h;
 }
+
+/* ── 길찾기 ──────────────────────────────────────────────────────────
+   규격은 조사 결과 그대로다(guide.ncloud-docs.com "URL Scheme for integration of Maps app"
+   + map.naver.com 301 리다이렉트 실측, 2026-08-28).
+
+   앱 스킴 : nmap://route/{car|walk}?dlat={위도}&dlng={경도}&dname={이름}&appname={우리 페이지 URL}
+     · 출발지(slat/slng/sname)는 **일부러 비운다** — 앱이 현재 위치를 출발지로 잡아 준다.
+     · appname 은 전 URL 필수. 모바일 웹은 값이 '웹페이지 URL' 이다.
+   웹 폴백 : https://map.naver.com/p/directions/{출발}/{도착}/{경유}/{수단}
+     · **네 칸이 전부 있어야 한다.** 비우는 칸은 '-' 한 글자. 하나라도 빠지면 HTTP 500.
+     · 지점 칸은 {경도},{위도},{이름},{placeId},{타입} — **스킴과 반대로 경도가 먼저다.**
+       뒤집으면 중국 어딘가로 간다.
+     · 수단 토큰은 car·walk 만 쓴다. 못 알아듣는 토큰은 조용히 대중교통으로 떨어진다.
+   모바일에서 이 웹 URL 은 네이버 브릿지 페이지로 이어져 앱을 자동으로 띄우고,
+   앱이 없으면 설치 안내가 남는다 — 그래서 폴백으로 제격이다.                        */
+function dirMode(p){ return p.m === "도보" ? "walk" : "car"; }
+function dirUrls(p){
+  var mode = dirMode(p);
+  var app = "nmap://route/" + mode +
+    "?dlat=" + encodeURIComponent(p.la) + "&dlng=" + encodeURIComponent(p.lo) +
+    "&dname=" + encodeURIComponent(p.n) +
+    "&appname=" + encodeURIComponent(location.origin + location.pathname);
+  var seg = encodeURIComponent(p.lo) + "," + encodeURIComponent(p.la) + "," + encodeURIComponent(p.n);
+  if (p.u) seg += "," + encodeURIComponent(p.u) + ",PLACE_POI";
+  return { mode:mode, app:app, web:"https://map.naver.com/p/directions/-/" + seg + "/-/" + mode };
+}
+/* 앱 스킴 → 안 열리면 웹으로. 반드시 사용자 제스처 안에서 부른다.
+   앱이 떴으면 이 페이지가 뒤로 숨으므로(pagehide·visibilitychange) 폴백을 취소한다.
+   버튼의 href 는 처음부터 웹 URL 이라 JS 가 죽어도 길찾기는 열린다(길게 눌러 복사도 된다). */
+var dirTimer = null;
+function dirCancel(){ if (dirTimer) { clearTimeout(dirTimer); dirTimer = null; } }
+function dirHide(){ if (document.hidden) dirCancel(); }
+function goDirections(p, ev){
+  var u = dirUrls(p);
+  window.__dirLast = { n:p.n, la:p.la, lo:p.lo, mode:u.mode, app:u.app, web:u.web, at:Date.now() };
+  if (ev && ev.preventDefault) ev.preventDefault();
+  dirCancel();
+  window.addEventListener("pagehide", dirCancel, { once:true });
+  document.addEventListener("visibilitychange", dirHide);
+  dirTimer = setTimeout(function(){
+    dirTimer = null;
+    document.removeEventListener("visibilitychange", dirHide);
+    if (document.hidden) return;                 /* 앱이 떴다 — 웹으로 또 보내지 않는다 */
+    location.href = u.web;
+  }, 1500);
+  try { location.href = u.app; }
+  catch (e) { dirCancel(); location.href = u.web; }
+}
+
+/* ── 선택한 위치 핀 ──────────────────────────────────────────────────
+   원래 마커는 그대로 두고 그 위에 얹는다. 지점 마커(z 90)보다도 위(z 95)다.
+   항상 최대 한 개 — 새로 열 때 이전 것을 지우고, 시트를 닫으면 사라진다.        */
+var mkSel = null, selKey = null;
+function selPinHTML(){
+  return '<div class="zwrap"><div class="selpin">' +
+    '<img src="img/sel.png" width="40" height="52" alt="" onerror="selPinFail(this)"></div></div>';
+}
+function selPinFail(img){        /* 그림을 못 받으면 조용히 없앤다 — 깨진 아이콘을 두지 않는다 */
+  clearSelPin();
+}
+function clearSelPin(){
+  if (mkSel) { try { mkSel.destroy(); } catch (e) {} }
+  mkSel = null; selKey = null;
+}
+function showSelPin(p){
+  clearSelPin();
+  if (!A || !A.marker) return;
+  mkSel = A.marker(selPinHTML(), p.la, p.lo, 95, true);
+  selKey = p.n;
+}
+/* 시트가 덮는 만큼 지도를 밀어 선택한 곳이 시트 위로 나오게 한다.
+   이미 잘 보이는 자리면 **움직이지 않는다**(쓸데없이 흔들리지 않게).
+   종이 바탕(PaperAdapter)에는 팬이 없으므로 그냥 건너뛴다.
+
+   ★ 자리는 **그려진 핀의 DOM 사각형**으로 잰다. A.project(=네이버
+     projection.fromCoordToOffset)를 쓰면 안 된다 — 지도를 한 번 팬 하고 나면 이 값이
+     화면 좌표와 어긋난다(실측: 팬 1,330px 뒤 화면 y 93 인 마커를 1,422 로 돌려줬다).
+     그대로 쓰면 두 번째 선택부터 지도가 엉뚱한 데로 튄다. 핀의 아래 꼭짓점은 정의상
+     그 식당 좌표이므로, 그것을 재는 것이 가장 정확하고 팬에도 흔들리지 않는다.       */
+function nudgeToSel(){
+  if (!A || !A.panBy) return;
+  var img = document.querySelector(".selpin img");
+  if (!img) return;
+  var w = $("mapwrap").getBoundingClientRect();
+  var W = w.width, H = w.height;
+  if (!W || !H) return;
+  var r = img.getBoundingClientRect();
+  if (!r.width || !r.height) return;             /* 아직 자리를 못 잡았다 — 움직이지 않는다 */
+  var qx = r.left + r.width / 2 - w.left;        /* 핀 아래 꼭짓점 = 그 식당 좌표 */
+  var qy = r.bottom - w.top;
+  /* 시트 높이는 transform 에 영향받지 않는 레이아웃 높이를 쓴다(열리는 중에도 정확하다) */
+  var shH = Math.min($("sheet").getBoundingClientRect().height || 0, H);
+  var top = 60, bot = H - shH - 14;              /* 핀 높이(52)+여유 만큼 위를 비운다 */
+  var left = 30, right = W - 30;
+  if (bot <= top) return;                        /* 시트가 화면을 거의 다 덮었다 — 포기 */
+  var inX = qx >= left && qx <= right, inY = qy >= top && qy <= bot;
+  if (inX && inY) return;
+  var tx = inX ? qx : W / 2, ty = inY ? qy : (top + bot) / 2;
+  A.panBy(qx - tx, qy - ty);
+}
+
 function openSheet(p){
-  var tags = '<span class="tag">' + esc(p.c) + '</span><span class="tag">' + esc(p.m) + '</span>' +
-    (p.b ? '<span class="tag red">강추</span>' : "") +
-    moodsOf(p).map(function(m){ return '<span class="tag">' + esc(m) + '</span>'; }).join("");
+  var acts =
+    '<a class="fill" id="shDir" href="' + esc(dirUrls(p).web) + '" ' +
+    'target="_blank" rel="noopener noreferrer">길찾기</a>' +
+    (p.u ? '<a href="' + esc(naverPlaceUrl(p.u)) + '" target="_blank" rel="noopener noreferrer">네이버 지도에서 열기</a>' : "");
   var facts = [];
   if (p.p) facts.push('<span>' + esc(p.p) + '</span>');
   if (p.s) facts.push('<span>' + esc(p.s) + '</span>');
   if (p.d) facts.push('<span>' + esc(p.d) + '</span>');
-  var acts = "";
-  if (p.t) acts += '<a href="tel:' + esc(String(p.t).replace(/[^0-9+]/g, "")) + '">전화 ' + esc(p.t) + '</a>';
-  if (p.u) acts += '<a class="fill" href="' + esc(naverPlaceUrl(p.u)) + '" target="_blank" rel="noopener noreferrer">네이버 지도에서 열기</a>';
   $("sheet").innerHTML =
     '<div class="sh-grab"></div>' +
-    '<div class="sh-head"><h2>' + esc(p.n) + '</h2><button class="sh-x" type="button" id="shX">닫기</button></div>' +
-    '<div class="sh-tags">' + tags + '</div>' +
+    '<div class="sh-head"><div class="sh-name"><h2>' + esc(p.n) + '</h2>' + badgesHTML(p) + '</div>' +
+      '<button class="sh-x" type="button" id="shX">닫기</button></div>' +
     (p.o ? '<p class="sh-one">' + esc(p.o) + '</p>' : "") +
     (facts.length ? '<div class="sh-facts">' + facts.join("") + '</div>' : "") +
-    (acts ? '<div class="sh-acts">' + acts + '</div>' : "");
+    '<div class="sh-acts">' + acts + '</div>';
   $("sheet").classList.add("on");
   var x = $("shX"); if (x) x.addEventListener("click", closeSheet);
+  var g = $("shDir"); if (g) g.addEventListener("click", function(ev){ goDirections(p, ev); });
+  showSelPin(p);
+  nudgeToSel();
 }
-function closeSheet(){ $("sheet").classList.remove("on"); }
+function closeSheet(){ $("sheet").classList.remove("on"); clearSelPin(); }
 
 /* ═══ 6. 현재 위치 ═══════════════════════════════════════════════════
    ┌──────────────────────────────────────────────────────────────────┐
@@ -678,6 +906,7 @@ function fallbackToPaper(reason){
   try { MK.forEach(function(h){ h.destroy(); }); } catch (e) {}
   try { if (mkBranch) mkBranch.destroy(); } catch (e) {}
   try { if (mkGeo) mkGeo.destroy(); } catch (e) {}
+  clearSelPin(); closeSheet();
   MK = []; mkBranch = null; mkGeo = null; PAPER_MARKERS = [];
   dataAttached = false; firstRender = false;
   var wrap = $("mapwrap");
@@ -735,7 +964,8 @@ function start(){
         if (!painted && Date.now() - t0 < 4000) { setTimeout(ask, 400); return; }
         sent = true;
         /* 마커 그림 두 장도 담는다 — 오프라인에서 지점·내 위치가 깨진 아이콘이 되지 않게 */
-        var urls = [location.pathname, "./data/places.json", "./img/branch.png", "./img/me.png"];
+        var urls = [location.pathname, "./data/places.json", "./img/branch.png", "./img/me.png",
+                    "./img/fresh.png", "./img/sel.png"];
         var sw = navigator.serviceWorker.controller;
         if (sw) sw.postMessage({ type:"precache", urls:urls });
       }
@@ -800,8 +1030,20 @@ function innerEl(h, sel){
   var q = el.querySelector ? el.querySelector(sel) : null;
   return q || el;
 }
-/* 마커 중심의 화면 좌표 — 어댑터 투영을 그대로 쓴다(뷰포트 밖도 계산된다) */
+/* 마커 중심의 지도 컨테이너 기준 좌표.
+   **그려진 DOM 사각형**을 먼저 쓴다 — 네이버 투영(A.project)은 지도를 팬 한 뒤
+   화면 좌표와 어긋나서(위 nudgeToSel 주석의 실측), 선택 핀이 지도를 움직인 다음에는
+   대비 표본이 엉뚱한 자리를 재게 된다. DOM 이 없을 때만 투영으로 물러난다. */
 function markerCenter(i){
+  for (var j = 0; j < MK.length; j++) {
+    if (MK[j].__i !== i) continue;
+    var el = innerEl(MK[j], ".mk");
+    if (!el) break;
+    var r = el.getBoundingClientRect();
+    if (!r.width || !r.height) break;
+    var w = $("mapwrap").getBoundingClientRect();
+    return [r.left + r.width / 2 - w.left, r.top + r.height / 2 - w.top];
+  }
   var p = PLACES[i];
   try { return A.project(p.la, p.lo); } catch (e) { return null; }
 }
@@ -834,7 +1076,11 @@ window.__qa = {
     Object.keys(f || {}).forEach(function(k){ un.push(k + ":칩 제거됨(2026-08-28)"); });
     return { ok:false, unsupported:un };
   },
-  reset: function(){ closeSheet(); $("fail").classList.remove("on"); return true; },
+  /* 기본 상태로 — 시트·안내를 닫고 **첫 화면 자리로 되돌린다**.
+     선택 핀이 지도를 움직이게 됐으므로(nudgeToSel), 자리를 되돌리지 않으면
+     다음 검사가 팬 된 화면을 물려받는다. */
+  reset: function(){ closeSheet(); $("fail").classList.remove("on");
+                     if (A && A.home) { try { A.home(); } catch (e) {} } return true; },
   getView: function(){ return "place"; },
   setView: function(){ return "place"; },
   getScale: function(){ return "near"; },
@@ -882,6 +1128,30 @@ window.__qa = {
     return out;
   },
   sheetOpen: function(){ return $("sheet").classList.contains("on"); },
+  /* 선택 핀 — 그려진 상자와 **아래 꼭짓점**(그 식당 좌표여야 한다)을 화면 좌표로 돌려준다 */
+  selPin: function(){
+    if (!mkSel) return null;
+    var img = innerEl(mkSel, ".selpin img");
+    if (!img || !visible(img)) return null;
+    var r = img.getBoundingClientRect();
+    return { name:selKey, src:img.getAttribute("src"),
+             ...rectOf(img), tipX:+(r.left + r.width / 2).toFixed(1), tipY:+r.bottom.toFixed(1) };
+  },
+  /* 길찾기 버튼이 마지막으로 내보낸 URL 두 벌(앱 스킴 · 웹 폴백) */
+  dirLast: function(){ return window.__dirLast || null; },
+  dirUrls: function(i){ var p = PLACES[i]; return p ? dirUrls(p) : null; },
+  /* 새로오픈 만료를 날짜를 넣어 되짚는다(읽기 전용 계산 — 화면은 건드리지 않는다) */
+  pickAt: function(today){
+    var out = { today:today || TODAY, gray:0, fresh:0, bySlug:{}, demoted:[] };
+    PLACES.forEach(function(p){
+      var now = pickOf(p, today), was = p.pk || null;
+      if (now) out.bySlug[now] = (out.bySlug[now] || 0) + 1; else out.gray++;
+      if (now === "fresh") out.fresh++;
+      if (was === "fresh" && now !== "fresh")
+        out.demoted.push({ n:p.n, fo:p.fo || null, until:freshUntil(p.fo), to:now });
+    });
+    return out;
+  },
   tapMarker: function(i){
     var h = null, n = 0;
     for (var j = 0; j < MK.length; j++) {
