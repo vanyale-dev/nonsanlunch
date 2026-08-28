@@ -6,13 +6,16 @@
    1. 외부 호스트(네이버 SDK·타일)는 **절대 가로채지 않는다** — 그대로 통과시킨다.
    2. 같은 출처는 네트워크 우선 + 실패 시 캐시(오래된 데이터를 조용히 굳히지 않는다).
    3. 미리 담기(precache)는 페이지가 "첫 타일 그린 뒤"에 보내는 메시지로만 한다 —
-      첫 화면의 대역폭을 뺏지 않기 위해서다.
+      첫 화면의 대역폭을 뺏지 않기 위해서다. 지금 페이지가 보내는 목록은
+      [location.pathname, "./data/places.json"] 둘뿐이고, 그게 배포 파일 전부다.
+      data/dong.geojson·zone_labels.json 은 파일로는 남아 있으나 페이지가 부르지
+      않으므로 담지 않는다(2026-08-28 동네 보기 제거).
    4. **낡은 캐시 청소는 우리 것(`nl-map-*`)만 한다.** CacheStorage 는 스코프가 아니라
       출처(origin) 단위라, 같은 출처에 사는 발권기 본 앱의 캐시(`nslunch-*`)가 여기서 다 보인다.
       "내 이름이 아니면 지운다"로 쓰면 지도를 한 번 여는 것만으로 발권기의 오프라인 폴백이
       통째로 지워진다(2026-08-27 실URL 실측으로 확인 — 지도 진입 뒤 `nslunch-v2` 소멸).
 */
-var V = "nl-map-v1";
+var V = "nl-map-v2";
 var MINE = "nl-map-";      /* 이 접두사가 붙은 캐시만 우리 것이다 */
 
 self.addEventListener("install", function(e){ self.skipWaiting(); });
@@ -56,11 +59,12 @@ self.addEventListener("fetch", function(e){
         return c.match(req, { ignoreSearch:true }).then(function(hit){
           if (hit) return hit;
           if (req.mode === "navigate") {
-            return c.match("app-naver.html", { ignoreSearch:true }).then(function(h){
-              return h || c.match("app-ours.html", { ignoreSearch:true }).then(function(h2){
-                if (h2) return h2;
-                throw err;
-              });
+            /* 페이지가 미리 담는 키는 location.pathname(= /nonsanlunch/map/) 이다.
+               "./" 는 이 스코프에서 그 주소로 풀린다 — index.html 로 맞추면 빗나간다.
+               app-naver.html·app-ours.html 폴백은 2026-08-28 배포 정리로 파일이 사라져 뺐다. */
+            return c.match("./", { ignoreSearch:true }).then(function(h){
+              if (h) return h;
+              throw err;
             });
           }
           throw err;
