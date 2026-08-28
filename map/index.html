@@ -72,6 +72,10 @@
     /* 점 파랑 — 사장이 그린 img/branch.png 에서 실제로 뽑은 주 색(면적 최대 7,653px).
        새로 고른 색이 아니다. 그림과 점이 같은 파랑을 쓴다. */
     --pin-blue:#1C73F2;
+    /* 카페 마커 두 색 — 사장이 준 카페표시.png 에서 실제로 뽑았다(새로 고른 색이 아니다).
+       원반 = 그림 안쪽 링의 최빈색, 테두리 = 그림 바깥 링의 최빈색.
+       카페만 종이·잉크 대신 이 두 색을 쓴다 — 그래야 다른 선정 마커와 한눈에 갈린다. */
+    --cafe-disc:#EDC49B; --cafe-line:#3B1A08;
     --shadow:0 1px 2px rgba(30,28,20,.10), 0 8px 22px rgba(30,28,20,.09);
     --shadow-s:0 1px 2px rgba(30,28,20,.14);
     /* 특별 선정 그림 — 마커 원반과 시트 배지가 **같은 원본**을 쓴다.
@@ -160,12 +164,22 @@
      자리수의 선택자로 못박는다. */
   .mk .ic.ic-fresh { background-size:14px auto; }
   .ic-fresh { background-image:url("img/fresh.png"); }
-  /* 카페 — 사장이 준 그림(img/cafe.png · 60×60). fresh.png 와 **같은 성질**의 그림이라
-     같은 처방을 쓴다: 여백 없이 꽉 찬 원반이어서 `.mk .ic.img` 의 15px 로 깔면 24px 원반
-     안에서 종이 여백이 사라진다(잉크 테두리에 닿는다). 14px 이면 원반 지름·종이 여백이
-     새로오픈과 정확히 같다 — DPR3 재현 시트에서 fresh14 · cafe14 · cafe15 를 나란히 놓고 골랐다.
-     비율 유지가 필요하므로 auto 를 쓰고, 15px 정사각을 이기게 같은 자리수의 선택자로 못박는다. */
-  .mk .ic.ic-cafe { background-size:14px auto; }
+  /* 카페 — 사장이 준 그림(img/cafe.png · 48×48) + **카페만의 원반색**.
+     2026-08-29 사장 지시: "카페아이콘 바깥 테두리에 하얀 영역이 있으니까 식당이랑 구분이
+     잘 안 간다 → 커피색 바탕에 더 진한 커피색 테두리선". 그래서 카페 원반만 종이·잉크를
+     버리고 --cafe-disc(#EDC49B) 바탕 + --cafe-line(#3B1A08) 테두리를 쓴다. 두 색 모두
+     사장의 카페표시.png 에서 뽑은 값이다. 다른 선정 마커는 종이+잉크 그대로 — 달라야 갈린다.
+     그림은 원반 배경(같은 베이지)과 바깥 링을 깎아 **잔·콩·딸기만** 남겼다(원본 60×60 의
+     알맹이만 48×48 로 다시 앉혔다). 안 깎으면 커피색 원반 위에 그림의 갈색 링이 한 겹 더 떠서
+     이중 테두리로 보인다 — DPR3 대조 시트에서 실제로 그렇게 보였다.
+     배경을 깎아 알맹이만 남기면 같은 14px 로는 원반 안이 허전해 17px 로 키웠다 — DPR3 시트에서
+     14·15·16·17·18·19 를 나란히 놓고 골랐다(딸기·🔥 와 눈으로 같은 무게, 19 는 테두리에 닿는다).
+     비율 유지가 필요하므로 auto 를 쓰고, 15px 정사각을 이기게 같은 자리수의 선택자로 못박는다.
+     halo 는 종이색 그대로 두되 1.5→2px 로 키웠다 — 진한 커피색 테두리가 네이버 POI 와
+     붙어 보이지 않게 종이 여백을 한 겹 더 준다(그림자는 그대로 이어 붙인다). */
+  .mk .ic.ic-cafe { background-size:17px auto;
+    background-color:var(--cafe-disc); border-color:var(--cafe-line);
+    box-shadow:0 0 0 2px var(--paper), var(--shadow-s); }
   .ic-cafe { background-image:url("img/cafe.png"); }
   .ic-nc   { background-image:var(--img-straw); }     /* 논슐랭 = 본 앱 칩의 딸기 원본 */
   .ic-blue { background-image:var(--img-ribbon); }    /* 블루리본 #2C4A85 */
@@ -331,7 +345,9 @@ var BRANCH = { la:36.1993678, lo:127.0891137 };   /* 이름 라벨은 제거됐�
 /* 당김(PULLS)·카테고리·이동수단 칩은 2026-08-28(3차) 지시로 시트에서 제거됐다 —
    쓰는 곳이 없어져 상수도 같이 지웠다(데이터의 k 필드는 그대로 두되 화면에 안 쓴다). */
 var C = { ink:"#29261F", paper:"#FAF7F0", paperLine:"#D9D2C4", paperInkSub:"#6B6558",
-          pinBlue:"#1C73F2" };
+          pinBlue:"#1C73F2",
+          /* CSS 의 --cafe-line 과 같은 값 — 카페 마커를 정의하는 테두리색(대비 판정 신고용) */
+          cafeLine:"#3B1A08" };
 var KLAT = Math.cos(36.2 * Math.PI / 180);
 
 /* 축척 전환이 없어졌다 — 초기 뷰는 지점 근처 고정이고 그 뒤는 손으로 줌·팬 한다.
@@ -423,9 +439,18 @@ function markerHTML(p){
     '" role="img" aria-label="' + esc(m.name) + '">' + (m.emoji || "") + "</span></div>";
 }
 /* 마커 시각 반경(그래픽 대비 표본의 둘레 반경) — 보이는 알맹이의 바깥 테두리까지 */
-function visR(p){ return mkKind(p) ? 13.5 : 7.7; }   /* 아이콘 24/2+1.5halo · 점 11/2+2.2halo */
-/* 대비 판정에 신고하는 '이 마커를 정의하는 색' */
-function visFill(p){ return mkKind(p) ? C.ink : C.pinBlue; }
+function visR(p){
+  var k = mkKind(p);
+  if (!k) return 7.7;                       /* 점 11/2 + 2.2 halo */
+  return k === "cafe" ? 14 : 13.5;          /* 아이콘 24/2 + halo(카페 2 · 나머지 1.5) */
+}
+/* 대비 판정에 신고하는 '이 마커를 정의하는 색' — 그 마커를 바탕에서 떼어 놓는 테두리색이다.
+   카페만 종이+잉크가 아니라 커피색 원반+진한 커피 테두리라 신고색도 따로 간다. */
+function visFill(p){
+  var k = mkKind(p);
+  if (!k) return C.pinBlue;
+  return k === "cafe" ? C.cafeLine : C.ink;
+}
 /* 지점 마커 — 사장이 직접 그린 그림 하나. 34px 정사각, 그림의 한가운데가 지점 좌표다.
    그림을 못 받으면(오프라인 첫 진입·파일 유실) onerror 가 옛 네이비 사각으로 물러난다. */
 var BRANCH_IMG_OK = true;
