@@ -28,6 +28,23 @@
   지도에서 안 보인다. 시트 배지에는 선정이 그대로 남으므로 정보는 잃지 않는다.
   세부 갈래(`ck`: dessert·brunch·view·coffee)는 이번에 마커를 가르지 않는다 — 22곳 전부 같은 커피잔이다.
 
+  2026-08-29(5차) 사장 지시 — **메인으로 돌아가는 길**. 좌상단에 `← 논산런치` 알약 하나.
+  이 화면은 상단바가 없고, PWA standalone 으로 홈화면에서 열면 **브라우저 뒤로가기가 없다** —
+  버튼이 없으면 사용자가 지도에 갇힌다. 장식이 아니라 이 화면의 유일한 출구다.
+  ① 자리: **좌상단**. 현재 위치 버튼(우하단)과 화면 대각선으로 갈라 서로 헷갈리지 않게 했다.
+     네이버 로고·저작권은 우하단이라 가리지 않는다(실측 확인).
+  ② 글자: 화살표만 두지 않는다. `논산런치` 라고 **어디로 가는지 적는다** — 아이콘만 있으면
+     "지도 안에서 뒤로"인지 "앱 밖으로"인지 갈리지 않는다.
+  ③ 동작: **직전 페이지가 본 앱이면 `history.back()`, 아니면 `../`**.
+     back 이라야 본 앱의 스크롤 위치·상태가 되살아난다(bfcache). 주소를 직접 열었거나
+     홈화면 아이콘이 지도를 가리키면 뒤로 갈 곳이 없으므로 `../` 로 간다.
+     판정은 `document.referrer` 가 **우리 오리진의 부모 폴더 문서**인가 + `history.length > 1`.
+     마크업은 `<a href="../">` 다 — 스크립트가 죽어도 링크는 살아 있고, 새 탭 열기도 정상이다.
+  ④ **하단 시트가 열려 있어도 이 버튼은 곧장 나간다 — 시트를 먼저 닫지 않는다.**
+     버튼이 `논산런치` 라고 적혀 있는데 한 번은 시트를 닫고 한 번은 나가면 그 글자가 거짓말이 된다
+     (사장 지시: "혼동없고 헷갈리지 않도록"). 시트에는 이미 자기 [닫기]가 있고, 시트는 하단·
+     버튼은 좌상단이라 자리도 갈린다. 한 버튼 = 한 가지 뜻으로 못박았다.
+
   ── 마커 규칙 (선택하게 하지 않는다 — 항상 전부 보인다) ─────────────────
   기본 = 파랑 점. 카페 = 커피잔. 그 밖의 특별 선정 = 그 칩에 쓰이는 아이콘.
   겹치는 곳은 하나만 그린다. 우선순위(mkKind 가 **여는 순간** 카테고리·배지 필드에서 다시 고른다):
@@ -185,6 +202,27 @@
   .ic-blue { background-image:var(--img-ribbon); }    /* 블루리본 #2C4A85 */
   .ic-cert { background-image:var(--img-cert); }      /* 백년가게 #70522A */
 
+  /* ── 메인으로 돌아가기 (좌상단 알약) ────────────────────────────────
+     이 화면에는 상단바가 없고, 홈화면에서 PWA 로 열면 브라우저 뒤로가기도 없다.
+     즉 이 버튼이 사용자의 **유일한 출구**다 — 장식이 아니다.
+     현재 위치 버튼은 우하단이므로 화면 대각선으로 갈라 서로 헷갈리지 않게 둔다.
+     종이 물성(종이 바탕 + 종이 테두리 + 그림자)이라 지도 위에 떠 보인다.
+     z-index 8 = 현재 위치 버튼과 같은 층(시트 20 · 안내 30 은 둘 다 아래쪽에 붙어
+     이 자리를 덮지 않는다 — 시트가 열려 있어도 계속 누를 수 있다). */
+  .backbtn {
+    position:absolute; z-index:8;
+    left:14px; top:14px;
+    left:max(14px, env(safe-area-inset-left)); top:max(14px, env(safe-area-inset-top));
+    height:44px; min-width:44px; padding:0 15px 0 12px;
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:inherit; font-size:13.5px; font-weight:700; line-height:1; letter-spacing:-.2px;
+    color:var(--navy); text-decoration:none; white-space:nowrap; cursor:pointer;
+    background:var(--paper); border:1.5px solid var(--paper-line); border-radius:22px;
+    box-shadow:var(--shadow);
+  }
+  .backbtn:active { background:var(--paper-dim); }
+  .backbtn svg { display:block; flex:none; }
+
   /* ── 현재 위치 버튼 (지도 앱 표준 관용구 — 우하단 원형) ──────────────
      네이버 로고·저작권(우하단, 약관상 가릴 수 없다) 위에 앉는다: --prov 만큼 띄운다 */
   .geobtn {
@@ -324,6 +362,16 @@ function __baseDone(kind, err){
     <div id="map"></div>
     <svg id="flat" xmlns="http://www.w3.org/2000/svg" aria-label="논산 식당 지도(바탕지도 없음)"></svg>
     <div id="pmk"></div>
+
+    <!-- 유일한 출구. <a href="../"> 인 이유 — 스크립트가 죽어도 링크는 살아 있고,
+         길게 눌러 새 탭으로 여는 것도 정상으로 동작한다. 본 앱에서 들어온 경우에만
+         스크립트가 가로채 history.back() 으로 바꾼다(아래 wireBack). -->
+    <a class="backbtn" id="backBtn" href="../" aria-label="논산런치 메인 화면으로 돌아가기">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="-7.5 -7.5 15 15" aria-hidden="true">
+        <path d="M6 0H-5.4M-0.6 -4.8L-5.4 0l4.8 4.8" fill="none" stroke="currentColor"
+              stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg><span>논산런치</span>
+    </a>
 
     <button class="geobtn" id="geoBtn" type="button" aria-pressed="false" aria-label="현재 위치 표시"></button>
 
@@ -878,8 +926,40 @@ function drawGeo(){
   else { mkGeo.html(html); mkGeo.pos(geoPos.la, geoPos.lo); }
 }
 
+/* ═══ 6-b. 메인으로 돌아가기 ═════════════════════════════════════════
+   두 갈래를 갈라야 한다.
+   · 본 앱에서 링크로 들어왔다  → history.back(). 그래야 본 앱의 **스크롤 위치·상태가
+     그대로 되살아난다**(bfcache). 새 문서를 여는 것은 그 자리를 잃는다.
+   · 주소를 직접 열었다 / 홈화면 아이콘이 지도를 가리킨다 → 뒤로 갈 곳이 없다. `../` 로 간다.
+   판정: document.referrer 가 **우리 오리진의 부모 폴더 문서**(…/nonsanlunch/ 또는 그 index.html)
+   인가 + history.length > 1. 새 탭으로 열린 경우 referrer 는 맞아도 length 가 1 이라 `../` 로 간다.
+   기본 마크업이 <a href="../"> 이므로, 아래에서 가로채지 않으면 그 링크가 그대로 간다.        */
+function fromMainApp(){
+  var r = document.referrer;
+  if (!r) return false;
+  var u;
+  try { u = new URL(r, location.href); } catch (e) { return false; }
+  if (u.origin !== location.origin) return false;
+  var here = location.pathname.replace(/[^/]*$/, "");     /* …/nonsanlunch/map/ */
+  var up   = here.replace(/[^/]+\/$/, "");                /* …/nonsanlunch/     */
+  return u.pathname === up || u.pathname === up + "index.html";
+}
+function wireBack(){
+  var a = $("backBtn");
+  if (!a) return;
+  a.addEventListener("click", function(ev){
+    /* 새 탭·새 창으로 여는 조작(⌘·Ctrl·Shift·가운데 버튼)은 건드리지 않는다 */
+    if (ev.defaultPrevented || ev.button !== 0 ||
+        ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+    if (!fromMainApp() || history.length <= 1) return;    /* href="../" 가 그대로 간다 */
+    ev.preventDefault();
+    history.back();
+  });
+}
+
 /* ═══ 7. 배선 ════════════════════════════════════════════════════════ */
 function wireControls(){
+  wireBack();
   $("geoBtn").addEventListener("click", function(){ toggleGeo(!geoOn); });
   $("mapwrap").addEventListener("scroll", function(){
     var w = $("mapwrap"); if (w.scrollTop || w.scrollLeft) { w.scrollTop = 0; w.scrollLeft = 0; }
@@ -1148,6 +1228,8 @@ window.__qa = {
   /* 누를 수 있는 것 전부 — 보이는 크기가 아니라 '손가락이 닿는 상자'를 잰다 */
   targets: function(){
     var out = [];
+    var bk = $("backBtn");
+    if (visible(bk)) out.push({ id:"btn:논산런치(메인)", kind:"button", ...rectOf(bk) });
     var g = $("geoBtn");
     if (visible(g)) out.push({ id:"btn:현재 위치", kind:"button", ...rectOf(g) });
     for (var i = 0; i < MK.length; i++) {
@@ -1172,6 +1254,8 @@ window.__qa = {
     var bimg = mkBranch ? innerEl(mkBranch, ".branch") : null;
     if (bimg && visible(bimg) && bimg.classList && bimg.classList.contains("branch"))
       out.push({ id:"marker:지점", kind:"marker", ...rectOf(bimg) });
+    var bk = $("backBtn");
+    if (visible(bk)) out.push({ id:"control:논산런치(메인)", kind:"control", sel:".backbtn", ...rectOf(bk) });
     var g = $("geoBtn");
     if (visible(g)) out.push({ id:"control:현재 위치", kind:"control", ...rectOf(g) });
     var sh = $("sheet"); if (sh.classList.contains("on")) out.push({ id:"sheet", kind:"sheet", ...rectOf(sh) });
@@ -1187,6 +1271,14 @@ window.__qa = {
     var r = img.getBoundingClientRect();
     return { name:selKey, src:img.getAttribute("src"),
              ...rectOf(img), tipX:+(r.left + r.width / 2).toFixed(1), tipY:+r.bottom.toFixed(1) };
+  },
+  /* 복귀 버튼이 지금 어느 갈래로 갈지 — 읽기 전용(누르지 않는다) */
+  backPlan: function(){
+    var a = $("backBtn");
+    return { href:a ? a.getAttribute("href") : null,
+             referrer:document.referrer || "", fromApp:fromMainApp(),
+             historyLength:history.length,
+             action:(fromMainApp() && history.length > 1) ? "history.back" : "href" };
   },
   /* 길찾기 버튼이 마지막으로 내보낸 URL 두 벌(앱 스킴 · 웹 폴백) */
   dirLast: function(){ return window.__dirLast || null; },
@@ -1225,6 +1317,7 @@ window.__qa = {
     var occ = [];                                   /* 마커보다 위에 그려지는 것들 */
     function addOcc(el){ if (visible(el)) occ.push(el.getBoundingClientRect()); }
     if (mkBranch) addOcc(innerEl(mkBranch, ".branch"));
+    addOcc($("backBtn"));
     addOcc($("geoBtn"));
     ["sheet","fail"].forEach(function(id){
       var el = $(id);
@@ -1289,6 +1382,10 @@ window.__qa = {
     function leftStrip(r){ return { x:+(r.left+3).toFixed(1), y:+(r.top+r.height/2-3).toFixed(1), w:4, h:6 }; }
     /* 위 여백 띠 — padding-top 안(글자는 그 아래) */
     function topStrip(r){ return { x:+(r.left+r.width/2-2).toFixed(1), y:+(r.top+2).toFixed(1), w:4, h:4 }; }
+
+    /* 좌상단 복귀 버튼 — 글자가 늘 화면에 있으므로 대비 표본에 넣는다.
+       leftStrip(x+3, w4)은 테두리 1.5 + 안쪽 여백 12 안이라 화살표·글자가 닿지 않는다. */
+    add($("backBtn"), "btn:논산런치(메인)", leftStrip);
 
     var sh = $("sheet");
     if (sh.classList.contains("on")) {
