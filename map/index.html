@@ -4,7 +4,8 @@
 
   2026-08-28 개편 — 사장 지시 "전부 빼라". 상단 명패·설정 시트·필터 칩·상태 줄·
   하단 버튼 4개·동네 보기(폴리곤·범례·묶음 라벨)를 **DOM 에서 제거**했다.
-  남은 것: 네이버 바탕지도 · 지점 마커 · 마커 167 · 하단 시트 · 현재 위치 버튼 하나.
+  남은 것: 네이버 바탕지도 · 지점 마커 · 마커 220 · 하단 시트 · 현재 위치 버튼 하나.
+  (2026-08-30 정정: 167 은 08-28 시점 수치였다. 동작은 언제나 places.json 전건이라 정확했고 주석만 낡았었다.)
 
   2026-08-28(2차) 사장 지시 — 지점 마커와 현재 위치 마커를 **사장이 직접 그린 그림**으로 바꿨다.
   img/branch.png(지점, 34px 정사각·가운데 앵커) · img/me.png(내 위치, 높이 44px·아래 꼭짓점 앵커).
@@ -13,6 +14,8 @@
 
   2026-08-28(3차) 사장 지시 4건 — 하단 시트와 마커.
   ① 시트에서 **칩 줄(카테고리·이동수단·강추·당김)을 DOM 에서 제거**했다.
+     (2026-08-30 부분 뒤집힘: **카테고리 칩만** 아래 6차 지시로 배지 줄에 되살아났다.
+      이동수단·강추·당김 칩은 그대로 없다.)
   ② 대신 **특별선정 배지만 이름 오른쪽**에 — 본 앱 홈화면 카드(card())의 마크업·CSS 그대로.
   ③ **전화 버튼 삭제 → 길찾기 버튼**(네이버지도 앱 스킴 nmap:// → 실패 시 웹 길찾기 폴백).
      [네이버 지도에서 열기]는 '장소 정보'라 성격이 달라 그대로 두고 둘을 나란히 세웠다.
@@ -21,7 +24,8 @@
      만료(fo+90일)는 여는 순간 다시 판정한다.
 
   2026-08-29(4차) 사장 지시 — **카페 마커**. 점심 뒤 이어지는 카페 동선을 위해
-  카페 22곳(places.json 의 `c === "카페"`)을 전부 커피잔 그림(img/cafe.png)으로 그린다.
+  카페 58곳(places.json 의 `c === "카페"`, 2026-08-30 실측. 최초 기록 22곳은 편입 진행 중 수치였다)을
+  전부 커피잔 그림(img/cafe.png)으로 그린다.
   **카페가 특별 선정을 이긴다** — 마커 종류를 고르는 mkKind() 가 선정보다 먼저 카페를 본다.
   대가: 해피어처럼 카페이면서 논슐랭인 곳은 지도에서 딸기 대신 커피잔이 된다.
   그래도 이렇게 하는 이유 — 선정이 이기면 카페 9곳만 커피잔이라 "카페가 어디 있나"가
@@ -44,6 +48,27 @@
      버튼이 `논산런치` 라고 적혀 있는데 한 번은 시트를 닫고 한 번은 나가면 그 글자가 거짓말이 된다
      (사장 지시: "혼동없고 헷갈리지 않도록"). 시트에는 이미 자기 [닫기]가 있고, 시트는 하단·
      버튼은 좌상단이라 자리도 갈린다. 한 버튼 = 한 가지 뜻으로 못박았다.
+
+  2026-08-30(6차) 사장 지시 — **하단 시트를 메인화면 식당 카드와 내용이 일치**시킨다.
+  종전 시트가 그리던 것(이름·배지·한줄평 + 가격·별점·거리를 평문 한 줄)은 카드의 일부였을
+  뿐이다. 이제 본 앱 카드(src/build_webapp.py 의 card())의 **순서·마크업·CSS 를 그대로** 옮겼다:
+    이름+배지 → 거리칩·별점 → 한줄평 → 대표 메뉴 → 가격 · 주소 → 회식용 안내
+    → 또간집 메모 → 식객 메모 → 기타 메모.
+  ① **카테고리 칩과 회식용(.tag.line) 태그가 들어왔다** — 08-28(3차)에 "배지가 아니므로
+     넣지 않는다"고 적어 둔 결정이 이 지시로 뒤집혔다(그 주석도 아래에서 고쳤다).
+     CATCOLORS 는 본 앱 src/constants.py 의 CATEGORY_COLORS 를 옮겨 적은 값이다 — 새 색이 아니다.
+  ② 별점·거리 줄을 평문(.sh-facts)에서 카드의 .row-dist 로 바꿨다 — 도보/차 SVG 가 든
+     거리 칩 + "★ 4.9 · 리뷰 1,234". 쓰이지 않게 된 .sh-one·.sh-facts 는 CSS 에서 **지웠다**.
+  ③ 시트가 새로 읽는 데이터 8종(st 별점숫자·rv 리뷰수·ms 대표메뉴·ad 주소·go 회식용·
+     tn 또간집메모·sn 식객메모·nt 기타메모)은 proto/build_places.py 가 실어 준다.
+     ad 는 빌드 때 이미 "충남 논산시 " 접두를 뗀 값이다(카드와 같은 결과, 가공은 한 곳에서).
+  ④ **[길찾기]·[네이버 지도에서 열기] 두 버튼은 그대로 둔다**(사장 명시). 카드에 있는
+     결재 도장은 넣지 않았다 — 사장이 시트에 둘 액션을 그 둘로 못박았고, 도장은 '내용'이
+     아니라 액션이다(원하시면 다음 배치에서 넣는다).
+  ⑤ 카드의 다크 모드 .distchip 분기는 **옮기지 않았다** — 이 화면은 meta color-scheme:light
+     의 라이트 전용이고 팔레트에도 어두운 갈래가 없다. 옮기면 OS 가 다크일 때 밝은 시트
+     위에 어두운 칩만 박힌다.
+  ⑥ places.json 이 바뀌었으므로 지도 서비스워커 캐시를 nl-map-v7 → v8 로 올렸다.
 
   ── 마커 규칙 (선택하게 하지 않는다 — 항상 전부 보인다) ─────────────────
   기본 = 파랑 점. 카페 = 커피잔. 그 밖의 특별 선정 = 그 칩에 쓰이는 아이콘.
@@ -286,8 +311,39 @@
   /* 새로오픈 아이콘 — 본 앱 .fresh-i 와 한 글자도 다르지 않다(눈높이 자동 일치) */
   .fresh-i { display:inline-block; width:13px; height:13px; flex:none; vertical-align:-2px;
     background:var(--img-fresh) center / contain no-repeat; }
-  .sh-one { margin:9px 0 0; font-size:13.5px; color:var(--wall-ink); }
-  .sh-facts { display:flex; flex-wrap:wrap; gap:10px; margin:9px 0 0; font-size:12.5px; color:var(--paper-ink-sub); }
+  /* ── 시트 본문 = 본 앱 카드 본문 (2026-08-30 사장 지시) ───────────────
+     종전의 .sh-one(한줄평)·.sh-facts(가격·별점·거리 평문)는 **지웠다** — 그 자리를
+     아래 카드 처방이 대신한다(숨기지 않는다. 이 파일의 규칙이다).
+     값은 전부 src/build_webapp.py 의 카드 CSS 를 글자 그대로 옮긴 것이고, 두 군데만 다르다.
+     ① **line-height:1.55 를 각 규칙에 적어 넣었다.** 본 앱은 body 가 1.55 라 상속으로
+        받지만 이 지도의 body 는 1.45 다 — 안 적으면 같은 글자가 다른 높이로 앉는다
+        (.tag 높이가 1px 어긋났던 2026-08-28 사고와 같은 병).
+     ② **다크 모드 .distchip 분기는 옮기지 않았다** — 이 화면은 라이트 전용이다(위 원장 ⑤).
+     .sh-body 라는 껍데기를 하나 두는 이유: 카드는 .card 가 flex column + gap:4px 라
+     자식 사이 간격이 거기서 나온다. 시트는 그냥 블록이라 껍데기 없이는 그 리듬이 안 나온다. */
+  .sh-body { display:flex; flex-direction:column; gap:4px; margin:9px 0 0; }
+  .cat { font-size:10.5px; font-weight:800; padding:1.5px 7px; border-radius:4px; line-height:1.55; }
+  .tag.line { color:var(--paper-ink-sub); border:1.2px solid #B9AF9D; background:transparent; }
+  .row-dist { display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
+  .distchip { display:inline-flex; align-items:center; gap:4px; flex:none;
+    font-size:13px; font-weight:800; padding:3px 9px 3px 7px; border-radius:7px;
+    line-height:1.55; font-variant-numeric:tabular-nums; }
+  .distchip svg { width:15px; height:15px; flex:none; }
+  .distchip.walk { color:#2F6B3C; background:#E6F3EB; }
+  .distchip.car { color:#26395B; background:#E7EDF5; }
+  .stars { color:#8A6A1F; font-size:12.5px; font-weight:800; line-height:1.55; }
+  .stars .num { color:var(--paper-ink-sub); font-weight:600; font-variant-numeric:tabular-nums; }
+  .liner { font-size:13px; line-height:1.55; }
+  .info { font-size:12.5px; color:var(--paper-ink-sub); line-height:1.55; }
+  /* .note 는 이 파일에서 이미 오류 패널이 쓰는 이름이다(위 .note 규칙). 같은 이름 다른
+     물건이라 시트 안에서만 카드 처방이 이기도록 한정하고, 패널 쪽 margin-top:9px 도
+     여기서 0 으로 되돌린다 — 카드에서는 그 간격을 .card 의 flex gap 이 준다. */
+  .sh-body .note { margin:0; font-size:11.5px; line-height:1.55; color:var(--paper-ink-sub);
+    border-left:3px solid var(--paper-line); padding-left:8px; }
+  .ttogan-note { margin-top:7px; font-size:12px; line-height:1.55; letter-spacing:-0.2px;
+    word-break:keep-all; color:#5E4A85; background:#F1EDF7; border-left:3px solid #8672AC;
+    border-radius:0 7px 7px 0; padding:7px 10px; }
+  .ttogan-note.sikgaek { color:#9C446B; background:#F9EEF4; border-left-color:#B4527A; }
   .sh-acts { display:flex; flex-wrap:wrap; gap:7px; margin:12px 0 0; }
   .sh-acts a {
     flex:1 1 42%; min-height:44px; display:inline-flex; align-items:center; justify-content:center;
@@ -474,7 +530,7 @@ function pickOf(p, today){
 /* 마커에 실제로 그려지는 종류. **카페가 선정을 이긴다**(2026-08-29 4차 지시).
    pickOf() 는 그대로 '특별 선정 판정'으로 남는다 — 시트 배지·새로오픈 만료 감사(pickAt)는
    선정 사실을 봐야 하므로 그쪽은 건드리지 않는다. 갈라 둔 이유가 이것이다.
-   세부 갈래(p.ck)는 보지 않는다 — 카페 22곳은 전부 같은 커피잔이다.               */
+   세부 갈래(p.ck)는 보지 않는다 — 카페 58곳은 전부 같은 커피잔이다.               */
 function mkKind(p, today){
   if (p && p.c === "카페") return "cafe";
   return pickOf(p, today);
@@ -688,26 +744,76 @@ function buildMarkers(){
 /* ═══ 5. 하단 시트 ═══════════════════════════════════════════════════
    2026-08-28(3차) 사장 지시로 크게 바뀌었다.
    ① 이름 아래 칩 줄(카테고리·이동수단·강추·당김)을 **DOM 에서 제거**했다(숨김 아님).
+      (2026-08-30 부분 뒤집힘 — 카테고리 칩만 배지 줄로 되살아났다. 아래 6차 항목 참조.)
    ② 대신 **특별선정 배지만** 이름 오른쪽에 — 본 앱 홈화면 카드(card())에서 쓰던 그대로.
    ③ 전화 버튼을 없애고 **길찾기**(네이버지도 앱/웹 길찾기 연동)를 주 버튼으로 넣었다.
    ④ 시트를 열면 그 좌표에 선택 핀(img/sel.png)이 서고, 닫거나 다른 곳을 고르면 사라진다.
-   한줄평·가격대·별점·거리는 종전 그대로다.                                        */
+
+   2026-08-30(6차) 사장 지시로 **본문이 통째로 본 앱 카드가 됐다** — "지도 시트를 원래 쓰던
+   메인화면 식당 카드 내용과 일치시켜라". 한줄평만 있던 자리에 카드의 본문 전부가 온다:
+   거리칩·별점 → 한줄평 → 대표 메뉴 → 가격 · 주소 → 회식용 안내 → 또간집·식객·기타 메모.
+   배지 줄에도 카테고리 칩과 회식용 태그가 들어왔다. [길찾기]·[네이버 지도에서 열기]는
+   그대로 두고, 카드의 결재 도장은 넣지 않았다(자세한 사유는 파일 머리 원장 6차 ④).      */
+
+/* 카테고리 칩 색 — 본 앱 src/constants.py 의 CATEGORY_COLORS 를 **옮겨 적은 값**이다
+   (본 앱은 빌드 때 같은 표를 CATCOLORS 로 굽는다). 새로 고른 색이 아니다 —
+   고치려면 두 곳을 같이 고쳐야 눈으로 같아 보인다.                              */
+var CATCOLORS = {
+  "한식": { bg:"FFF2CC", fg:"7F6000" },
+  "중식": { bg:"FCE4D6", fg:"843C0C" },
+  "양식": { bg:"E2EFDA", fg:"375623" },
+  "일식": { bg:"DDEBF7", fg:"1F4E79" },
+  "분식": { bg:"F8E0EC", fg:"973C64" },
+  "카페": { bg:"EFE6DC", fg:"6B4E31" },
+  "기타": { bg:"EDEDED", fg:"595959" }
+};
+function catChip(c){
+  var col = CATCOLORS[c] || CATCOLORS["기타"];
+  return '<span class="cat" style="background:#' + esc(col.bg) + ';color:#' + esc(col.fg) + '">' + esc(c) + '</span>';
+}
 
 /* 배지 — 본 앱 src/build_webapp.py 의 card() 마크업을 글자 그대로 옮겼다.
-   카테고리 칩(catChip)·회식용(.tag.line)은 배지가 아니므로 넣지 않는다.
-   순서도 card() 와 같다: 논슐랭 → 인기체인 → 블루리본 → 백년가게 → 새로오픈 → 또간집 → 식객.
+   2026-08-30: 종전엔 "카테고리 칩·회식용은 배지가 아니므로 넣지 않는다"였는데, 시트를
+   카드와 일치시키라는 사장 지시로 그 결정이 뒤집혀 **둘 다 들어왔다**.
+   순서도 card() 와 같다: 논슐랭 → 카테고리 → 인기체인 → 블루리본 → 회식용 → 백년가게
+   → 새로오픈 → 또간집 → 식객.
+   카테고리 칩은 카드와 마찬가지로 **언제나** 나온다(값이 비는 곳이 없다).
    새로오픈만 데이터의 fr 대신 freshOn(fo+90일) 로 다시 판정한다(마커와 같은 판정이다). */
 function strawImgs(n){ var h = ""; for (var i = 0; i < n; i++) h += '<i class="straw"></i>'; return h; }
 function badgesHTML(p){
   var h = "";
   if (p.nc) h += '<span class="ncb" role="img" aria-label="논슐랭 ' + p.nc + '딸기">' + strawImgs(p.nc) + '</span>';
+  h += catChip(p.c);
   if (p.ch) h += '<span class="tag chain">🔥 인기 체인</span>';
   if (p.bl) h += '<span class="tag blue"><i class="ribbon"></i>블루리본' + (p.rb >= 2 ? " " + p.rb + "리본" : "") + '</span>';
+  if (p.go) h += '<span class="tag line">회식용</span>';
   if (p.ct) h += '<span class="tag heritage"><i class="cert"></i>' + esc(p.ct) + '</span>';
   if (freshOn(p)) h += '<span class="tag fresh"><i class="fresh-i"></i> 새로오픈</span>';
   if (p.tg) h += '<span class="tag ttogan">📺 또간집' + esc(p.tg === "1위" ? "1위" : "출연") + '</span>';
   if (p.sg) h += '<span class="tag sikgaek">🍚 백반기행 ' + esc(p.sg) + '</span>';
   return h;
+}
+
+/* 거리 칩·별점 — 카드의 distChip()·starsHtml() 를 그대로 옮겼다(SVG 는 바이트 동일).
+   도보/차는 새 데이터 없이 기존 두 필드로 가른다: 분 수는 d(거리요약)에서 정규식으로
+   뽑고, 도보인지 차인지는 m(이동)이 정한다. "N분"이 없는 요약(원정 등)은 요약을 그대로
+   칩에 넣는다 — 카드와 같은 처리다.                                            */
+var WALK_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="13.5" cy="4" r="2"/><path d="M11.7 6.3 8.5 8.1a1.5 1.5 0 0 0-.66.86L6.9 12H5a1 1 0 1 0 0 2h2.6a1.5 1.5 0 0 0 1.43-1.05l.3-.95.9.7-1.6 4.9a1 1 0 0 0 1.9.62l1.6-4.9.1 3.2 2.2 2.9a1 1 0 0 0 1.6-1.2l-1.9-2.5-.2-4.6 1.5 1.4a1.5 1.5 0 0 0 1 .4H18a1 1 0 1 0 0-2h-1.1l-2.6-2.5a2 2 0 0 0-2.6-.24z"/></svg>';
+var CAR_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.4 6.6A2 2 0 0 1 8.3 5.3h7.4a2 2 0 0 1 1.9 1.3L19 10.5l.9.3a2 2 0 0 1 1.3 1.9V16a1 1 0 0 1-1 1h-1a2.5 2.5 0 0 1-5 0H10a2.5 2.5 0 0 1-5 0H4a1 1 0 0 1-1-1v-3.3a2 2 0 0 1 1.3-1.9l.9-.3 1.2-3.9zM8 7.3l-.9 3h9.8l-.9-3H8zM7.5 15a1 1 0 1 0 0 .01zM17 15a1 1 0 1 0 0 .01z"/></svg>';
+function distChip(p){
+  var ds = p.d || "";
+  var m = (ds.match(/(\d+)\s*분/) || [])[1];
+  if (!m) return ds ? '<span class="distchip car">' + esc(ds) + '</span>' : "";
+  var walk = p.m === "도보";
+  var label = walk ? "도보 " + m + "분" : "차 " + m + "분";
+  return '<span class="distchip ' + (walk ? "walk" : "car") + '">' + (walk ? WALK_SVG : CAR_SVG) + label + '</span>';
+}
+/* 별 그림은 s(별점표시 "★★★★☆ 4.9")의 앞 토막이다 — 카드가 stars_display 를 쪼개는 것과 같다.
+   별점이 없는 곳은 s 가 "정보부족"이고 st 도 없다 — 그때는 카드처럼 .info 로 "정보부족". */
+function starsHtml(p){
+  if (p.st == null) return '<span class="info">정보부족</span>';
+  return '<span class="stars">' + esc(String(p.s || "").split(" ")[0]) + ' <span class="num">' +
+    p.st.toFixed(1) + ' · 리뷰 ' + (p.rv || 0).toLocaleString() + '</span></span>';
 }
 
 /* ── 길찾기 ──────────────────────────────────────────────────────────
@@ -815,16 +921,26 @@ function openSheet(p){
     '<a class="fill" id="shDir" href="' + esc(dirUrls(p).web) + '" ' +
     'target="_blank" rel="noopener noreferrer">길찾기</a>' +
     (p.u ? '<a href="' + esc(naverPlaceUrl(p.u)) + '" target="_blank" rel="noopener noreferrer">네이버 지도에서 열기</a>' : "");
-  var facts = [];
-  if (p.p) facts.push('<span>' + esc(p.p) + '</span>');
-  if (p.s) facts.push('<span>' + esc(p.s) + '</span>');
-  if (p.d) facts.push('<span>' + esc(p.d) + '</span>');
+  /* 가격 · 주소 한 줄 — 카드의 meta 와 같은 규칙. 가격이 "정보없음"이면 가격을 뺀다
+     (그 글자를 사용자에게 보이지 않는다). ad 는 빌드 때 이미 접두를 뗀 값이다. */
+  var meta = [];
+  if (p.p && p.p !== "정보없음") meta.push(p.p);
+  if (p.ad) meta.push(p.ad);
+  /* 본문 = 본 앱 카드 card() 의 본문. 순서·클래스·문구를 그대로 옮겼다. */
+  var body =
+    '<div class="row-dist">' + distChip(p) + starsHtml(p) + '</div>' +
+    (p.o ? '<div class="liner">' + esc(p.o) + '</div>' : "") +
+    (p.ms ? '<div class="info">' + esc(p.ms) + '</div>' : "") +
+    (meta.length ? '<div class="info">' + esc(meta.join(" · ")) + '</div>' : "") +
+    (p.go ? '<div class="note">구이 전문(1인 점심 단품 없음) — 회식·모임용으로 참고하세요</div>' : "") +
+    (p.tn ? '<div class="ttogan-note">📺 ' + esc(p.tn) + '</div>' : "") +
+    (p.sn ? '<div class="ttogan-note sikgaek">🍚 ' + esc(p.sn) + '</div>' : "") +
+    (p.nt ? '<div class="note">' + esc(p.nt) + '</div>' : "");
   $("sheet").innerHTML =
     '<div class="sh-grab"></div>' +
     '<div class="sh-head"><div class="sh-name"><h2>' + esc(p.n) + '</h2>' + badgesHTML(p) + '</div>' +
       '<button class="sh-x" type="button" id="shX">닫기</button></div>' +
-    (p.o ? '<p class="sh-one">' + esc(p.o) + '</p>' : "") +
-    (facts.length ? '<div class="sh-facts">' + facts.join("") + '</div>' : "") +
+    '<div class="sh-body">' + body + '</div>' +
     '<div class="sh-acts">' + acts + '</div>';
   $("sheet").classList.add("on");
   var x = $("shX"); if (x) x.addEventListener("click", closeSheet);
