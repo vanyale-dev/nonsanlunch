@@ -1,5 +1,5 @@
 {
- "scanned": "2026-08-23",
+ "scanned": "2026-08-31",
  "queries": {
   "식당": [
    "논산 식당",
@@ -14,7 +14,7 @@
   ]
  },
  "total_new_opening": 25,
- "already_known": 20,
+ "already_known": 19,
  "candidates": [
   {
    "pid": "2062050332",
@@ -29,27 +29,27 @@
    ]
   },
   {
-   "pid": "2089133619",
-   "name": "명품염소명가",
-   "category": "육류,고기요리",
-   "addr": "충남 논산시 부창로72번길 15-9 1층",
-   "kind": "식당",
-   "known": false,
-   "visitor_reviews": null,
-   "queries": [
-    "논산 식당"
-   ]
-  },
-  {
    "pid": "2022654951",
    "name": "부대담 논산점",
    "category": "찌개,전골",
    "addr": "충남 논산시 연무읍 연무로 191-1 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 1,
+   "visitor_reviews": 2,
    "queries": [
     "연무 식당"
+   ]
+  },
+  {
+   "pid": "2092964580",
+   "name": "삼겹철판소",
+   "category": "돼지고기구이",
+   "addr": "충남 논산시 관촉로58번길 7",
+   "kind": "식당",
+   "known": false,
+   "visitor_reviews": 4,
+   "queries": [
+    "논산 식당"
    ]
   },
   {
@@ -65,13 +65,25 @@
    ]
   },
   {
+   "pid": "2016355917",
+   "name": "한옥마을휴게소흑돼지곰탕",
+   "category": "곰탕,설렁탕",
+   "addr": "충남 논산시 연산면 계백로 1902 2동 1층",
+   "kind": "식당",
+   "known": false,
+   "visitor_reviews": 9,
+   "queries": [
+    "논산 식당"
+   ]
+  },
+  {
    "pid": "2060911290",
    "name": "카페 아트페어",
    "category": "카페,디저트",
    "addr": "충남 논산시 벌곡면 수락로 570 1,2층",
    "kind": "카페",
    "known": false,
-   "visitor_reviews": 21,
+   "visitor_reviews": 26,
    "queries": [
     "논산 맛집"
    ]
