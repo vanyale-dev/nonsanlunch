@@ -1,5 +1,5 @@
 {
- "scanned": "2026-08-31",
+ "scanned": "2026-09-06",
  "queries": {
   "식당": [
    "논산 식당",
@@ -23,7 +23,7 @@
    "addr": "충남 논산시 양촌면 황산벌로1098번길 61-1 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 46,
+   "visitor_reviews": 48,
    "queries": [
     "논산 식당"
    ]
@@ -37,7 +37,7 @@
    "known": false,
    "visitor_reviews": 2,
    "queries": [
-    "연무 식당"
+    "논산 식당"
    ]
   },
   {
@@ -47,7 +47,7 @@
    "addr": "충남 논산시 관촉로58번길 7",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 4,
+   "visitor_reviews": 8,
    "queries": [
     "논산 식당"
    ]
@@ -59,19 +59,19 @@
    "addr": "충남 논산시 대화로133번길 9-13 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 5,
+   "visitor_reviews": 25,
    "queries": [
     "논산 식당"
    ]
   },
   {
-   "pid": "2016355917",
-   "name": "한옥마을휴게소흑돼지곰탕",
-   "category": "곰탕,설렁탕",
-   "addr": "충남 논산시 연산면 계백로 1902 2동 1층",
+   "pid": "2002710666",
+   "name": "황산벌기사님한식뷔페",
+   "category": "한식뷔페",
+   "addr": "충남 논산시 부적면 계백로 1653 황산벌기사님한식뷔페",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 9,
+   "visitor_reviews": 5,
    "queries": [
     "논산 식당"
    ]
@@ -83,7 +83,7 @@
    "addr": "충남 논산시 벌곡면 수락로 570 1,2층",
    "kind": "카페",
    "known": false,
-   "visitor_reviews": 26,
+   "visitor_reviews": 28,
    "queries": [
     "논산 맛집"
    ]
