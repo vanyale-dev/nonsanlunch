@@ -1,5 +1,5 @@
 {
- "scanned": "2026-09-06",
+ "scanned": "2026-09-14",
  "queries": {
   "식당": [
    "논산 식당",
@@ -13,17 +13,29 @@
    "논산 베이커리"
   ]
  },
- "total_new_opening": 25,
- "already_known": 19,
+ "total_new_opening": 26,
+ "already_known": 18,
  "candidates": [
   {
-   "pid": "2062050332",
-   "name": "뚝심애",
-   "category": "갈비탕",
-   "addr": "충남 논산시 양촌면 황산벌로1098번길 61-1 1층",
+   "pid": "2011597550",
+   "name": "BBQ치킨 충남연산점",
+   "category": "치킨,닭강정",
+   "addr": "충남 논산시 연산면 황산벌로 1486 상가동 105호",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 48,
+   "visitor_reviews": null,
+   "queries": [
+    "논산 식당"
+   ]
+  },
+  {
+   "pid": "2089133619",
+   "name": "명품염소명가",
+   "category": "육류,고기요리",
+   "addr": "충남 논산시 부창로72번길 15-9 1층",
+   "kind": "식당",
+   "known": false,
+   "visitor_reviews": null,
    "queries": [
     "논산 식당"
    ]
@@ -35,7 +47,7 @@
    "addr": "충남 논산시 연무읍 연무로 191-1 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 2,
+   "visitor_reviews": 4,
    "queries": [
     "논산 식당"
    ]
@@ -47,7 +59,7 @@
    "addr": "충남 논산시 관촉로58번길 7",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 8,
+   "visitor_reviews": 9,
    "queries": [
     "논산 식당"
    ]
@@ -59,19 +71,31 @@
    "addr": "충남 논산시 대화로133번길 9-13 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 25,
+   "visitor_reviews": 43,
    "queries": [
     "논산 식당"
    ]
   },
   {
-   "pid": "2002710666",
-   "name": "황산벌기사님한식뷔페",
-   "category": "한식뷔페",
-   "addr": "충남 논산시 부적면 계백로 1653 황산벌기사님한식뷔페",
+   "pid": "2013649667",
+   "name": "자연정가양평해장국 강경점",
+   "category": "해장국",
+   "addr": "충남 논산시 강경읍 금백로 129 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 5,
+   "visitor_reviews": null,
+   "queries": [
+    "강경 식당"
+   ]
+  },
+  {
+   "pid": "2058715568",
+   "name": "천동국밥",
+   "category": "국밥",
+   "addr": "충남 논산시 광석면 천동1길 41-26 1층",
+   "kind": "식당",
+   "known": false,
+   "visitor_reviews": 3,
    "queries": [
     "논산 식당"
    ]
@@ -83,7 +107,7 @@
    "addr": "충남 논산시 벌곡면 수락로 570 1,2층",
    "kind": "카페",
    "known": false,
-   "visitor_reviews": 28,
+   "visitor_reviews": 30,
    "queries": [
     "논산 맛집"
    ]
