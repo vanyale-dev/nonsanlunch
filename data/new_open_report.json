@@ -1,5 +1,5 @@
 {
- "scanned": "2026-09-14",
+ "scanned": "2026-09-21",
  "queries": {
   "식당": [
    "논산 식당",
@@ -13,8 +13,8 @@
    "논산 베이커리"
   ]
  },
- "total_new_opening": 26,
- "already_known": 18,
+ "total_new_opening": 24,
+ "already_known": 16,
  "candidates": [
   {
    "pid": "2011597550",
@@ -29,25 +29,13 @@
    ]
   },
   {
-   "pid": "2089133619",
-   "name": "명품염소명가",
-   "category": "육류,고기요리",
-   "addr": "충남 논산시 부창로72번길 15-9 1층",
-   "kind": "식당",
-   "known": false,
-   "visitor_reviews": null,
-   "queries": [
-    "논산 식당"
-   ]
-  },
-  {
    "pid": "2022654951",
    "name": "부대담 논산점",
    "category": "찌개,전골",
    "addr": "충남 논산시 연무읍 연무로 191-1 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 4,
+   "visitor_reviews": 6,
    "queries": [
     "논산 식당"
    ]
@@ -59,19 +47,19 @@
    "addr": "충남 논산시 관촉로58번길 7",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 9,
+   "visitor_reviews": 10,
    "queries": [
     "논산 식당"
    ]
   },
   {
    "pid": "2077236892",
-   "name": "양문숯불갈비 논산점",
+   "name": "양문 숯불갈비 논산점",
    "category": "육류,고기요리",
    "addr": "충남 논산시 대화로133번길 9-13 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 43,
+   "visitor_reviews": 70,
    "queries": [
     "논산 식당"
    ]
@@ -85,7 +73,7 @@
    "known": false,
    "visitor_reviews": null,
    "queries": [
-    "강경 식당"
+    "논산 식당"
    ]
   },
   {
@@ -95,7 +83,19 @@
    "addr": "충남 논산시 광석면 천동1길 41-26 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 3,
+   "visitor_reviews": 6,
+   "queries": [
+    "논산 식당"
+   ]
+  },
+  {
+   "pid": "2016355917",
+   "name": "한옥마을휴게소흑돼지곰탕",
+   "category": "곰탕,설렁탕",
+   "addr": "충남 논산시 연산면 계백로 1902 2동 1층",
+   "kind": "식당",
+   "known": false,
+   "visitor_reviews": 9,
    "queries": [
     "논산 식당"
    ]
