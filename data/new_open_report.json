@@ -1,5 +1,5 @@
 {
- "scanned": "2026-09-21",
+ "scanned": "2026-09-28",
  "queries": {
   "식당": [
    "논산 식당",
@@ -13,8 +13,8 @@
    "논산 베이커리"
   ]
  },
- "total_new_opening": 24,
- "already_known": 16,
+ "total_new_opening": 25,
+ "already_known": 17,
  "candidates": [
   {
    "pid": "2011597550",
@@ -47,7 +47,7 @@
    "addr": "충남 논산시 관촉로58번길 7",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 10,
+   "visitor_reviews": 13,
    "queries": [
     "논산 식당"
    ]
@@ -59,7 +59,7 @@
    "addr": "충남 논산시 대화로133번길 9-13 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 70,
+   "visitor_reviews": 81,
    "queries": [
     "논산 식당"
    ]
@@ -71,7 +71,19 @@
    "addr": "충남 논산시 강경읍 금백로 129 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": null,
+   "visitor_reviews": 1,
+   "queries": [
+    "논산 식당"
+   ]
+  },
+  {
+   "pid": "2036818952",
+   "name": "지코바치킨 논산1호점",
+   "category": "치킨,닭강정",
+   "addr": "충남 논산시 시민로 293",
+   "kind": "식당",
+   "known": false,
+   "visitor_reviews": 1,
    "queries": [
     "논산 식당"
    ]
@@ -83,19 +95,7 @@
    "addr": "충남 논산시 광석면 천동1길 41-26 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 6,
-   "queries": [
-    "논산 식당"
-   ]
-  },
-  {
-   "pid": "2016355917",
-   "name": "한옥마을휴게소흑돼지곰탕",
-   "category": "곰탕,설렁탕",
-   "addr": "충남 논산시 연산면 계백로 1902 2동 1층",
-   "kind": "식당",
-   "known": false,
-   "visitor_reviews": 9,
+   "visitor_reviews": 7,
    "queries": [
     "논산 식당"
    ]
@@ -107,7 +107,7 @@
    "addr": "충남 논산시 벌곡면 수락로 570 1,2층",
    "kind": "카페",
    "known": false,
-   "visitor_reviews": 30,
+   "visitor_reviews": 32,
    "queries": [
     "논산 맛집"
    ]
