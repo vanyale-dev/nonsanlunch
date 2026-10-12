@@ -1,5 +1,5 @@
 {
- "scanned": "2026-10-05",
+ "scanned": "2026-10-12",
  "queries": {
   "식당": [
    "논산 식당",
@@ -13,8 +13,8 @@
    "논산 베이커리"
   ]
  },
- "total_new_opening": 23,
- "already_known": 15,
+ "total_new_opening": 22,
+ "already_known": 13,
  "candidates": [
   {
    "pid": "2011597550",
@@ -29,25 +29,25 @@
    ]
   },
   {
+   "pid": "2092986605",
+   "name": "미소쌀국수",
+   "category": "아시아음식",
+   "addr": "충남 논산시 중앙로 484 1층",
+   "kind": "식당",
+   "known": false,
+   "visitor_reviews": null,
+   "queries": [
+    "논산 식당"
+   ]
+  },
+  {
    "pid": "2022654951",
    "name": "부대담 논산점",
    "category": "찌개,전골",
    "addr": "충남 논산시 연무읍 연무로 191-1 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 10,
-   "queries": [
-    "논산 식당"
-   ]
-  },
-  {
-   "pid": "2092964580",
-   "name": "삼겹철판소",
-   "category": "돼지고기구이",
-   "addr": "충남 논산시 관촉로58번길 7",
-   "kind": "식당",
-   "known": false,
-   "visitor_reviews": 14,
+   "visitor_reviews": 11,
    "queries": [
     "논산 식당"
    ]
@@ -59,7 +59,7 @@
    "addr": "충남 논산시 강경읍 금백로 129 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 1,
+   "visitor_reviews": 3,
    "queries": [
     "논산 식당"
    ]
@@ -71,7 +71,7 @@
    "addr": "충남 논산시 시민로 293",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 1,
+   "visitor_reviews": 2,
    "queries": [
     "논산 식당"
    ]
@@ -95,7 +95,19 @@
    "addr": "충남 논산시 연산면 계백로 1902 2동 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 9,
+   "visitor_reviews": 10,
+   "queries": [
+    "논산 식당"
+   ]
+  },
+  {
+   "pid": "2004303964",
+   "name": "카이로스",
+   "category": "카페,디저트",
+   "addr": "충남 논산시 부적면 신풍길 100 1층",
+   "kind": "카페",
+   "known": false,
+   "visitor_reviews": 113,
    "queries": [
     "논산 식당"
    ]
