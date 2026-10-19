@@ -1,5 +1,5 @@
 {
- "scanned": "2026-10-12",
+ "scanned": "2026-10-19",
  "queries": {
   "식당": [
    "논산 식당",
@@ -13,17 +13,17 @@
    "논산 베이커리"
   ]
  },
- "total_new_opening": 22,
+ "total_new_opening": 23,
  "already_known": 13,
  "candidates": [
   {
-   "pid": "2011597550",
-   "name": "BBQ치킨 충남연산점",
-   "category": "치킨,닭강정",
-   "addr": "충남 논산시 연산면 황산벌로 1486 상가동 105호",
+   "pid": "2057438356",
+   "name": "덕담",
+   "category": "오리요리",
+   "addr": "충남 논산시 은진면 방축길 26 1층 덕담",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 1,
+   "visitor_reviews": 3,
    "queries": [
     "논산 식당"
    ]
@@ -35,7 +35,7 @@
    "addr": "충남 논산시 중앙로 484 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": null,
+   "visitor_reviews": 1,
    "queries": [
     "논산 식당"
    ]
@@ -47,7 +47,19 @@
    "addr": "충남 논산시 연무읍 연무로 191-1 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 11,
+   "visitor_reviews": 13,
+   "queries": [
+    "논산 식당"
+   ]
+  },
+  {
+   "pid": "2001599552",
+   "name": "스시 하나비",
+   "category": "일식,초밥뷔페",
+   "addr": "충남 논산시 시민로 341-1 1층",
+   "kind": "식당",
+   "known": false,
+   "visitor_reviews": null,
    "queries": [
     "논산 식당"
    ]
@@ -107,7 +119,7 @@
    "addr": "충남 논산시 부적면 신풍길 100 1층",
    "kind": "카페",
    "known": false,
-   "visitor_reviews": 113,
+   "visitor_reviews": 121,
    "queries": [
     "논산 식당"
    ]
@@ -121,7 +133,7 @@
    "known": false,
    "visitor_reviews": 32,
    "queries": [
-    "논산 식당"
+    "논산 맛집"
    ]
   }
  ]
