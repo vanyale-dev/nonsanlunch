@@ -1,5 +1,5 @@
 {
- "scanned": "2026-10-19",
+ "scanned": "2026-10-26",
  "queries": {
   "식당": [
    "논산 식당",
@@ -18,24 +18,12 @@
  "candidates": [
   {
    "pid": "2057438356",
-   "name": "덕담",
+   "name": "논산덕담오리숯불구이",
    "category": "오리요리",
    "addr": "충남 논산시 은진면 방축길 26 1층 덕담",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 3,
-   "queries": [
-    "논산 식당"
-   ]
-  },
-  {
-   "pid": "2092986605",
-   "name": "미소쌀국수",
-   "category": "아시아음식",
-   "addr": "충남 논산시 중앙로 484 1층",
-   "kind": "식당",
-   "known": false,
-   "visitor_reviews": 1,
+   "visitor_reviews": 5,
    "queries": [
     "논산 식당"
    ]
@@ -47,7 +35,7 @@
    "addr": "충남 논산시 연무읍 연무로 191-1 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 13,
+   "visitor_reviews": 14,
    "queries": [
     "논산 식당"
    ]
@@ -95,7 +83,19 @@
    "addr": "충남 논산시 광석면 천동1길 41-26 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 9,
+   "visitor_reviews": 11,
+   "queries": [
+    "논산 식당"
+   ]
+  },
+  {
+   "pid": "2007656011",
+   "name": "한식요리주점 개성",
+   "category": "요리주점",
+   "addr": "충남 논산시 시민로132번길 52-17 1층",
+   "kind": "식당",
+   "known": false,
+   "visitor_reviews": 4,
    "queries": [
     "논산 식당"
    ]
@@ -119,7 +119,7 @@
    "addr": "충남 논산시 부적면 신풍길 100 1층",
    "kind": "카페",
    "known": false,
-   "visitor_reviews": 121,
+   "visitor_reviews": 131,
    "queries": [
     "논산 식당"
    ]
