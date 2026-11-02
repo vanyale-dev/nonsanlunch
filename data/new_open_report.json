@@ -1,5 +1,5 @@
 {
- "scanned": "2026-10-26",
+ "scanned": "2026-11-02",
  "queries": {
   "식당": [
    "논산 식당",
@@ -14,7 +14,7 @@
   ]
  },
  "total_new_opening": 23,
- "already_known": 13,
+ "already_known": 14,
  "candidates": [
   {
    "pid": "2057438356",
@@ -23,7 +23,19 @@
    "addr": "충남 논산시 은진면 방축길 26 1층 덕담",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 5,
+   "visitor_reviews": 29,
+   "queries": [
+    "논산 식당"
+   ]
+  },
+  {
+   "pid": "2092986605",
+   "name": "미소쌀국수",
+   "category": "아시아음식",
+   "addr": "충남 논산시 중앙로 484 1층",
+   "kind": "식당",
+   "known": false,
+   "visitor_reviews": 1,
    "queries": [
     "논산 식당"
    ]
@@ -36,18 +48,6 @@
    "kind": "식당",
    "known": false,
    "visitor_reviews": 14,
-   "queries": [
-    "논산 식당"
-   ]
-  },
-  {
-   "pid": "2001599552",
-   "name": "스시 하나비",
-   "category": "일식,초밥뷔페",
-   "addr": "충남 논산시 시민로 341-1 1층",
-   "kind": "식당",
-   "known": false,
-   "visitor_reviews": null,
    "queries": [
     "논산 식당"
    ]
@@ -71,7 +71,7 @@
    "addr": "충남 논산시 시민로 293",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 2,
+   "visitor_reviews": 3,
    "queries": [
     "논산 식당"
    ]
@@ -83,7 +83,7 @@
    "addr": "충남 논산시 광석면 천동1길 41-26 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 11,
+   "visitor_reviews": 12,
    "queries": [
     "논산 식당"
    ]
@@ -101,25 +101,13 @@
    ]
   },
   {
-   "pid": "2016355917",
-   "name": "한옥마을휴게소흑돼지곰탕",
-   "category": "곰탕,설렁탕",
-   "addr": "충남 논산시 연산면 계백로 1902 2동 1층",
-   "kind": "식당",
-   "known": false,
-   "visitor_reviews": 10,
-   "queries": [
-    "논산 식당"
-   ]
-  },
-  {
    "pid": "2004303964",
    "name": "카이로스",
    "category": "카페,디저트",
    "addr": "충남 논산시 부적면 신풍길 100 1층",
    "kind": "카페",
    "known": false,
-   "visitor_reviews": 131,
+   "visitor_reviews": 134,
    "queries": [
     "논산 식당"
    ]
