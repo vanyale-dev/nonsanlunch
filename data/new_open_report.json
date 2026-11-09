@@ -1,5 +1,5 @@
 {
- "scanned": "2026-11-02",
+ "scanned": "2026-11-09",
  "queries": {
   "식당": [
    "논산 식당",
@@ -13,9 +13,21 @@
    "논산 베이커리"
   ]
  },
- "total_new_opening": 23,
- "already_known": 14,
+ "total_new_opening": 27,
+ "already_known": 18,
  "candidates": [
+  {
+   "pid": "2021121191",
+   "name": "깍뚝",
+   "category": "한식",
+   "addr": "충남 논산시 시민로132번길 52-4 1층 깍뚝",
+   "kind": "식당",
+   "known": false,
+   "visitor_reviews": 30,
+   "queries": [
+    "논산 식당"
+   ]
+  },
   {
    "pid": "2057438356",
    "name": "논산덕담오리숯불구이",
@@ -23,7 +35,7 @@
    "addr": "충남 논산시 은진면 방축길 26 1층 덕담",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 29,
+   "visitor_reviews": 64,
    "queries": [
     "논산 식당"
    ]
@@ -83,7 +95,7 @@
    "addr": "충남 논산시 광석면 천동1길 41-26 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 12,
+   "visitor_reviews": 18,
    "queries": [
     "논산 식당"
    ]
@@ -107,21 +119,9 @@
    "addr": "충남 논산시 부적면 신풍길 100 1층",
    "kind": "카페",
    "known": false,
-   "visitor_reviews": 134,
+   "visitor_reviews": 138,
    "queries": [
     "논산 식당"
-   ]
-  },
-  {
-   "pid": "2060911290",
-   "name": "카페 아트페어",
-   "category": "카페,디저트",
-   "addr": "충남 논산시 벌곡면 수락로 570 1,2층",
-   "kind": "카페",
-   "known": false,
-   "visitor_reviews": 32,
-   "queries": [
-    "논산 맛집"
    ]
   }
  ]
