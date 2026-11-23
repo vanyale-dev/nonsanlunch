@@ -1,5 +1,5 @@
 {
- "scanned": "2026-11-16",
+ "scanned": "2026-11-23",
  "queries": {
   "식당": [
    "논산 식당",
@@ -13,8 +13,8 @@
    "논산 베이커리"
   ]
  },
- "total_new_opening": 29,
- "already_known": 19,
+ "total_new_opening": 31,
+ "already_known": 22,
  "candidates": [
   {
    "pid": "2021121191",
@@ -23,7 +23,7 @@
    "addr": "충남 논산시 시민로132번길 52-4 1층 깍뚝",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 63,
+   "visitor_reviews": 95,
    "queries": [
     "논산 식당"
    ]
@@ -35,7 +35,7 @@
    "addr": "충남 논산시 은진면 방축길 26 1층 덕담",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 100,
+   "visitor_reviews": 139,
    "queries": [
     "논산 식당"
    ]
@@ -48,18 +48,6 @@
    "kind": "식당",
    "known": false,
    "visitor_reviews": 1,
-   "queries": [
-    "논산 식당"
-   ]
-  },
-  {
-   "pid": "2001599552",
-   "name": "스시 하나비",
-   "category": "일식,초밥뷔페",
-   "addr": "충남 논산시 시민로 341-1 1층",
-   "kind": "식당",
-   "known": false,
-   "visitor_reviews": null,
    "queries": [
     "논산 식당"
    ]
@@ -85,7 +73,7 @@
    "known": false,
    "visitor_reviews": null,
    "queries": [
-    "강경 식당"
+    "논산 식당"
    ]
   },
   {
@@ -119,7 +107,7 @@
    "addr": "충남 논산시 시민로132번길 52-17 1층",
    "kind": "식당",
    "known": false,
-   "visitor_reviews": 4,
+   "visitor_reviews": 5,
    "queries": [
     "논산 식당"
    ]
@@ -131,7 +119,7 @@
    "addr": "충남 논산시 부적면 신풍길 100 1층",
    "kind": "카페",
    "known": false,
-   "visitor_reviews": 150,
+   "visitor_reviews": 155,
    "queries": [
     "논산 식당"
    ]
